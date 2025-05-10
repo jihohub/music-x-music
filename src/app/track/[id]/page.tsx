@@ -1,9 +1,12 @@
 "use client";
 
 import Header from "@/components/Header";
+import { getArtistById, getTrackById } from "@/features/music/api";
+import { SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IoCalendarOutline,
   IoHeart,
@@ -11,323 +14,81 @@ import {
   IoMusicalNotesOutline,
   IoPlayCircleOutline,
   IoShareSocialOutline,
+  IoStatsChart,
   IoTimeOutline,
 } from "react-icons/io5";
 
-// 임시 데이터 (스포티파이 API 연동 전까지 사용)
-const tracks = {
-  "101": {
-    id: "101",
-    title: "라일락",
-    artist: "아이유",
-    artistId: "1",
-    album: "IU 5th Album 'LILAC'",
-    albumId: "201",
-    image: "https://i.scdn.co/image/ab67616d0000b273b658330eca5deefbe3f050c0",
-    duration: "3:35",
-    releaseDate: "2021-03-25",
-    plays: "12,345,678",
-    features: ["Pop", "K-Pop"],
-    lyrics: `나리는 꽃가루에 눈이 따끔해 (아야)\n눈물이 고여도 꾹 참을래\n내 마음 한켠 비밀스런 오르골에 넣어두고서\n영원히 되감을 순간이니까\n\n우리 둘의 마지막 페이지를 잘 부탁해\n어느 작별이 이보다 완벽할까\n Love me only till this spring\n\n오 라일락 꽃이 지는 날 Good bye\n이런 결말이 어울려 \n안녕 꽃잎 같은 안녕\n하이얀 우리 봄날의 climax\n아 얼마나 기쁜일이야\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "102",
-        title: "밤편지",
-        artist: "아이유",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739c4a5ee6b0a18b7ae73926d2",
-      },
-      {
-        id: "103",
-        title: "Celebrity",
-        artist: "아이유",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273b658330eca5deefbe3f050c0",
-      },
-      {
-        id: "104",
-        title: "좋은 날",
-        artist: "아이유",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2731e8981172836d5a4eabd50bc",
-      },
-    ],
-  },
-  "106": {
-    id: "106",
-    title: "Blinding Lights",
-    artist: "The Weeknd",
-    artistId: "2",
-    album: "After Hours",
-    albumId: "205",
-    image: "https://i.scdn.co/image/ab67616d0000b2732f7f8273a666e35383bacc65",
-    duration: "3:20",
-    releaseDate: "2020-03-20",
-    plays: "32,456,789",
-    features: ["Synth-pop", "Dance-pop"],
-    lyrics: `Yeah\n\nI've been tryna call\nI've been on my own for long enough\nMaybe you can show me how to love, maybe\nI'm going through withdrawals\nYou don't even have to do too much\nYou can turn me on with just a touch, baby\n\nI look around and Sin City's cold and empty (oh)\nNo one's around to judge me (oh)\nI can't see clearly when you're gone\n\nI said, ooh, I'm blinded by the lights\nNo, I can't sleep until I feel your touch\nI said, ooh, I'm drowning in the night\nOh, when I'm like this, you're the one I trust\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "107",
-        title: "Save Your Tears",
-        artist: "The Weeknd",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2732f7f8273a666e35383bacc65",
-      },
-      {
-        id: "108",
-        title: "Starboy",
-        artist: "The Weeknd",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739317f85a5f5eff5a4850c192",
-      },
-      {
-        id: "109",
-        title: "Die For You",
-        artist: "The Weeknd",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739317f85a5f5eff5a4850c192",
-      },
-    ],
-  },
-  "1": {
-    id: "1",
-    title: "Blinding Lights",
-    artist: "The Weeknd",
-    artistId: "2",
-    album: "After Hours",
-    albumId: "205",
-    image: "https://i.scdn.co/image/ab67616d0000b2732f7f8273a666e35383bacc65",
-    duration: "3:20",
-    releaseDate: "2020-03-20",
-    plays: "32,456,789",
-    features: ["Synth-pop", "Dance-pop"],
-    lyrics: `Yeah\n\nI've been tryna call\nI've been on my own for long enough\nMaybe you can show me how to love, maybe\nI'm going through withdrawals\nYou don't even have to do too much\nYou can turn me on with just a touch, baby\n\nI look around and Sin City's cold and empty (oh)\nNo one's around to judge me (oh)\nI can't see clearly when you're gone\n\nI said, ooh, I'm blinded by the lights\nNo, I can't sleep until I feel your touch\nI said, ooh, I'm drowning in the night\nOh, when I'm like this, you're the one I trust\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "107",
-        title: "Save Your Tears",
-        artist: "The Weeknd",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2732f7f8273a666e35383bacc65",
-      },
-      {
-        id: "108",
-        title: "Starboy",
-        artist: "The Weeknd",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739317f85a5f5eff5a4850c192",
-      },
-      {
-        id: "109",
-        title: "Die For You",
-        artist: "The Weeknd",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739317f85a5f5eff5a4850c192",
-      },
-    ],
-  },
-  "2": {
-    id: "2",
-    title: "Hype Boy",
-    artist: "NewJeans",
-    artistId: "3",
-    album: "NewJeans 1st EP 'New Jeans'",
-    albumId: "301",
-    image: "https://i.scdn.co/image/ab67616d0000b273d70036292d54f29e8b68ec01",
-    duration: "2:59",
-    releaseDate: "2022-08-01",
-    plays: "25,876,432",
-    features: ["K-Pop", "Dance"],
-    lyrics: `(Hype boy) 너만 원해 Hype boy\n내가 전해 Hype boy\n널 따라가 Hype boy\n뭐라도 될 Hype boy\n\n너라는 책의 내용 속에\n행간을 읽고 싶어\n널 담은 건 백 퍼센 나의 취향\n다 알아 맞혀\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "5",
-        title: "Attention",
-        artist: "NewJeans",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273d70036292d54f29e8b68ec01",
-      },
-      {
-        id: "201",
-        title: "OMG",
-        artist: "NewJeans",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739c4a5ee6b0a18b7ae73926d2",
-      },
-      {
-        id: "202",
-        title: "Ditto",
-        artist: "NewJeans",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273d016d39658cfa0a13bf71d59",
-      },
-    ],
-  },
-  "3": {
-    id: "3",
-    title: "Lilac",
-    artist: "아이유",
-    artistId: "1",
-    album: "IU 5th Album 'LILAC'",
-    albumId: "201",
-    image: "https://i.scdn.co/image/ab67616d0000b273b658330eca5deefbe3f050c0",
-    duration: "3:35",
-    releaseDate: "2021-03-25",
-    plays: "12,345,678",
-    features: ["Pop", "K-Pop"],
-    lyrics: `나리는 꽃가루에 눈이 따끔해 (아야)\n눈물이 고여도 꾹 참을래\n내 마음 한켠 비밀스런 오르골에 넣어두고서\n영원히 되감을 순간이니까\n\n우리 둘의 마지막 페이지를 잘 부탁해\n어느 작별이 이보다 완벽할까\n Love me only till this spring\n\n오 라일락 꽃이 지는 날 Good bye\n이런 결말이 어울려 \n안녕 꽃잎 같은 안녕\n하이얀 우리 봄날의 climax\n아 얼마나 기쁜일이야\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "102",
-        title: "밤편지",
-        artist: "아이유",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739c4a5ee6b0a18b7ae73926d2",
-      },
-      {
-        id: "103",
-        title: "Celebrity",
-        artist: "아이유",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273b658330eca5deefbe3f050c0",
-      },
-      {
-        id: "104",
-        title: "좋은 날",
-        artist: "아이유",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2731e8981172836d5a4eabd50bc",
-      },
-    ],
-  },
-  "4": {
-    id: "4",
-    title: "Paint The Town Red",
-    artist: "Doja Cat",
-    artistId: "4",
-    album: "Scarlet",
-    albumId: "401",
-    image: "https://i.scdn.co/image/ab67616d0000b273e9ca8d3eb78153d4fd03161c",
-    duration: "3:50",
-    releaseDate: "2023-09-22",
-    plays: "18,765,432",
-    features: ["Hip-Hop", "Pop"],
-    lyrics: `It's the one and only, it's the OD\nI'm the heavyweight champion, ring the alarm\nBitches want smoke, I'm the OG\nI'm the hardest in the game, this where I belong\n\nSo many hits, can't remember them all\nWhile you're working at your 9 to 5, I'm working on the charts\nCaught all the stars, went to Mars\nBought out the block, went to war, and still won't battle-scar\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "401",
-        title: "Woman",
-        artist: "Doja Cat",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273c4f7c9bb327875dd3428742a",
-      },
-      {
-        id: "402",
-        title: "Say So",
-        artist: "Doja Cat",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273d42a57a0b3ab2201c35380b8",
-      },
-      {
-        id: "403",
-        title: "Kiss Me More",
-        artist: "Doja Cat",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273908280d9807127e185b71d52",
-      },
-    ],
-  },
-  "5": {
-    id: "5",
-    title: "Attention",
-    artist: "NewJeans",
-    artistId: "3",
-    album: "NewJeans 1st EP 'New Jeans'",
-    albumId: "301",
-    image: "https://i.scdn.co/image/ab67616d0000b273d70036292d54f29e8b68ec01",
-    duration: "3:00",
-    releaseDate: "2022-07-22",
-    plays: "24,567,890",
-    features: ["K-Pop", "Dance"],
-    lyrics: `You and me 내 맘이 보이지\nYou and me 투명하게 보이지\n(That's a big no-no)\n\nYou and me 경고하고 있어\nYou and me 이대로 두지 않기로 해\n\nYou want my attention\nYou want my attention\nYou want my attention\nYou got it\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "2",
-        title: "Hype Boy",
-        artist: "NewJeans",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273d70036292d54f29e8b68ec01",
-      },
-      {
-        id: "201",
-        title: "OMG",
-        artist: "NewJeans",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b2739c4a5ee6b0a18b7ae73926d2",
-      },
-      {
-        id: "202",
-        title: "Ditto",
-        artist: "NewJeans",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273d016d39658cfa0a13bf71d59",
-      },
-    ],
-  },
-  "6": {
-    id: "6",
-    title: "Savage",
-    artist: "aespa",
-    artistId: "5",
-    album: "Savage - The 1st Mini Album",
-    albumId: "501",
-    image: "https://i.scdn.co/image/ab67616d0000b273ed4aaaa6c79f4a5f6b3547a8",
-    duration: "3:40",
-    releaseDate: "2021-10-05",
-    plays: "21,345,678",
-    features: ["K-Pop", "Dance"],
-    lyrics: `Oh my gosh\n네 손길 내 귓가에 닿을 때\n난 미칠 것만 같아 중독된 듯이\n더 원해 갈수록\n\nGet me get me now\nGet me get me now (Zu zu zu zu)\n\n기분은 천국 위\nToo nice 날 위한 거니\n완전히 넘어가\nI'm a Savage\n\n... (중략) ...`,
-    similarTracks: [
-      {
-        id: "501",
-        title: "Next Level",
-        artist: "aespa",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273a1d8b7c5b5752172469a5ecb",
-      },
-      {
-        id: "502",
-        title: "Black Mamba",
-        artist: "aespa",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273c5cd9e88cf7506c24a73d661",
-      },
-      {
-        id: "503",
-        title: "Girls",
-        artist: "aespa",
-        image:
-          "https://i.scdn.co/image/ab67616d0000b273c937b4a6af1821721a1e18d2",
-      },
-    ],
-  },
-};
+// 임시 데이터 삭제
 
-export default function TrackPage({ params }: { params: { id: string } }) {
+export default function TrackPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = React.use(params);
+  const trackId = resolvedParams.id;
+  const [track, setTrack] = useState<SpotifyTrack | null>(null);
+  const [artists, setArtists] = useState<SpotifyArtist[]>([]);
+  // const [similarTracks, setSimilarTracks] = useState<SpotifyTrack[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
-  const track = tracks[params.id as keyof typeof tracks];
 
+  // 트랙 정보 가져오기
   useEffect(() => {
-    // 여기에 스포티파이 API 호출 코드가 들어갈 예정
-    console.log("현재 트랙 ID:", params.id);
-  }, [params.id]);
+    async function fetchTrackData() {
+      try {
+        setLoading(true);
+        const trackData = await getTrackById(trackId);
+        setTrack(trackData);
 
-  if (!track) {
+        // 트랙의 모든 아티스트 정보 가져오기
+        if (trackData.artists && trackData.artists.length > 0) {
+          try {
+            const artistPromises = trackData.artists.map((artist) =>
+              getArtistById(artist.id)
+            );
+            const artistData = await Promise.all(artistPromises);
+            setArtists(artistData);
+          } catch (artistError) {
+            console.error(
+              "아티스트 정보를 가져오는데 실패했습니다:",
+              artistError
+            );
+          }
+        }
+
+        setError(null);
+      } catch (err) {
+        console.error("트랙 정보를 가져오는데 실패했습니다:", err);
+        setError("트랙 정보를 가져오는데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTrackData();
+  }, [trackId]);
+
+  const toggleLike = () => {
+    setIsLiked(!isLiked);
+  };
+
+  if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh]">
-        <h1 className="text-2xl font-bold mb-4">트랙을 찾을 수 없습니다</h1>
-        <p className="mb-4 text-text-secondary">요청하신 ID: {params.id}</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="mt-4">트랙 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (error || !track) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh]">
+        <h1 className="text-2xl font-bold mb-4">
+          {error || "트랙을 찾을 수 없습니다"}
+        </h1>
         <Link href="/" className="btn btn-primary">
           홈으로 돌아가기
         </Link>
@@ -335,128 +96,359 @@ export default function TrackPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const toggleLike = () => {
-    setIsLiked(!isLiked);
-  };
+  // 앨범 이미지가 없는 경우 기본 이미지 사용
+  const albumImage =
+    track.album?.images && track.album?.images.length > 0
+      ? track.album.images[0].url
+      : "https://via.placeholder.com/300";
+
+  // 아티스트 이름 추출
+  const artistNames = track.artists.map((artist) => artist.name).join(", ");
 
   return (
     <>
-      <Header title={track.title} />
-      <div className="py-6 space-y-8">
-        {/* 트랙 헤더 */}
-        <section className="container px-4 pt-4">
-          <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-            <div className="relative w-64 h-64 shadow-lg">
-              <Image
-                src={track.image}
-                alt={track.title}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
+      <Header title={track.name} />
 
-            <div className="flex flex-col items-center sm:items-start">
-              <h1 className="text-3xl font-bold mb-2">{track.title}</h1>
-              <Link
-                href={`/artist/${track.artistId}`}
-                className="text-xl text-primary mb-4 hover:underline"
-              >
-                {track.artist}
-              </Link>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                <div className="flex items-center gap-1 text-text-secondary text-sm">
-                  <IoMusicalNotesOutline size={18} />
-                  <span>{track.album}</span>
-                </div>
-                <div className="flex items-center gap-1 text-text-secondary text-sm">
-                  <IoTimeOutline size={18} />
-                  <span>{track.duration}</span>
-                </div>
-                <div className="flex items-center gap-1 text-text-secondary text-sm">
-                  <IoCalendarOutline size={18} />
-                  <span>{track.releaseDate}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-4 mt-2">
-                <button className="btn btn-primary flex items-center gap-2">
-                  <IoPlayCircleOutline size={20} />
-                  재생
-                </button>
-                <button
-                  onClick={toggleLike}
-                  className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-colors"
-                  aria-label={isLiked ? "좋아요 취소" : "좋아요"}
-                >
-                  {isLiked ? (
-                    <IoHeart size={24} className="text-primary" />
-                  ) : (
-                    <IoHeartOutline size={24} />
-                  )}
-                </button>
-                <button
-                  className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-colors"
-                  aria-label="공유하기"
-                >
-                  <IoShareSocialOutline size={24} />
-                </button>
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {track.features.map((feature, index) => (
-                  <span
-                    key={index}
-                    className="text-xs px-3 py-1 rounded-full bg-card-bg text-text-secondary"
-                  >
-                    {feature}
-                  </span>
-                ))}
-              </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="py-6"
+      >
+        {/* 트랙 헤더 - 음악 웨이브 배경 */}
+        <div className="relative bg-gradient-to-b from-primary/20 to-transparent">
+          <div className="absolute inset-0 opacity-10">
+            <div className="flex items-end justify-center h-full">
+              {/* 음악 파형 애니메이션 */}
+              {[...Array(40)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1 mx-0.5 bg-white rounded-full opacity-80"
+                  style={{
+                    height: `${
+                      10 + Math.sin(i * 0.3) * 15 + Math.random() * 20
+                    }px`,
+                    animation: `waveAnimation ${
+                      0.8 + Math.random() * 0.5
+                    }s ease-in-out infinite alternate`,
+                    animationDelay: `${i * 0.05}s`,
+                  }}
+                ></div>
+              ))}
             </div>
           </div>
-        </section>
 
-        {/* 가사 */}
-        <section className="container px-4">
-          <h2 className="text-xl font-bold mb-4">가사</h2>
-          <div className="bg-card-bg rounded-lg p-4 whitespace-pre-line">
-            {track.lyrics}
-          </div>
-        </section>
-
-        {/* 비슷한 트랙 */}
-        <section className="container px-4">
-          <h2 className="text-xl font-bold mb-4">이런 노래는 어떠세요?</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {track.similarTracks.map((similar) => (
-              <Link
-                href={`/track/${similar.id}`}
-                key={similar.id}
-                className="card"
-              >
-                <div className="relative aspect-square w-full overflow-hidden">
+          <div className="container px-4 py-6">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col md:flex-row gap-6 md:items-center"
+            >
+              <div className="flex justify-center w-full md:w-auto">
+                <div className="relative aspect-square w-full max-w-[300px] md:max-w-[400px] h-[300px] md:h-[400px] shadow-lg rounded-md overflow-hidden">
                   <Image
-                    src={similar.image}
-                    alt={similar.title}
+                    src={
+                      track.album?.images?.[0]?.url ||
+                      "https://via.placeholder.com/400"
+                    }
+                    alt={track.album?.name || "앨범 이미지"}
                     fill
+                    sizes="(max-width: 768px) 80vw, 400px"
                     className="object-cover"
+                    priority
                   />
                 </div>
-                <div className="p-3">
-                  <h3 className="font-semibold text-sm text-ellipsis">
-                    {similar.title}
-                  </h3>
-                  <p className="text-text-secondary text-xs">
-                    {similar.artist}
+              </div>
+
+              <div className="flex-grow space-y-4">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold">
+                    {track.name}
+                  </h1>
+                  <div className="flex items-center mt-2">
+                    {track.artists.map((artist, index) => (
+                      <React.Fragment key={artist.id}>
+                        <Link
+                          href={`/artist/${artist.id}`}
+                          className="text-xl text-primary hover:underline"
+                        >
+                          {artist.name}
+                        </Link>
+                        {index < track.artists.length - 1 && (
+                          <span className="mx-1">, </span>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <p className="text-md text-text-secondary mt-1">
+                    앨범:{" "}
+                    <Link
+                      href={`/album/${track.album?.id}`}
+                      className="hover:underline"
+                    >
+                      {track.album?.name}
+                    </Link>
                   </p>
                 </div>
-              </Link>
-            ))}
+
+                <div className="flex items-center gap-4 mt-4">
+                  <button className="btn btn-primary rounded-full px-6 py-3 flex items-center gap-2">
+                    <IoPlayCircleOutline size={24} />
+                    <span>재생</span>
+                  </button>
+                  <button
+                    className="btn btn-ghost rounded-full p-3"
+                    onClick={toggleLike}
+                    aria-label={isLiked ? "좋아요 취소" : "좋아요"}
+                  >
+                    {isLiked ? (
+                      <IoHeart size={24} className="text-primary" />
+                    ) : (
+                      <IoHeartOutline size={24} />
+                    )}
+                  </button>
+                  <button
+                    className="btn btn-ghost rounded-full p-3"
+                    aria-label="공유하기"
+                  >
+                    <IoShareSocialOutline size={24} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </section>
-      </div>
+        </div>
+
+        <div className="container px-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* 트랙 정보 */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="md:col-span-2 space-y-6"
+            >
+              {/* 트랙 속성 */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-card-bg rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <IoMusicalNotesOutline
+                      className="mr-2 text-primary"
+                      size={18}
+                    />
+                    <span className="font-medium">앨범</span>
+                  </div>
+                  <p className="truncate">
+                    <Link
+                      href={`/album/${track.album?.id}`}
+                      className="hover:text-primary"
+                    >
+                      {track.album?.name}
+                    </Link>
+                  </p>
+                </div>
+
+                <div className="bg-card-bg rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <IoCalendarOutline
+                      className="mr-2 text-primary"
+                      size={18}
+                    />
+                    <span className="font-medium">릴리즈</span>
+                  </div>
+                  <p>{track.album?.release_date || "알 수 없음"}</p>
+                </div>
+
+                <div className="bg-card-bg rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <IoTimeOutline className="mr-2 text-primary" size={18} />
+                    <span className="font-medium">재생 시간</span>
+                  </div>
+                  <p>
+                    {Math.floor(track.duration_ms / 60000)}:
+                    {((track.duration_ms % 60000) / 1000)
+                      .toFixed(0)
+                      .padStart(2, "0")}
+                  </p>
+                </div>
+
+                <div className="bg-card-bg rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <IoStatsChart className="mr-2 text-primary" size={18} />
+                    <span className="font-medium">인기도</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-grow h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary"
+                        style={{ width: `${track.popularity || 0}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm text-text-secondary">
+                      {track.popularity || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 아티스트 정보 섹션 */}
+              {artists.length > 0 && (
+                <div className="bg-card-bg rounded-lg">
+                  <h2 className="text-lg font-bold mb-3">아티스트 정보</h2>
+                  <div className="space-y-3">
+                    {artists.map((artist) => (
+                      <div key={artist.id} className="flex items-start gap-3">
+                        <Link
+                          href={`/artist/${artist.id}`}
+                          className="block relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
+                        >
+                          <Image
+                            src={
+                              artist.images && artist.images.length > 0
+                                ? artist.images[0].url
+                                : "https://via.placeholder.com/300"
+                            }
+                            alt={artist.name}
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                        </Link>
+                        <div>
+                          <Link
+                            href={`/artist/${artist.id}`}
+                            className="font-medium hover:text-primary"
+                          >
+                            {artist.name}
+                          </Link>
+                          {artist.genres && artist.genres.length > 0 && (
+                            <p className="text-sm text-text-secondary">
+                              {artist.genres.slice(0, 2).join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 오디오 플레이어 섹션 주석 처리
+              <div className="bg-card-bg rounded-lg p-4">
+                <h2 className="text-lg font-bold mb-3">미리 들어보기</h2>
+                <div className="flex items-center gap-3">
+                  <button className="bg-primary rounded-full w-10 h-10 flex items-center justify-center">
+                    <IoPlayCircleOutline size={24} className="text-white" />
+                  </button>
+                  <div className="flex-grow">
+                    <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary"
+                        style={{ width: "30%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs mt-1 text-text-secondary">
+                      <span>0:00</span>
+                      <span>3:42</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              */}
+            </motion.div>
+
+            {/* 추천 트랙 섹션 주석 처리
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="md:col-span-1"
+            >
+              <div className="sticky top-20">
+                <h2 className="text-lg font-bold mb-4">비슷한 트랙</h2>
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map((item) => (
+                    <div
+                      key={item}
+                      className="flex items-center gap-3 p-2 hover:bg-card-bg rounded-md transition-colors"
+                    >
+                      <div className="relative w-10 h-10 flex-shrink-0">
+                        <Image
+                          src={albumImage}
+                          alt="관련 트랙"
+                          fill
+                          sizes="40px"
+                          className="object-cover rounded"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium truncate">
+                          비슷한 트랙 {item}
+                        </p>
+                        <p className="text-xs text-text-secondary truncate">
+                          {artistNames}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+            */}
+          </div>
+        </div>
+
+        {/* 트랙 인사이트 섹션 주석 처리
+        <div className="container px-4 mt-8">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="bg-card-bg rounded-lg p-6"
+          >
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <IoSparkles className="text-primary" />
+              <span>트랙 인사이트</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <h3 className="font-medium text-text-secondary">장르</h3>
+                <div className="flex flex-wrap gap-2">
+                  {artist?.genres?.slice(0, 3).map((genre, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-primary/10 rounded-full text-sm"
+                    >
+                      {genre}
+                    </span>
+                  )) || <span className="text-text-secondary">정보 없음</span>}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-medium text-text-secondary">BPM</h3>
+                <p>128</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-text-secondary">키</h3>
+                <p>C# 마이너</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        */}
+      </motion.div>
+
+      {/* CSS 애니메이션 */}
+      <style jsx global>{`
+        @keyframes waveAnimation {
+          0% {
+            height: 10px;
+          }
+          100% {
+            height: 35px;
+          }
+        }
+      `}</style>
     </>
   );
 }

@@ -1,5 +1,8 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import AuthProvider from "@/providers/AuthProvider";
+import QueryProvider from "@/providers/QueryProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -16,11 +19,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <Header />
-        <main className="container mx-auto !pt-16 !pb-16 min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <ThemeProvider>
+          <AuthProvider>
+            <QueryProvider>
+              <Header />
+              <main className="container mx-auto !pt-16 !pb-16 min-h-screen">
+                {children}
+              </main>
+              <Footer />
+            </QueryProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
