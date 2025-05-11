@@ -41,11 +41,23 @@ export interface SpotifyTrack {
 export interface SpotifySearchResult {
   tracks?: {
     items: SpotifyTrack[];
+    total: number;
+    limit: number;
+    offset: number;
+    next?: string | null;
   };
   artists?: {
     items: SpotifyArtist[];
+    total: number;
+    limit: number;
+    offset: number;
+    next?: string | null;
   };
   albums?: {
     items: SpotifyAlbum[];
+    total: number;
+    limit: number;
+    offset: number;
+    next?: string | null;
   };
 }

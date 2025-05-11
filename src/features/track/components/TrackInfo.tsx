@@ -3,7 +3,6 @@
 import { SpotifyTrack } from "@/types/spotify";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import React from "react";
 import {
   IoCalendarOutline,
   IoMusicalNotesOutline,
@@ -15,7 +14,7 @@ interface TrackInfoProps {
   track: SpotifyTrack;
 }
 
-export const TrackInfo: React.FC<TrackInfoProps> = ({ track }) => {
+export const TrackInfo = ({ track }: TrackInfoProps) => {
   return (
     <motion.section
       initial={{ y: 20, opacity: 0 }}

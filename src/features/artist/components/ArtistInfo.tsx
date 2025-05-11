@@ -2,7 +2,6 @@
 
 import { SpotifyArtist } from "@/types/spotify";
 import { motion } from "framer-motion";
-import React from "react";
 import {
   IoHeartOutline,
   IoMusicalNotesOutline,
@@ -13,7 +12,7 @@ interface ArtistInfoProps {
   artist: SpotifyArtist;
 }
 
-export const ArtistInfo: React.FC<ArtistInfoProps> = ({ artist }) => {
+export const ArtistInfo = ({ artist }: ArtistInfoProps) => {
   return (
     <motion.section
       initial={{ y: 20, opacity: 0 }}

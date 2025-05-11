@@ -1,26 +1,18 @@
 "use client";
 
 import { SpotifyArtist } from "@/types/spotify";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import React from "react";
 
 interface ArtistHeaderProps {
   artist: SpotifyArtist;
 }
 
-export const ArtistHeader: React.FC<ArtistHeaderProps> = ({ artist }) => {
-  // 이미지가 없는 경우 기본 이미지 URL
-  const artistImage =
-    artist.images && artist.images.length > 0
-      ? artist.images[0].url
-      : "https://via.placeholder.com/300";
-
-  // 배너 이미지 - 아티스트 메인 이미지에 그라데이션 효과를 적용
-  const bannerImage =
-    artist.images && artist.images.length > 0
-      ? artist.images[0].url
-      : "https://via.placeholder.com/1200x400";
+export const ArtistHeader = ({ artist }: ArtistHeaderProps) => {
+  // 이미지 URL 가져오기
+  const artistImage = getSafeImageUrl(artist.images, "lg");
+  const bannerImage = getSafeImageUrl(artist.images, "lg");
 
   return (
     <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">

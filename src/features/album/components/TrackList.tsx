@@ -1,21 +1,19 @@
 "use client";
 
 import { SpotifyAlbum } from "@/types/spotify";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { Fragment } from "react";
 import { IoPlayCircleOutline } from "react-icons/io5";
 
 interface TrackListProps {
   album: SpotifyAlbum;
 }
 
-export const TrackList: React.FC<TrackListProps> = ({ album }) => {
-  const albumImage =
-    album.images && album.images.length > 0
-      ? album.images[0].url
-      : "https://via.placeholder.com/40";
+export const TrackList = ({ album }: TrackListProps) => {
+  const albumImage = getSafeImageUrl(album.images, "sm");
 
   return (
     <motion.section
@@ -63,7 +61,7 @@ export const TrackList: React.FC<TrackListProps> = ({ album }) => {
             <div className="hidden md:block w-1/3 min-w-0">
               <div className="text-text-secondary truncate">
                 {track.artists.map((artist, index) => (
-                  <React.Fragment key={artist.id}>
+                  <Fragment key={artist.id}>
                     <Link
                       href={`/artist/${artist.id}`}
                       className="hover:text-primary"
@@ -73,7 +71,7 @@ export const TrackList: React.FC<TrackListProps> = ({ album }) => {
                     {index < track.artists.length - 1 && (
                       <span className="mx-1">, </span>
                     )}
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </div>
             </div>

@@ -1,17 +1,17 @@
 "use client";
 
 import { SpotifyTrack } from "@/types/spotify";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import { IoPlayCircleOutline } from "react-icons/io5";
 
 interface TopTracksProps {
   tracks: SpotifyTrack[];
 }
 
-export const TopTracks: React.FC<TopTracksProps> = ({ tracks }) => {
+export const TopTracks = ({ tracks }: TopTracksProps) => {
   return (
     <motion.section
       initial={{ y: 20, opacity: 0 }}
@@ -40,10 +40,7 @@ export const TopTracks: React.FC<TopTracksProps> = ({ tracks }) => {
             </div>
             <div className="w-10 h-10 shrink-0">
               <Image
-                src={
-                  track.album?.images?.[0]?.url ||
-                  "https://via.placeholder.com/40"
-                }
+                src={getSafeImageUrl(track.album?.images, "sm")}
                 alt={track.album?.name || "앨범 이미지"}
                 width={40}
                 height={40}

@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react";
-
-export const ArtistSkeleton: React.FC = () => {
+export const ArtistSkeleton = () => {
   return (
     <div className="py-6">
       {/* 아티스트 배너 및 프로필 영역 */}

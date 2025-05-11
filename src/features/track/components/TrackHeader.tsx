@@ -1,21 +1,18 @@
 "use client";
 
 import { SpotifyTrack } from "@/types/spotify";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 interface TrackHeaderProps {
   track: SpotifyTrack;
 }
 
-export const TrackHeader: React.FC<TrackHeaderProps> = ({ track }) => {
-  // 앨범 이미지가 없는 경우 기본 이미지 사용
-  const albumImage =
-    track.album?.images && track.album?.images.length > 0
-      ? track.album.images[0].url
-      : "https://via.placeholder.com/300";
+export const TrackHeader = ({ track }: TrackHeaderProps) => {
+  // 이미지 URL 가져오기
+  const albumImage = getSafeImageUrl(track.album?.images, "lg");
 
   return (
     <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">

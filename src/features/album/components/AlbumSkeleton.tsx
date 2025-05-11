@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react";
-
-export const AlbumSkeleton: React.FC = () => {
+export const AlbumSkeleton = () => {
   return (
     <div className="py-6">
       {/* 앨범 배너 및 커버 영역 */}

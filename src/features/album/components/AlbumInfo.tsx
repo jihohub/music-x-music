@@ -2,7 +2,6 @@
 
 import { SpotifyAlbum } from "@/types/spotify";
 import { motion } from "framer-motion";
-import React from "react";
 import {
   IoCalendarOutline,
   IoMusicalNotesOutline,
@@ -13,7 +12,7 @@ interface AlbumInfoProps {
   album: SpotifyAlbum;
 }
 
-export const AlbumInfo: React.FC<AlbumInfoProps> = ({ album }) => {
+export const AlbumInfo = ({ album }: AlbumInfoProps) => {
   return (
     <motion.section
       initial={{ y: 20, opacity: 0 }}

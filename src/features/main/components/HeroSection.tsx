@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 
-export const HeroSection: React.FC = () => {
+export const HeroSection = () => {
   return (
     <section className="mb-8">
       <div className="rounded-lg bg-gradient-to-r from-primary to-primary-hover p-6">

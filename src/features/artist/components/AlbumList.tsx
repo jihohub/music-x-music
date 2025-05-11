@@ -1,16 +1,16 @@
 "use client";
 
 import { SpotifyAlbum } from "@/types/spotify";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 interface AlbumListProps {
   albums: SpotifyAlbum[];
 }
 
-export const AlbumList: React.FC<AlbumListProps> = ({ albums }) => {
+export const AlbumList = ({ albums }: AlbumListProps) => {
   return (
     <motion.section
       initial={{ y: 20, opacity: 0 }}
@@ -24,11 +24,7 @@ export const AlbumList: React.FC<AlbumListProps> = ({ albums }) => {
           <Link href={`/album/${album.id}`} key={album.id} className="group">
             <div className="relative aspect-square bg-card-bg rounded-md overflow-hidden">
               <Image
-                src={
-                  album.images && album.images.length > 0
-                    ? album.images[0].url
-                    : "https://via.placeholder.com/300"
-                }
+                src={getSafeImageUrl(album.images, "lg")}
                 alt={album.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"

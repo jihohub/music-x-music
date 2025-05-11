@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 
 interface ErrorStateProps {
   error: string | null;
 }
 
-export const ErrorState: React.FC<ErrorStateProps> = ({ error }) => {
+export const ErrorState = ({ error }: ErrorStateProps) => {
   return (
     <div className="flex flex-col items-center justify-center h-[70vh]">
       <h1 className="text-2xl font-bold mb-4">

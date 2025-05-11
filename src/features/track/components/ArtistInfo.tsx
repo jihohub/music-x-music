@@ -1,16 +1,16 @@
 "use client";
 
 import { SpotifyArtist } from "@/types/spotify";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 interface ArtistInfoProps {
   artists: SpotifyArtist[];
 }
 
-export const ArtistInfo: React.FC<ArtistInfoProps> = ({ artists }) => {
+export const ArtistInfo = ({ artists }: ArtistInfoProps) => {
   if (artists.length === 0) return null;
 
   return (
@@ -29,11 +29,7 @@ export const ArtistInfo: React.FC<ArtistInfoProps> = ({ artists }) => {
               className="block relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
             >
               <Image
-                src={
-                  artist.images && artist.images.length > 0
-                    ? artist.images[0].url
-                    : "https://via.placeholder.com/300"
-                }
+                src={getSafeImageUrl(artist.images, "sm")}
                 alt={artist.name}
                 fill
                 sizes="48px"

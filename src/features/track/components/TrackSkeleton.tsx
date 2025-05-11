@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react";
-
-export const TrackSkeleton: React.FC = () => {
+export const TrackSkeleton = () => {
   return (
     <div className="py-6">
       {/* 트랙 헤더 스켈레톤 */}

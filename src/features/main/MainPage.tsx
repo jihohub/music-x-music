@@ -1,15 +1,15 @@
 "use client";
 
-import { FeaturedArtistsSection } from "./components/FeaturedArtistsSection";
+import FeaturedArtists from "./components/FeaturedArtists";
 import { HeroSection } from "./components/HeroSection";
-import { RecommendedTracksSection } from "./components/RecommendedTracksSection";
+import RecommendedTracks from "./components/RecommendedTracks";
 
 export function MainPage() {
   return (
     <div className="py-6 space-y-8">
       <HeroSection />
-      <FeaturedArtistsSection />
-      <RecommendedTracksSection />
+      <FeaturedArtists />
+      <RecommendedTracks />
       {/* <GenreSection /> */}
     </div>
   );
