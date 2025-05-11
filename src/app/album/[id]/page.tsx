@@ -299,7 +299,7 @@ export default function AlbumPage({
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
-                className="bg-card-bg rounded-lg py-5 px-4"
+                className="bg-card-bg rounded-lg py-5"
               >
                 <h2 className="text-lg font-bold mb-4">앨범 정보</h2>
                 <div className="space-y-3">
