@@ -3,8 +3,9 @@
 import { useRecommendedTracks } from "@/hooks/useSpotifyData";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
-export default function RecommendedTracks() {
+export const RecommendedTracks: React.FC = () => {
   const { data: tracks, isLoading, isError } = useRecommendedTracks();
 
   if (isLoading) {
@@ -82,4 +83,6 @@ export default function RecommendedTracks() {
       ))}
     </div>
   );
-}
+};
+
+export default RecommendedTracks;

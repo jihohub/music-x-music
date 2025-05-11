@@ -1,8 +1,9 @@
 "use client";
 
-import RecommendedTracks from "../RecommendedTracks";
+import React from "react";
+import RecommendedTracks from "./RecommendedTracks";
 
-export default function RecommendedTracksSection() {
+export const RecommendedTracksSection: React.FC = () => {
   return (
     <section>
       <div className="flex-between mb-4">
@@ -14,4 +15,4 @@ export default function RecommendedTracksSection() {
       <RecommendedTracks />
     </section>
   );
-}
+};

@@ -1,14 +1,5 @@
-import FeaturedArtistsSection from "@/features/main/components/sections/FeaturedArtistsSection";
-import HeroSection from "@/features/main/components/sections/HeroSection";
-import RecommendedTracksSection from "@/features/main/components/sections/RecommendedTracksSection";
+import { MainPage } from "@/features/main/MainPage";
 
 export default function Home() {
-  return (
-    <div className="py-6 space-y-8">
-      <HeroSection />
-      <FeaturedArtistsSection />
-      <RecommendedTracksSection />
-      {/* <GenreSection /> */}
-    </div>
-  );
+  return <MainPage />;
 }

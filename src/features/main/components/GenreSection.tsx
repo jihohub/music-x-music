@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import React from "react";
 
 // 장르 데이터
 const genres = [
@@ -14,7 +15,7 @@ const genres = [
   { id: "classical", name: "클래식", color: "#7D4B32" },
 ];
 
-export default function GenreSection() {
+export const GenreSection: React.FC = () => {
   return (
     <section>
       <div className="flex-between mb-4">
@@ -34,4 +35,4 @@ export default function GenreSection() {
       </div>
     </section>
   );
-}
+};

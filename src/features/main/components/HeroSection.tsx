@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import React from "react";
 
-export default function HeroSection() {
+export const HeroSection: React.FC = () => {
   return (
     <section className="mb-8">
       <div className="rounded-lg bg-gradient-to-r from-primary to-primary-hover p-6">
@@ -17,4 +18,4 @@ export default function HeroSection() {
       </div>
     </section>
   );
-}
+};

@@ -1,8 +1,9 @@
 "use client";
 
-import FeaturedArtists from "../FeaturedArtists";
+import React from "react";
+import FeaturedArtists from "./FeaturedArtists";
 
-export default function FeaturedArtistsSection() {
+export const FeaturedArtistsSection: React.FC = () => {
   return (
     <section>
       <div className="flex-between mb-4">
@@ -14,4 +15,4 @@ export default function FeaturedArtistsSection() {
       <FeaturedArtists />
     </section>
   );
-}
+};

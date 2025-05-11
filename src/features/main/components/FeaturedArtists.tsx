@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function FeaturedArtists() {
+export const FeaturedArtists: React.FC = () => {
   const [artists, setArtists] = useState<SpotifyArtist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,4 +87,6 @@ export default function FeaturedArtists() {
       ))}
     </div>
   );
-}
+};
+
+export default FeaturedArtists;
