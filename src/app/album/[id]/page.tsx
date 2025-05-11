@@ -9,11 +9,8 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
   IoCalendarOutline,
-  IoHeart,
-  IoHeartOutline,
   IoMusicalNotesOutline,
   IoPlayCircleOutline,
-  IoShareSocialOutline,
   IoTimeOutline,
 } from "react-icons/io5";
 
@@ -68,10 +65,52 @@ export default function AlbumPage({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[70vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="mt-4">앨범 정보를 불러오는 중...</p>
-      </div>
+      <>
+        <Header title="앨범 로딩 중..." />
+        <div className="py-6">
+          {/* 앨범 헤더 스켈레톤 */}
+          <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
+              <div
+                className="absolute inset-0 animate-pulse"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+            </div>
+          </section>
+
+          {/* 트랙 목록 스켈레톤 */}
+          <div className="container px-4 mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-card-bg rounded-lg py-5">
+                  <div
+                    className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                    style={{ backgroundColor: "var(--skeleton-bg)" }}
+                  />
+                  <div
+                    className="h-[300px] rounded animate-pulse"
+                    style={{ backgroundColor: "var(--skeleton-bg)" }}
+                  />
+                </div>
+              </div>
+
+              {/* 앨범 정보 스켈레톤 */}
+              <div className="space-y-6">
+                <div className="bg-card-bg rounded-lg py-5">
+                  <div
+                    className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                    style={{ backgroundColor: "var(--skeleton-bg)" }}
+                  />
+                  <div
+                    className="h-[200px] rounded animate-pulse"
+                    style={{ backgroundColor: "var(--skeleton-bg)" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -102,79 +141,77 @@ export default function AlbumPage({
         animate={{ opacity: 1 }}
         className="py-6"
       >
-        {/* 앨범 헤더 */}
-        <div className="container px-4">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col md:flex-row gap-6 md:items-center"
-          >
-            <div className="flex justify-center w-full md:w-auto">
-              <div className="relative aspect-square w-full max-w-[300px] md:max-w-[400px] h-[300px] md:h-[400px] shadow-lg rounded-md overflow-hidden">
-                <Image
-                  src={albumImage}
-                  alt={album.name}
-                  fill
-                  sizes="(max-width: 768px) 80vw, 400px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </div>
+        {/* 앨범 배너 및 정보 영역 */}
+        <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
+            <Image
+              src={albumImage}
+              alt={album.name}
+              fill
+              sizes="100vw"
+              className="object-cover -z-10 opacity-50"
+              quality={90}
+              priority
+            />
+          </div>
 
-            <div className="flex-grow space-y-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold">{album.name}</h1>
-                <div className="flex items-center mt-2">
-                  {album.artists.map((artist, index) => (
-                    <React.Fragment key={artist.id}>
-                      <Link
-                        href={`/artist/${artist.id}`}
-                        className="text-xl text-primary hover:underline"
-                      >
-                        {artist.name}
-                      </Link>
-                      {index < album.artists.length - 1 && (
-                        <span className="mx-1">, </span>
-                      )}
-                    </React.Fragment>
-                  ))}
+          <div className="absolute bottom-0 left-0 right-0 container px-4 pb-6">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex items-end gap-6"
+            >
+              <div className="relative shadow-2xl group">
+                <div
+                  className="relative aspect-square rounded-lg overflow-hidden"
+                  style={{
+                    width: "160px",
+                    height: "160px",
+                    minWidth: "160px",
+                    minHeight: "160px",
+                    maxWidth: "160px",
+                    maxHeight: "160px",
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <Image
+                    src={albumImage}
+                    alt={album.name}
+                    fill
+                    sizes="160px"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 ring-1 ring-white/10" />
                 </div>
-                <p className="text-md text-text-secondary mt-1">
-                  {album.release_date} • {album.total_tracks}곡
-                </p>
               </div>
-
-              <div className="flex items-center gap-4 mt-4">
-                <button className="btn btn-primary rounded-full px-6 py-3 flex items-center gap-2">
-                  <IoPlayCircleOutline size={24} />
-                  <span>재생</span>
-                </button>
-                <button
-                  className="btn btn-ghost rounded-full p-3"
-                  onClick={toggleLike}
-                  aria-label={isLiked ? "좋아요 취소" : "좋아요"}
-                >
-                  {isLiked ? (
-                    <IoHeart size={24} className="text-primary" />
-                  ) : (
-                    <IoHeartOutline size={24} />
-                  )}
-                </button>
-                <button
-                  className="btn btn-ghost rounded-full p-3"
-                  aria-label="공유하기"
-                >
-                  <IoShareSocialOutline size={24} />
-                </button>
+              <div className="flex-grow">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                  <div>
+                    <h1 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
+                      {album.name}
+                    </h1>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {album.artists.map((albumArtist, index) => (
+                        <Link
+                          key={albumArtist.id}
+                          href={`/artist/${albumArtist.id}`}
+                          className="text-lg text-white hover:text-primary drop-shadow-md"
+                        >
+                          {albumArtist.name}
+                          {index < album.artists.length - 1 && ", "}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </div>
+            </motion.div>
+          </div>
+        </section>
 
         {/* 컨텐츠 영역 */}
-        <div className="container px-4 mt-6">
+        <div className="container px-4 mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* 왼쪽 및 중앙 컬럼 */}
             <div className="lg:col-span-2 space-y-6">
@@ -183,9 +220,9 @@ export default function AlbumPage({
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-card-bg rounded-lg"
+                className="bg-card-bg rounded-lg py-5"
               >
-                <h2 className="text-lg font-bold mb-3">트랙 목록</h2>
+                <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
                 <div>
                   <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
                     <div className="w-8 text-center shrink-0">#</div>
@@ -262,9 +299,9 @@ export default function AlbumPage({
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
-                className="bg-card-bg rounded-lg"
+                className="bg-card-bg rounded-lg py-5 px-4"
               >
-                <h2 className="text-lg font-bold mb-3">앨범 정보</h2>
+                <h2 className="text-lg font-bold mb-4">앨범 정보</h2>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
                     <IoCalendarOutline
