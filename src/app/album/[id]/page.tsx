@@ -2,8 +2,9 @@
 
 import Header from "@/components/Header";
 import { AlbumPage } from "@/features/album/AlbumPage";
-import { getAlbumById, getArtistById } from "@/features/music/api";
-import { SpotifyAlbum, SpotifyArtist } from "@/lib/spotify-api";
+import { getAlbumById } from "@/features/album/queries";
+import { getArtistById } from "@/features/artist/queries";
+import { SpotifyAlbum, SpotifyArtist } from "@/types/spotify";
 import React, { useEffect, useState } from "react";
 
 export default function AlbumPageRoute({

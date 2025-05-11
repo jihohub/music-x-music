@@ -1,9 +1,10 @@
 "use client";
 
 import Header from "@/components/Header";
-import { getArtistById, getTrackById } from "@/features/music/api";
+import { getArtistById } from "@/features/artist/queries";
 import { TrackPage } from "@/features/track/TrackPage";
-import { SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
+import { getTrackById } from "@/features/track/queries";
+import { SpotifyArtist, SpotifyTrack } from "@/types/spotify";
 import React, { useEffect, useState } from "react";
 
 export default function TrackPageRoute({

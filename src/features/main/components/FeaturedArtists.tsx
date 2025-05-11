@@ -1,7 +1,7 @@
 "use client";
 
-import { getFeaturedArtists } from "@/features/music/api";
-import { SpotifyArtist } from "@/lib/spotify-api";
+import { getFeaturedArtists } from "@/features/main/queries";
+import { SpotifyArtist } from "@/types/spotify";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";

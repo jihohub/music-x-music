@@ -1,6 +1,6 @@
 "use client";
 
-import { SpotifyAlbum } from "@/lib/spotify-api";
+import { SpotifyAlbum } from "@/types/spotify";
 import { AlbumHeader } from "./components/AlbumHeader";
 import { AlbumInfo } from "./components/AlbumInfo";
 import { AlbumSkeleton } from "./components/AlbumSkeleton";

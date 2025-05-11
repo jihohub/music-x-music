@@ -1,6 +1,6 @@
 "use client";
 
-import { SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
+import { SpotifyArtist, SpotifyTrack } from "@/types/spotify";
 import { ArtistInfo } from "./components/ArtistInfo";
 import { ErrorState } from "./components/ErrorState";
 import { TrackHeader } from "./components/TrackHeader";

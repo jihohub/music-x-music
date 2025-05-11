@@ -1,8 +1,7 @@
+import { SPOTIFY_API_BASE } from "@/constants/spotify";
 import { authOptions, refreshUserAccessToken } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-
-const SPOTIFY_API_BASE = "https://api.spotify.com/v1";
 
 /**
  * 스포티파이 API 프록시 라우트

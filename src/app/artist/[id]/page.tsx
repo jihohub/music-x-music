@@ -6,8 +6,8 @@ import {
   getArtistAlbums,
   getArtistById,
   getArtistTopTracks,
-} from "@/features/music/api";
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
+} from "@/features/artist/queries";
+import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
 import React, { useEffect, useState } from "react";
 
 export default function ArtistPageContainer({

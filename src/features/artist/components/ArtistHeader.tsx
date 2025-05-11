@@ -1,6 +1,6 @@
 "use client";
 
-import { SpotifyArtist } from "@/lib/spotify-api";
+import { SpotifyArtist } from "@/types/spotify";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import React from "react";

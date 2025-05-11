@@ -1,7 +1,10 @@
 "use client";
 
-import { getFeaturedArtists, getRecommendedTracks } from "@/features/music/api";
-import { SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
+import {
+  getFeaturedArtists,
+  getRecommendedTracks,
+} from "@/features/main/queries";
+import { SpotifyArtist, SpotifyTrack } from "@/types/spotify";
 import { useQuery } from "@tanstack/react-query";
 
 /**

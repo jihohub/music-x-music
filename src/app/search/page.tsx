@@ -1,8 +1,8 @@
 "use client";
 
 import Header from "@/components/Header";
-import { searchSpotify } from "@/features/music/api";
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
+import { searchSpotify } from "@/features/search/queries";
+import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
