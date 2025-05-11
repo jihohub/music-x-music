@@ -134,6 +134,15 @@ export function useSearchPageLogic() {
     isSpecificTypeSearch
   );
 
+  // 검색 결과가 있는지 확인
+  const hasResults =
+    allTracks.length > 0 || allArtists.length > 0 || allAlbums.length > 0;
+
+  // 선택된 유형에 따라 표시할 결과 결정
+  const shouldShowArtists = searchType === "all" || searchType === "artist";
+  const shouldShowTracks = searchType === "all" || searchType === "track";
+  const shouldShowAlbums = searchType === "all" || searchType === "album";
+
   const updateSearchParams = useCallback(
     (term: string, type: SearchType = searchType) => {
       if (term.trim().length > 1) {
@@ -232,15 +241,6 @@ export function useSearchPageLogic() {
 
     return () => clearTimeout(timer);
   }, [searchTerm, queryParam, updateSearchParams]);
-
-  // 검색 결과가 있는지 확인
-  const hasResults =
-    allTracks.length > 0 || allArtists.length > 0 || allAlbums.length > 0;
-
-  // 선택된 유형에 따라 표시할 결과 결정
-  const shouldShowArtists = searchType === "all" || searchType === "artist";
-  const shouldShowTracks = searchType === "all" || searchType === "track";
-  const shouldShowAlbums = searchType === "all" || searchType === "album";
 
   // 무한 스크롤 다음 페이지 로드 함수
   const handleFetchNextPage = useCallback(() => {

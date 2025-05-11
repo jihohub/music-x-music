@@ -52,13 +52,20 @@ export function SearchPage() {
       (searchType === "track" && allTracks.length > 0) ||
       (searchType === "album" && allAlbums.length > 0));
   const showNoResults =
-    !isFetching &&
+    !isFetching && // 로딩 중이 아닐 때만 "결과 없음" 표시
     searchTerm &&
     !isError &&
     !hasResults &&
     searchTerm.trim().length >= 2;
   const showPopularSearches =
     (!searchTerm || searchTerm.trim() === "") && !isFetching;
+
+  // 검색 로딩 중 상태 표시 최적화
+  const showLoading =
+    isFetching &&
+    !isFetchingNextPage &&
+    searchTerm.trim().length >= 2 &&
+    !hasResults;
 
   return (
     <motion.div
@@ -80,10 +87,7 @@ export function SearchPage() {
 
       {/* 초기 로딩 상태 */}
       <AnimatePresence mode="wait">
-        {isFetching &&
-          !isFetchingNextPage &&
-          searchTerm.trim().length >= 2 &&
-          !hasResults && <LoadingIndicator key="loading" size="large" />}
+        {showLoading && <LoadingIndicator key="loading" size="large" />}
 
         {/* 에러 표시 */}
         {isError && (
@@ -158,7 +162,11 @@ export function SearchPage() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <NoResults searchTerm={searchTerm} searchType={searchType} />
+            <NoResults
+              searchTerm={searchTerm}
+              searchType={searchType}
+              isLoading={isFetching}
+            />
           </motion.div>
         )}
       </AnimatePresence>
