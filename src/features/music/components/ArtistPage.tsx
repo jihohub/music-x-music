@@ -84,7 +84,7 @@ export function ArtistPage({
               {/* 아티스트 정보 */}
               <div className="bg-card-bg rounded-lg py-5">
                 <div
-                  className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                  className="h-6 rounded w-1/3 mb-4 animate-pulse"
                   style={{ backgroundColor: "var(--skeleton-bg)" }}
                 />
                 <div
