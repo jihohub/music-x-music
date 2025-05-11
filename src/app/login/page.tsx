@@ -8,7 +8,7 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center h-[80vh] px-4 text-center">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h1 className="text-3xl font-bold mb-6">음악 스타일</h1>
+          <h1 className="text-3xl font-bold mb-6">DJSETLIST</h1>
           <p className="text-text-secondary mb-8">
             스포티파이 계정으로 로그인하여 맞춤형 음악 추천을 받아보세요.
           </p>
@@ -29,7 +29,7 @@ export default function LoginPage() {
         </button>
 
         <div className="mt-6 text-sm text-text-tertiary">
-          로그인하면 음악 스타일의{" "}
+          로그인하면 DJSETLIST의{" "}
           <a href="#" className="text-primary hover:underline">
             서비스 약관
           </a>{" "}

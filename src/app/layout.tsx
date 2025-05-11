@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "음악 스타일 - 스포티파이 API 기반 음악 앱",
+  title: "DJSETLIST - 스포티파이 API 기반 음악 앱",
   description: "스포티파이 API를 사용한 음악 탐색 및 재생 앱",
 };
 
