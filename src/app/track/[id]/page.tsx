@@ -9,13 +9,9 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import {
   IoCalendarOutline,
-  IoHeart,
-  IoHeartOutline,
   IoMusicalNotesOutline,
-  IoPlayCircleOutline,
-  IoShareSocialOutline,
-  IoStatsChart,
   IoTimeOutline,
+  IoTrendingUpOutline,
 } from "react-icons/io5";
 
 // 임시 데이터 삭제
@@ -76,10 +72,88 @@ export default function TrackPage({
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[70vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="mt-4">트랙 정보를 불러오는 중...</p>
-      </div>
+      <>
+        <Header title="트랙 로딩 중..." />
+        <div className="py-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+          {/* 트랙 헤더 스켈레톤 */}
+          <div className="relative bg-gradient-to-b from-primary/20 to-transparent">
+            <div className="py-6">
+              <div className="flex flex-col md:flex-row gap-6 md:items-center">
+                {/* 앨범 이미지 스켈레톤 */}
+                <div className="flex justify-center w-full md:w-auto md:mx-auto">
+                  <div className="relative aspect-square w-full max-w-[300px] md:max-w-[400px] h-[300px] md:h-[400px] shadow-lg rounded-md overflow-hidden">
+                    <div
+                      className="absolute inset-0 animate-pulse"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                  </div>
+                </div>
+
+                {/* 트랙 정보 스켈레톤 */}
+                <div className="flex-grow space-y-4 md:max-w-md">
+                  <div className="mt-3 md:mt-0">
+                    <div
+                      className="h-8 w-3/4 rounded animate-pulse mb-3"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                    <div
+                      className="h-6 w-1/2 rounded animate-pulse"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                    <div
+                      className="h-4 w-1/3 rounded animate-pulse mt-3"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                  </div>
+
+                  {/* 버튼 스켈레톤 제거 */}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 트랙 상세 정보 스켈레톤 */}
+          <div className="mt-6">
+            <div className="max-w-3xl mx-auto w-full space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <div className="bg-card-bg rounded-lg" key={i}>
+                    <div
+                      className="h-6 w-2/3 rounded animate-pulse mb-2 ml-3 mt-3"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                    <div
+                      className="h-4 w-1/2 rounded animate-pulse ml-3 mb-3"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-card-bg rounded-lg p-4">
+                <div
+                  className="h-6 w-1/3 rounded animate-pulse mb-4 ml-1"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
+                <div className="mt-2">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-12 h-12 rounded-full animate-pulse flex-shrink-0"
+                      style={{ backgroundColor: "var(--skeleton-bg)" }}
+                    />
+                    <div className="h-12 flex items-center">
+                      <div
+                        className="h-5 w-24 rounded animate-pulse"
+                        style={{ backgroundColor: "var(--skeleton-bg)" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -112,13 +186,13 @@ export default function TrackPage({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="py-6"
+        className="py-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto"
       >
-        {/* 트랙 헤더 - 음악 웨이브 배경 */}
+        {/* 트랙 헤더 */}
         <div className="relative bg-gradient-to-b from-primary/20 to-transparent">
+          {/* 파형 애니메이션 주석 처리 
           <div className="absolute inset-0 opacity-10">
             <div className="flex items-end justify-center h-full">
-              {/* 음악 파형 애니메이션 */}
               {[...Array(40)].map((_, i) => (
                 <div
                   key={i}
@@ -136,15 +210,16 @@ export default function TrackPage({
               ))}
             </div>
           </div>
+          */}
 
-          <div className="container px-4 py-6">
+          <div className="py-6">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5 }}
               className="flex flex-col md:flex-row gap-6 md:items-center"
             >
-              <div className="flex justify-center w-full md:w-auto">
+              <div className="flex justify-center w-full md:w-auto md:mx-auto">
                 <div className="relative aspect-square w-full max-w-[300px] md:max-w-[400px] h-[300px] md:h-[400px] shadow-lg rounded-md overflow-hidden">
                   <Image
                     src={
@@ -160,7 +235,7 @@ export default function TrackPage({
                 </div>
               </div>
 
-              <div className="flex-grow space-y-4">
+              <div className="flex-grow space-y-4 md:max-w-md">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-bold">
                     {track.name}
@@ -191,6 +266,7 @@ export default function TrackPage({
                   </p>
                 </div>
 
+                {/* 재생, 좋아요, 공유 버튼 주석 처리
                 <div className="flex items-center gap-4 mt-4">
                   <button className="btn btn-primary rounded-full px-6 py-3 flex items-center gap-2">
                     <IoPlayCircleOutline size={24} />
@@ -214,23 +290,24 @@ export default function TrackPage({
                     <IoShareSocialOutline size={24} />
                   </button>
                 </div>
+                */}
               </div>
             </motion.div>
           </div>
         </div>
 
-        <div className="container px-4 mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-6">
+          <div className="max-w-3xl mx-auto w-full space-y-6">
             {/* 트랙 정보 */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="md:col-span-2 space-y-6"
+              className="space-y-6"
             >
               {/* 트랙 속성 */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-card-bg rounded-lg">
+                <div className="bg-card-bg rounded-lg p-3">
                   <div className="flex items-center mb-2">
                     <IoMusicalNotesOutline
                       className="mr-2 text-primary"
@@ -248,7 +325,7 @@ export default function TrackPage({
                   </p>
                 </div>
 
-                <div className="bg-card-bg rounded-lg">
+                <div className="bg-card-bg rounded-lg p-3">
                   <div className="flex items-center mb-2">
                     <IoCalendarOutline
                       className="mr-2 text-primary"
@@ -259,7 +336,7 @@ export default function TrackPage({
                   <p>{track.album?.release_date || "알 수 없음"}</p>
                 </div>
 
-                <div className="bg-card-bg rounded-lg">
+                <div className="bg-card-bg rounded-lg p-3">
                   <div className="flex items-center mb-2">
                     <IoTimeOutline className="mr-2 text-primary" size={18} />
                     <span className="font-medium">재생 시간</span>
@@ -272,32 +349,25 @@ export default function TrackPage({
                   </p>
                 </div>
 
-                <div className="bg-card-bg rounded-lg">
+                <div className="bg-card-bg rounded-lg p-3">
                   <div className="flex items-center mb-2">
-                    <IoStatsChart className="mr-2 text-primary" size={18} />
+                    <IoTrendingUpOutline
+                      className="mr-2 text-primary"
+                      size={18}
+                    />
                     <span className="font-medium">인기도</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-grow h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary"
-                        style={{ width: `${track.popularity || 0}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-text-secondary">
-                      {track.popularity || 0}
-                    </span>
-                  </div>
+                  <p>{track.popularity || 0}</p>
                 </div>
               </div>
 
               {/* 아티스트 정보 섹션 */}
               {artists.length > 0 && (
-                <div className="bg-card-bg rounded-lg">
+                <div className="bg-card-bg rounded-lg p-4">
                   <h2 className="text-lg font-bold mb-3">아티스트 정보</h2>
                   <div className="space-y-3">
                     {artists.map((artist) => (
-                      <div key={artist.id} className="flex items-start gap-3">
+                      <div key={artist.id} className="flex items-center gap-3">
                         <Link
                           href={`/artist/${artist.id}`}
                           className="block relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
@@ -314,18 +384,13 @@ export default function TrackPage({
                             className="object-cover"
                           />
                         </Link>
-                        <div>
+                        <div className="h-12 flex items-center">
                           <Link
                             href={`/artist/${artist.id}`}
                             className="font-medium hover:text-primary"
                           >
                             {artist.name}
                           </Link>
-                          {artist.genres && artist.genres.length > 0 && (
-                            <p className="text-sm text-text-secondary">
-                              {artist.genres.slice(0, 2).join(", ")}
-                            </p>
-                          )}
                         </div>
                       </div>
                     ))}

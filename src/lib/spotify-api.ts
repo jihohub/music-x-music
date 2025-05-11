@@ -236,3 +236,40 @@ export async function testSpotifyAuth() {
     };
   }
 }
+
+/**
+ * 토큰 만료 시 자동으로 새 토큰을 발급받아 API 요청을 재시도하는 유틸리티 함수
+ * @param apiCall 실행할 API 호출 함수
+ * @param getNewToken 새 토큰을 발급받는 함수
+ * @returns API 호출 결과
+ */
+export async function withTokenRefresh<T>(
+  apiCall: (token: string) => Promise<T>,
+  token: string,
+  getNewToken: () => Promise<string>
+): Promise<T> {
+  try {
+    // 첫 번째 시도
+    return await apiCall(token);
+  } catch (error) {
+    // 오류가 AxiosError이며 401(Unauthorized) 상태 코드인 경우
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      console.log("액세스 토큰이 만료되었습니다. 토큰을 새로 발급합니다.");
+
+      try {
+        // 새 액세스 토큰 요청
+        const newToken = await getNewToken();
+        console.log("새 토큰 발급 성공, 요청을 재시도합니다.");
+
+        // 새 토큰으로 API 재호출
+        return await apiCall(newToken);
+      } catch (refreshError) {
+        console.error("토큰 재발급 실패:", refreshError);
+        throw refreshError;
+      }
+    }
+
+    // 다른 오류는 그대로 던짐
+    throw error;
+  }
+}

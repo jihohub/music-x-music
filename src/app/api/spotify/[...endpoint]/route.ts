@@ -1,4 +1,4 @@
-import { authOptions } from "@/lib/auth";
+import { authOptions, refreshUserAccessToken } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -37,7 +37,7 @@ export async function GET(
         : "none",
     });
 
-    const accessToken = session?.accessToken;
+    let accessToken = session?.accessToken;
 
     // 액세스 토큰이 없는 경우 401 에러를 반환합니다.
     // 클라이언트 측에서 이 오류를 캐치하여 더미 데이터로 대체합니다.
@@ -49,21 +49,63 @@ export async function GET(
       );
     }
 
-    // 스포티파이 API 요청
-    console.log("스포티파이 API 호출 시작");
-    const response = await fetch(
-      `${SPOTIFY_API_BASE}${endpoint}${queryString}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
+    // 스포티파이 API 요청 (토큰 만료 시 재시도 로직 포함)
+    async function makeRequestWithTokenRefreshOnFail() {
+      // 스포티파이 API 요청
+      console.log("스포티파이 API 호출 시작");
+      let response = await fetch(
+        `${SPOTIFY_API_BASE}${endpoint}${queryString}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("스포티파이 API 응답:", {
+        status: response.status,
+        statusText: response.statusText,
+      });
+
+      // 토큰 만료 오류인 경우(401) 토큰 재발급 후 재시도
+      if (response.status === 401 && session) {
+        console.log("액세스 토큰이 만료되었습니다. 토큰을 새로 발급합니다.");
+
+        try {
+          // 액세스 토큰 갱신 시도
+          const refreshedToken = await refreshUserAccessToken(session);
+
+          if (refreshedToken) {
+            console.log("토큰 재발급 성공, 새 토큰으로 재시도합니다.");
+            accessToken = refreshedToken;
+
+            // 새 토큰으로 API 재요청
+            response = await fetch(
+              `${SPOTIFY_API_BASE}${endpoint}${queryString}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            console.log("재시도 결과:", {
+              status: response.status,
+              statusText: response.statusText,
+            });
+          }
+        } catch (refreshError) {
+          console.error("토큰 재발급 실패:", refreshError);
+        }
       }
-    );
-    console.log("스포티파이 API 응답:", {
-      status: response.status,
-      statusText: response.statusText,
-    });
+
+      return response;
+    }
+
+    // 토큰 재발급 로직을 포함한 API 요청 실행
+    const response = await makeRequestWithTokenRefreshOnFail();
 
     // 스포티파이 API 응답이 에러인 경우
     if (!response.ok) {

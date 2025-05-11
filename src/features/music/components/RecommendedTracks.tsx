@@ -13,11 +13,20 @@ export default function RecommendedTracks() {
         {[...Array(6)].map((_, i) => (
           <div key={i} className="group bg-card-bg rounded-lg overflow-hidden">
             <div className="relative aspect-square w-full overflow-hidden">
-              <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+              <div
+                className="absolute inset-0 animate-pulse"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
             </div>
             <div className="h-[64px] p-3">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse" />
-              <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse" />
+              <div
+                className="h-4 rounded w-3/4 mb-2 animate-pulse"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-3 rounded w-1/2 animate-pulse"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
             </div>
           </div>
         ))}

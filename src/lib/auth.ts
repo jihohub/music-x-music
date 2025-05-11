@@ -1,6 +1,15 @@
+import "next-auth";
 import { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import SpotifyProvider from "next-auth/providers/spotify";
+
+// Session 타입을 확장하여 refreshToken 속성 추가
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string;
+    refreshToken?: string;
+  }
+}
 
 const scopes = [
   "user-read-email",
@@ -61,6 +70,40 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
   }
 }
 
+/**
+ * 세션을 사용하여 사용자 액세스 토큰을 새로고침합니다.
+ * API 라우트에서 토큰이 만료된 경우 사용하는 함수입니다.
+ */
+export async function refreshUserAccessToken(
+  session: any
+): Promise<string | null> {
+  try {
+    if (!session?.refreshToken) {
+      console.error("재발급 불가: 세션에 리프레시 토큰이 없습니다.");
+      return null;
+    }
+
+    // JWT와 유사한 형태의 토큰 객체 생성
+    const tokenObject: JWT = {
+      refreshToken: session.refreshToken,
+    };
+
+    // 기존 refreshAccessToken 함수를 활용하여 토큰 갱신
+    const refreshedToken = await refreshAccessToken(tokenObject);
+
+    if (refreshedToken.error) {
+      console.error("토큰 갱신 실패:", refreshedToken.error);
+      return null;
+    }
+
+    // 새로운 액세스 토큰 반환
+    return refreshedToken.accessToken as string;
+  } catch (error) {
+    console.error("토큰 갱신 중 오류 발생:", error);
+    return null;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     SpotifyProvider({
@@ -109,9 +152,11 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // 세션에 accessToken 추가
       session.accessToken = token.accessToken;
+      session.refreshToken = token.refreshToken;
 
       console.log("세션 업데이트:", {
         hasAccessToken: !!session.accessToken,
+        hasRefreshToken: !!session.refreshToken,
         tokenError: token.error,
       });
 

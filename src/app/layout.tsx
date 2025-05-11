@@ -17,7 +17,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        {/* 초기 테마 깜빡임 방지를 위한 인라인 스크립트 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  
+                  let initialTheme = 'light';
+                  if (savedTheme) {
+                    initialTheme = savedTheme;
+                  } else if (prefersDark) {
+                    initialTheme = 'dark';
+                  }
+                  
+                  document.documentElement.setAttribute('data-theme', initialTheme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <ThemeProvider>
           <AuthProvider>

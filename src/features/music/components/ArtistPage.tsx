@@ -4,7 +4,8 @@ import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+// 팔로우 버튼 관련 기능 주석 처리
+// import { useState } from "react";
 import {
   IoHeartOutline,
   IoMusicalNotesOutline,
@@ -27,70 +28,69 @@ export function ArtistPage({
   isLoading = false,
   error = null,
 }: ArtistPageProps) {
-  const [isFollowing, setIsFollowing] = useState(false);
+  // 팔로우 관련 상태 및 기능 주석 처리
+  // const [isFollowing, setIsFollowing] = useState(false);
 
   // 팔로우 토글
-  const toggleFollow = () => {
-    setIsFollowing(!isFollowing);
-  };
+  // const toggleFollow = () => {
+  //   setIsFollowing(!isFollowing);
+  // };
 
   if (isLoading) {
     return (
-      <div className="pb-12">
+      <div className="py-6">
         {/* 아티스트 배너 및 프로필 영역 */}
         <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
-            <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 container px-4 pb-6">
-            <div className="flex items-end gap-6">
-              <div
-                className="relative rounded-full overflow-hidden shadow-2xl"
-                style={{
-                  width: "160px",
-                  height: "160px",
-                  minWidth: "160px",
-                  minHeight: "160px",
-                  maxWidth: "160px",
-                  maxHeight: "160px",
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
-                <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-                <div className="absolute inset-0 ring-1 ring-white/10" />
-              </div>
-              <div className="flex-grow">
-                <div className="h-12 bg-gray-200 rounded w-1/3 animate-pulse" />
-              </div>
-            </div>
+            <div
+              className="absolute inset-0 animate-pulse"
+              style={{ backgroundColor: "var(--skeleton-bg)" }}
+            />
           </div>
         </section>
 
         {/* 컨텐츠 영역 */}
-        <div className="container px-4 mt-6">
+        <div className="container px-4 mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* 왼쪽 및 중앙 컬럼 */}
             <div className="lg:col-span-2 space-y-6">
               {/* 인기 트랙 */}
-              <div className="bg-card-bg rounded-lg p-4">
-                <div className="h-6 bg-gray-200 rounded w-1/4 mb-4 animate-pulse" />
-                <div className="h-[300px] bg-gray-200 rounded animate-pulse" />
+              <div className="bg-card-bg rounded-lg py-5">
+                <div
+                  className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
+                <div
+                  className="h-[300px] rounded animate-pulse"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
               </div>
 
               {/* 앨범 및 싱글 */}
-              <div className="bg-card-bg rounded-lg p-4">
-                <div className="h-6 bg-gray-200 rounded w-1/4 mb-4 animate-pulse" />
-                <div className="h-[400px] bg-gray-200 rounded animate-pulse" />
+              <div className="bg-card-bg rounded-lg py-5">
+                <div
+                  className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
+                <div
+                  className="h-[400px] rounded animate-pulse"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
               </div>
             </div>
 
             {/* 오른쪽 컬럼 */}
             <div className="space-y-6">
               {/* 아티스트 정보 */}
-              <div className="bg-card-bg rounded-lg p-4">
-                <div className="h-6 bg-gray-200 rounded w-1/4 mb-4 animate-pulse" />
-                <div className="h-[200px] bg-gray-200 rounded animate-pulse" />
+              <div className="bg-card-bg rounded-lg py-5">
+                <div
+                  className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
+                <div
+                  className="h-[200px] rounded animate-pulse"
+                  style={{ backgroundColor: "var(--skeleton-bg)" }}
+                />
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ export function ArtistPage({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="pb-12"
+      className="py-6"
     >
       {/* 아티스트 배너 및 프로필 영역 */}
       <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
@@ -183,10 +183,16 @@ export function ArtistPage({
                   </h1>
                   {artist.genres && artist.genres.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
+                      {/* 모바일: 첫 번째 장르만 표시 */}
+                      <span className="md:hidden text-sm bg-primary/20 text-primary px-3 py-1 rounded-full">
+                        {artist.genres[0]}
+                      </span>
+
+                      {/* 태블릿/데스크톱: 최대 3개 장르 표시 */}
                       {artist.genres.slice(0, 3).map((genre, idx) => (
                         <span
                           key={idx}
-                          className="text-sm bg-primary/20 text-primary px-3 py-1 rounded-full"
+                          className="hidden md:inline-block text-sm bg-primary/20 text-primary px-3 py-1 rounded-full"
                         >
                           {genre}
                         </span>
@@ -194,7 +200,8 @@ export function ArtistPage({
                     </div>
                   )}
                 </div>
-                <div className="flex gap-3">
+                {/* 팔로우 버튼 주석 처리 - 영역 제거 */}
+                {/* <div className="flex gap-3">
                   <button
                     onClick={toggleFollow}
                     className={`px-6 py-2 rounded-full border ${
@@ -205,7 +212,7 @@ export function ArtistPage({
                   >
                     {isFollowing ? "팔로잉" : "팔로우"}
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </motion.div>
@@ -213,7 +220,7 @@ export function ArtistPage({
       </section>
 
       {/* 컨텐츠 영역 */}
-      <div className="container px-4 mt-6">
+      <div className="container px-4 mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 왼쪽 및 중앙 컬럼 */}
           <div className="lg:col-span-2 space-y-6">
@@ -222,9 +229,9 @@ export function ArtistPage({
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="bg-card-bg rounded-lg"
+              className="bg-card-bg rounded-lg py-5"
             >
-              <h2 className="text-lg font-bold mb-3">인기 트랙</h2>
+              <h2 className="text-lg font-bold mb-4">인기 트랙</h2>
               <div>
                 <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
                   <div className="w-8 text-center shrink-0">#</div>
@@ -287,9 +294,9 @@ export function ArtistPage({
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-card-bg rounded-lg"
+              className="bg-card-bg rounded-lg py-5"
             >
-              <h2 className="text-lg font-bold mb-3">앨범 및 싱글</h2>
+              <h2 className="text-lg font-bold mb-4">앨범 및 싱글</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {albums.map((album) => (
                   <Link
@@ -328,9 +335,9 @@ export function ArtistPage({
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="bg-card-bg rounded-lg"
+              className="bg-card-bg rounded-lg py-5"
             >
-              <h2 className="text-lg font-bold mb-3">아티스트 정보</h2>
+              <h2 className="text-lg font-bold mb-4">아티스트 정보</h2>
               <div className="space-y-3">
                 {artist.genres && artist.genres.length > 0 && (
                   <div className="flex items-start gap-3">
@@ -341,7 +348,12 @@ export function ArtistPage({
                     <div>
                       <h3 className="font-medium">장르</h3>
                       <p className="text-text-secondary">
-                        {artist.genres.slice(0, 3).join(", ")}
+                        {/* 모바일에서는 첫 번째 장르만 표시 */}
+                        <span className="md:hidden">{artist.genres[0]}</span>
+                        {/* 데스크톱에서는 최대 3개 장르 표시 */}
+                        <span className="hidden md:inline">
+                          {artist.genres.slice(0, 3).join(", ")}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -367,9 +379,7 @@ export function ArtistPage({
                     />
                     <div>
                       <h3 className="font-medium">인기도</h3>
-                      <p className="text-text-secondary">
-                        {artist.popularity}%
-                      </p>
+                      <p className="text-text-secondary">{artist.popularity}</p>
                     </div>
                   </div>
                 )}

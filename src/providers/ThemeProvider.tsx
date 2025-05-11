@@ -11,6 +11,40 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// 클라이언트 사이드에서 초기 테마를 미리 설정하는 스크립트
+const ThemeScript = () => {
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function() {
+            try {
+              const savedTheme = localStorage.getItem('theme');
+              const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              
+              let initialTheme = 'light';
+              if (savedTheme) {
+                initialTheme = savedTheme;
+              } else if (prefersDark) {
+                initialTheme = 'dark';
+              }
+              
+              document.documentElement.setAttribute('data-theme', initialTheme);
+              
+              // 약간의 지연 후 transition 활성화 (깜빡임 방지)
+              setTimeout(() => {
+                document.documentElement.classList.add('theme-ready');
+              }, 100);
+            } catch (e) {
+              console.error('테마 초기화 중 오류 발생:', e);
+            }
+          })();
+        `,
+      }}
+    />
+  );
+};
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
 
@@ -23,11 +57,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     if (savedTheme) {
       setTheme(savedTheme);
-      document.documentElement.setAttribute("data-theme", savedTheme);
     } else if (prefersDark) {
       setTheme("dark");
-      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
     }
+
+    // 테마가 설정된 후 transition 활성화
+    document.documentElement.classList.add("theme-ready");
   }, []);
 
   const toggleTheme = () => {
@@ -38,9 +74,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <>
+      <ThemeScript />
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        {children}
+      </ThemeContext.Provider>
+    </>
   );
 }
 
