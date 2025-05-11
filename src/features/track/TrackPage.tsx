@@ -1,11 +1,11 @@
 "use client";
 
 import { SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
-import { ErrorState } from "./ErrorState";
-import { ArtistInfo } from "./sections/ArtistInfo";
-import { TrackHeader } from "./sections/TrackHeader";
-import { TrackInfo } from "./sections/TrackInfo";
-import { TrackSkeleton } from "./skeletons/TrackSkeleton";
+import { ArtistInfo } from "./components/ArtistInfo";
+import { ErrorState } from "./components/ErrorState";
+import { TrackHeader } from "./components/TrackHeader";
+import { TrackInfo } from "./components/TrackInfo";
+import { TrackSkeleton } from "./components/TrackSkeleton";
 
 interface TrackPageProps {
   track: SpotifyTrack | null;

@@ -2,7 +2,7 @@
 
 import Header from "@/components/Header";
 import { getArtistById, getTrackById } from "@/features/music/api";
-import { TrackPage } from "@/features/track/components/TrackPage";
+import { TrackPage } from "@/features/track/TrackPage";
 import { SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
 import React, { useEffect, useState } from "react";
 
