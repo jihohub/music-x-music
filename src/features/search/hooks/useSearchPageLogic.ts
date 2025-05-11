@@ -82,7 +82,6 @@ export function useSearchPageLogic() {
 
   const [searchTerm, setSearchTerm] = useState(queryParam);
   const [searchType, setSearchType] = useState<SearchType>(typeParam);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   // 한 번에 가져올 결과 수
   const PAGE_SIZE = 20;
@@ -135,62 +134,6 @@ export function useSearchPageLogic() {
     isSpecificTypeSearch
   );
 
-  // 스크롤 위치 저장 및 무한 스크롤 처리
-  useEffect(() => {
-    const handleScroll = () => {
-      // 페이지를 로드하거나, 다음 페이지를 페칭할 때의 스크롤 위치를 저장
-      if (scrollContainerRef.current && !isFetchingNextPage) {
-        setScrollPosition(window.scrollY);
-
-        // 무한 스크롤 처리
-        if (isSpecificTypeSearch && hasNextPage && !isFetchingNextPage) {
-          // 스크롤이 페이지 하단에 닿았는지 확인
-          const windowHeight = window.innerHeight;
-          const documentHeight = document.documentElement.scrollHeight;
-          const scrollTop = window.scrollY;
-
-          // 하단에서 10% 이내에 도달했을 때 다음 페이지 로드
-          const scrollThreshold = 0.9;
-          const reachedThreshold =
-            scrollTop + windowHeight >= documentHeight * scrollThreshold;
-
-          if (reachedThreshold) {
-            console.log("스크롤 이벤트를 통한 다음 페이지 로드", {
-              scrollTop,
-              windowHeight,
-              documentHeight,
-              threshold: documentHeight * scrollThreshold,
-            });
-
-            fetchNextPage().catch((error) =>
-              console.error("다음 페이지 로드 오류:", error)
-            );
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isSpecificTypeSearch]);
-
-  // 스크롤 위치 복원 - 페이지 전환 후에만 적용
-  useEffect(() => {
-    // 페이지 전환 후 한 번만 실행되도록 타이머 사용
-    // 스크롤 위치가 0보다 크고, 로딩 중이 아닐 때만 복원
-    if (scrollPosition > 0 && !isFetching && !isFetchingNextPage) {
-      const timeoutId = setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: "auto", // smooth 대신 auto를 사용하여 즉시 스크롤
-        });
-      }, 100);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [searchType, searchTerm, isFetching, isFetchingNextPage, scrollPosition]);
-
-  // URL 업데이트 함수
   const updateSearchParams = useCallback(
     (term: string, type: SearchType = searchType) => {
       if (term.trim().length > 1) {
@@ -221,7 +164,6 @@ export function useSearchPageLogic() {
   // 검색어 초기화
   const clearSearch = () => {
     setSearchTerm("");
-    setScrollPosition(0);
 
     // React Query 캐시 초기화
     queryClient.removeQueries({ queryKey: ["search"] });
@@ -234,7 +176,6 @@ export function useSearchPageLogic() {
   const handlePopularSearchClick = (term: string) => {
     if (term !== searchTerm) {
       setSearchTerm(term);
-      setScrollPosition(0);
       updateSearchParams(term);
     }
   };
@@ -251,8 +192,6 @@ export function useSearchPageLogic() {
   // 검색 유형 변경 핸들러
   const handleTypeChange = (type: SearchType) => {
     if (type !== searchType) {
-      // 검색 유형이 변경될 때는 스크롤 위치 초기화
-      setScrollPosition(0);
       setSearchType(type);
       updateSearchParams(searchTerm, type);
     }
@@ -261,7 +200,6 @@ export function useSearchPageLogic() {
   // 장르 클릭
   const handleGenreClick = (genre: string) => {
     setSearchTerm(genre);
-    setScrollPosition(0);
     updateSearchParams(genre);
   };
 
@@ -281,7 +219,6 @@ export function useSearchPageLogic() {
     // URL에 검색어가 없는 경우 초기 상태로 리셋
     if (!queryParam || queryParam.trim() === "") {
       setSearchTerm("");
-      setScrollPosition(0);
     }
   }, [queryParam]);
 

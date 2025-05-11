@@ -35,7 +35,7 @@ export const ArtistResults = ({
             onClick={onShowMore}
             className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded-full transition-all duration-200"
           >
-            더 보기 &rarr;
+            더 보기
           </button>
         )}
       </div>

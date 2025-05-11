@@ -1,7 +1,6 @@
 "use client";
 
 import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { SearchType } from "../queries/searchSpotify";
@@ -68,28 +67,16 @@ export function InfiniteScrollResults({
   if (!currentItems.length) return null;
 
   return (
-    <motion.div
-      key={`${searchType}-results-${searchTerm}`}
-      initial={{ opacity: 0.8 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2 }}
-      className="min-h-[300px]"
-      layout
-      style={{ overflowAnchor: "none" }}
-    >
+    <div className="min-h-[300px]">
       <InfiniteScroll
         dataLength={currentItems.length}
         next={handleNext}
         hasMore={!!hasNextPage && !isFetchingNextPage}
-        loader={
-          <div className="py-4 flex justify-center">
-            <div className="w-6 h-6 border-t-2 border-primary rounded-full animate-spin"></div>
-          </div>
-        }
+        loader={null}
         endMessage={null}
         className="space-y-6"
         scrollThreshold={0.85}
-        style={{ overflow: "visible", overflowAnchor: "none" }}
+        style={{ overflow: "visible" }}
       >
         {/* 결과 컴포넌트 - 즉시 렌더링 */}
         {searchType === "artist" && (
@@ -116,7 +103,7 @@ export function InfiniteScrollResults({
           />
         )}
       </InfiniteScroll>
-    </motion.div>
+    </div>
   );
 }
 
