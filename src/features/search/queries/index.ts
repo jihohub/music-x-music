@@ -1,0 +1,1 @@
+export { searchSpotify } from "./searchSpotify";
