@@ -1,12 +1,12 @@
 "use client";
 
 import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
-import { ErrorState } from "./ErrorState";
-import { AlbumList } from "./sections/AlbumList";
-import { ArtistHeader } from "./sections/ArtistHeader";
-import { ArtistInfo } from "./sections/ArtistInfo";
-import { TopTracks } from "./sections/TopTracks";
-import { ArtistSkeleton } from "./skeletons/ArtistSkeleton";
+import { AlbumList } from "./components/AlbumList";
+import { ArtistHeader } from "./components/ArtistHeader";
+import { ArtistInfo } from "./components/ArtistInfo";
+import { ArtistSkeleton } from "./components/ArtistSkeleton";
+import { ErrorState } from "./components/ErrorState";
+import { TopTracks } from "./components/TopTracks";
 
 interface ArtistPageProps {
   artist: SpotifyArtist;

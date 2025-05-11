@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
-import { ArtistPage } from "@/features/artist/components/ArtistPage";
+import { ArtistPage } from "@/features/artist/ArtistPage";
 import {
   getArtistAlbums,
   getArtistById,
