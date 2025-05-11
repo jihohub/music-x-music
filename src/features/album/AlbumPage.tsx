@@ -1,11 +1,11 @@
 "use client";
 
 import { SpotifyAlbum } from "@/lib/spotify-api";
-import { ErrorState } from "./ErrorState";
-import { AlbumHeader } from "./sections/AlbumHeader";
-import { AlbumInfo } from "./sections/AlbumInfo";
-import { TrackList } from "./sections/TrackList";
-import { AlbumSkeleton } from "./skeletons/AlbumSkeleton";
+import { AlbumHeader } from "./components/AlbumHeader";
+import { AlbumInfo } from "./components/AlbumInfo";
+import { AlbumSkeleton } from "./components/AlbumSkeleton";
+import { ErrorState } from "./components/ErrorState";
+import { TrackList } from "./components/TrackList";
 
 interface AlbumPageProps {
   album: SpotifyAlbum | null;
