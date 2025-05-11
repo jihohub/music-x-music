@@ -1,12 +1,12 @@
 "use client";
 
 import Header from "@/components/Header";
+import { ArtistPage } from "@/features/artist/components/ArtistPage";
 import {
   getArtistAlbums,
   getArtistById,
   getArtistTopTracks,
 } from "@/features/music/api";
-import { ArtistPage } from "@/features/music/components/ArtistPage";
 import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/lib/spotify-api";
 import React, { useEffect, useState } from "react";
 
