@@ -1,7 +1,7 @@
 "use client";
 
 import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { SearchType } from "../queries/searchSpotify";
 import AlbumResults from "./AlbumResults";
@@ -31,6 +31,8 @@ export function InfiniteScrollResults({
 }: InfiniteScrollResultsProps) {
   // 마지막 데이터 요청 시간 추적
   const lastFetchTimeRef = useRef<number>(0);
+  // 스크롤 컨테이너 참조
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 현재 검색 유형에 맞는 데이터 선택
   const currentItems =
@@ -51,15 +53,35 @@ export function InfiniteScrollResults({
     };
   }, []);
 
-  // 스크롤 이벤트 핸들러
-  const handleNext = () => {
-    // 연속 요청 방지
+  // 메모이제이션된 handleNext 함수
+  const handleNext = useCallback(() => {
+    // 연속 요청 방지 (시간 간격 줄임)
     const now = Date.now();
-    if (now - lastFetchTimeRef.current < 800) return;
+    if (now - lastFetchTimeRef.current < 500) return;
 
     lastFetchTimeRef.current = now;
     fetchNextPage();
-  };
+  }, [currentItems.length, fetchNextPage]);
+
+  // 수동 스크롤 감지 추가
+  useEffect(() => {
+    const handleScroll = () => {
+      // 스크롤 위치 확인
+      if (!hasNextPage || isFetchingNextPage) return;
+
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const clientHeight = window.innerHeight;
+
+      // 페이지 하단에 근접했을 때 추가 데이터 로드
+      if (scrollHeight - scrollTop - clientHeight < 300) {
+        handleNext();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasNextPage, isFetchingNextPage, handleNext]);
 
   if (searchType === "all") return null;
 
@@ -71,36 +93,29 @@ export function InfiniteScrollResults({
       <InfiniteScroll
         dataLength={currentItems.length}
         next={handleNext}
-        hasMore={!!hasNextPage && !isFetchingNextPage}
-        loader={null}
-        endMessage={null}
+        hasMore={!!hasNextPage}
+        loader={<p className="text-center py-4">로딩 중...</p>}
+        endMessage={
+          <p className="text-center py-4 text-gray-500">
+            모든 결과를 불러왔습니다
+          </p>
+        }
         className="space-y-6"
-        scrollThreshold={0.85}
+        scrollThreshold={0.5}
+        scrollableTarget="search-page-container"
         style={{ overflow: "visible" }}
       >
         {/* 결과 컴포넌트 - 즉시 렌더링 */}
         {searchType === "artist" && (
-          <ArtistResults
-            artists={allArtists}
-            searchTerm={searchTerm}
-            showMoreLink={false}
-          />
+          <ArtistResults artists={allArtists} showMoreLink={false} />
         )}
 
         {searchType === "track" && (
-          <TrackResults
-            tracks={allTracks}
-            searchTerm={searchTerm}
-            showMoreLink={false}
-          />
+          <TrackResults tracks={allTracks} showMoreLink={false} />
         )}
 
         {searchType === "album" && (
-          <AlbumResults
-            albums={allAlbums}
-            searchTerm={searchTerm}
-            showMoreLink={false}
-          />
+          <AlbumResults albums={allAlbums} showMoreLink={false} />
         )}
       </InfiniteScroll>
     </div>

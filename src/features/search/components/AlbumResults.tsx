@@ -8,14 +8,12 @@ import Link from "next/link";
 
 interface AlbumResultsProps {
   albums: SpotifyAlbum[];
-  searchTerm: string;
   showMoreLink?: boolean;
   onShowMore?: () => void;
 }
 
 export const AlbumResults = ({
   albums,
-  searchTerm,
   showMoreLink = false,
   onShowMore,
 }: AlbumResultsProps) => {

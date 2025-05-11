@@ -16,17 +16,17 @@ import {
 /**
  * 검색 페이지의 모든 로직을 관리하는 커스텀 훅
  */
-export function useSearchLogic() {
+export function useSearchLogic(
+  initialQuery = "",
+  initialType: SearchType = "all"
+) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
-  // URL에서 검색어 및 유형 가져오기
-  const queryParam = searchParams.get("q") || "";
-  const typeParam = (searchParams.get("type") || "all") as SearchType;
-
-  const [searchTerm, setSearchTerm] = useState(queryParam);
-  const [searchType, setSearchType] = useState<SearchType>(typeParam);
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
+  const [searchType, setSearchType] = useState<SearchType>(initialType);
+  const [debouncedTerm, setDebouncedTerm] = useState(initialQuery);
 
   // 한 번에 가져올 결과 수
   const PAGE_SIZE = 20;
@@ -34,20 +34,26 @@ export function useSearchLogic() {
   // 검색 타입에 따라 다른 쿼리 훅 사용
   const isSpecificTypeSearch = searchType !== "all";
 
-  // 기본 검색 (타입이 'all'인 경우) - 무한 스크롤 없음
+  // 입력값 디바운싱
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // 기본 검색 쿼리 (타입이 'all'인 경우)
   const {
     data: basicSearchData,
-    isLoading: isBasicLoading,
     isFetching: isBasicFetching,
     isError: isBasicError,
     error: basicError,
   } = useBasicSearchQuery({
-    query: queryParam,
-    enabled: !isSpecificTypeSearch && queryParam.trim().length >= 2,
-    pageSize: PAGE_SIZE,
+    query: debouncedTerm,
+    enabled: searchType === "all" && debouncedTerm.trim().length >= 2,
   });
 
-  // 무한 스크롤 검색 (특정 타입 선택 시)
+  // 무한 스크롤 타입 검색 쿼리
   const {
     data: infiniteSearchData,
     fetchNextPage,
@@ -57,10 +63,9 @@ export function useSearchLogic() {
     isError: isInfiniteError,
     error: infiniteError,
   } = useInfiniteSearchQuery({
-    query: queryParam,
-    type: typeParam,
-    enabled: isSpecificTypeSearch && queryParam.trim().length >= 2,
-    pageSize: PAGE_SIZE,
+    query: debouncedTerm,
+    type: searchType,
+    enabled: searchType !== "all" && debouncedTerm.trim().length >= 2,
   });
 
   // 검색 결과 및 상태 통합
@@ -188,33 +193,33 @@ export function useSearchLogic() {
 
   // URL 쿼리 파라미터 변경 감지
   useEffect(() => {
-    if (queryParam) {
-      setSearchTerm(queryParam);
+    if (initialQuery) {
+      setSearchTerm(initialQuery);
     } else {
       // 쿼리 파라미터가 없는 경우 검색어 초기화
       setSearchTerm("");
     }
-    setSearchType(typeParam);
-  }, [queryParam, typeParam]);
+    setSearchType(initialType);
+  }, [initialQuery, initialType]);
 
   // 페이지 로드 시 초기화 로직
   useEffect(() => {
     // URL에 검색어가 없는 경우 초기 상태로 리셋
-    if (!queryParam || queryParam.trim() === "") {
+    if (!initialQuery || initialQuery.trim() === "") {
       setSearchTerm("");
     }
-  }, [queryParam]);
+  }, [initialQuery]);
 
   // 검색어 변경 시 URL 업데이트 (디바운스 적용)
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (searchTerm !== queryParam) {
+      if (searchTerm !== initialQuery) {
         updateSearchParams(searchTerm);
       }
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, queryParam, updateSearchParams]);
+  }, [searchTerm, initialQuery, updateSearchParams]);
 
   // 검색 결과가 있는지 확인
   const hasResults =
@@ -257,6 +262,6 @@ export function useSearchLogic() {
 
     // 기타
     popularSearches,
-    queryParam,
+    initialQuery,
   };
 }

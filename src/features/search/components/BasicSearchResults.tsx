@@ -28,7 +28,7 @@ export function BasicSearchResults({
   handleTypeChange,
 }: BasicSearchResultsProps) {
   return (
-    <>
+    <div className="space-y-16">
       {/* 아티스트 결과 */}
       {shouldShowArtists && allArtists.length > 0 && (
         <motion.div
@@ -39,7 +39,6 @@ export function BasicSearchResults({
         >
           <ArtistResults
             artists={allArtists.slice(0, 4)}
-            searchTerm={searchTerm}
             showMoreLink={true}
             onShowMore={() => handleTypeChange("artist")}
           />
@@ -56,7 +55,6 @@ export function BasicSearchResults({
         >
           <TrackResults
             tracks={allTracks.slice(0, 5)}
-            searchTerm={searchTerm}
             showMoreLink={true}
             onShowMore={() => handleTypeChange("track")}
           />
@@ -73,13 +71,12 @@ export function BasicSearchResults({
         >
           <AlbumResults
             albums={allAlbums.slice(0, 4)}
-            searchTerm={searchTerm}
             showMoreLink={true}
             onShowMore={() => handleTypeChange("album")}
           />
         </motion.div>
       )}
-    </>
+    </div>
   );
 }
 

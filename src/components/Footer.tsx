@@ -11,16 +11,16 @@ import {
   IoPersonOutline,
   IoSearch,
   IoSearchOutline,
-  IoTrophy,
-  IoTrophyOutline,
+  IoTrendingUp,
+  IoTrendingUpOutline,
 } from "react-icons/io5";
 
-type NavItem = {
+interface NavItem {
   name: string;
   path: string;
   icon: React.ReactNode;
   activeIcon: React.ReactNode;
-};
+}
 
 export default function Footer() {
   const pathname = usePathname();
@@ -39,10 +39,10 @@ export default function Footer() {
       activeIcon: <IoSearch size={24} />,
     },
     {
-      name: "랭킹",
-      path: "/ranking",
-      icon: <IoTrophyOutline size={24} />,
-      activeIcon: <IoTrophy size={24} />,
+      name: "트렌드",
+      path: "/trend",
+      icon: <IoTrendingUpOutline size={24} />,
+      activeIcon: <IoTrendingUp size={24} />,
     },
     {
       name: "좋아요",

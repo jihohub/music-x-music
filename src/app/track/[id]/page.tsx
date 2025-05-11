@@ -18,7 +18,6 @@ export default function TrackPageRoute({
   const [artists, setArtists] = useState<SpotifyArtist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
 
   // 트랙 정보 가져오기
   useEffect(() => {

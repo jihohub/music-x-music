@@ -2,6 +2,7 @@
 
 import Header from "@/components/Header";
 import ThemeToggle from "@/components/ThemeToggle";
+import { DEFAULT_IMAGE_SM } from "@/constants/images";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -13,14 +14,14 @@ import {
 export default function ProfilePage() {
   // 임시 프로필 데이터
   const profile = {
-    name: "음악 스타일 사용자",
-    username: "music_lover",
-    image: "https://i.scdn.co/image/ab6761610000e5eb6e0261c8deaf6e8d69f0e204", // 기본 프로필 이미지
-    email: "user@example.com",
-    joinDate: "2023년 1월 1일",
+    name: "릭오",
+    username: "ricko",
+    image: DEFAULT_IMAGE_SM, // 기본 프로필 이미지
+    email: "ricko@gmail.com",
+    joinDate: "2025년 1월 1일",
     stats: {
-      tracks: 128,
-      artists: 45,
+      following: 32,
+      followers: 531,
       playlists: 12,
     },
   };
@@ -44,12 +45,12 @@ export default function ProfilePage() {
 
           <div className="flex justify-center gap-8 w-full mt-4">
             <div className="text-center">
-              <p className="font-bold">{profile.stats.tracks}</p>
-              <p className="text-text-secondary text-sm">트랙</p>
+              <p className="font-bold">{profile.stats.following}</p>
+              <p className="text-text-secondary text-sm">팔로잉</p>
             </div>
             <div className="text-center">
-              <p className="font-bold">{profile.stats.artists}</p>
-              <p className="text-text-secondary text-sm">아티스트</p>
+              <p className="font-bold">{profile.stats.followers}</p>
+              <p className="text-text-secondary text-sm">팔로워</p>
             </div>
             <div className="text-center">
               <p className="font-bold">{profile.stats.playlists}</p>
@@ -82,7 +83,7 @@ export default function ProfilePage() {
             <div className="p-4 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <IoSettingsOutline size={20} className="text-text-secondary" />
-                <span>앱 테마</span>
+                <span>다크 모드</span>
               </div>
               <ThemeToggle />
             </div>

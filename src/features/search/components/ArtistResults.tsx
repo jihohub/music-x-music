@@ -8,14 +8,12 @@ import Link from "next/link";
 
 interface ArtistResultsProps {
   artists: SpotifyArtist[];
-  searchTerm: string;
   showMoreLink?: boolean;
   onShowMore?: () => void;
 }
 
 export const ArtistResults = ({
   artists,
-  searchTerm,
   showMoreLink = false,
   onShowMore,
 }: ArtistResultsProps) => {
@@ -42,17 +40,21 @@ export const ArtistResults = ({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {artists.map((artist) => (
           <Link href={`/artist/${artist.id}`} key={artist.id} className="group">
-            <div className="overflow-hidden rounded-lg aspect-square relative bg-card-bg">
+            <div className="overflow-hidden rounded-full aspect-square relative bg-card-bg">
               <Image
                 src={getSafeImageUrl(artist.images)}
                 alt={artist.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                className="object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                className="object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="mt-2 font-semibold truncate">{artist.name}</h3>
-            <p className="text-sm text-text-secondary truncate">아티스트</p>
+            <h3 className="mt-2 font-semibold truncate text-center">
+              {artist.name}
+            </h3>
+            <p className="text-sm text-text-secondary truncate text-center">
+              아티스트
+            </p>
           </Link>
         ))}
       </div>

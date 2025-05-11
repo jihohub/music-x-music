@@ -29,9 +29,6 @@ export async function searchSpotify(
         query
       )}&type=${searchType}&offset=${offset}&limit=${limit}`
     );
-    console.log(
-      `검색 결과를 성공적으로 가져왔습니다: ${query} (타입: ${type}, 시작: ${offset}, 개수: ${limit})`
-    );
     return response;
   } catch (error: any) {
     console.error(

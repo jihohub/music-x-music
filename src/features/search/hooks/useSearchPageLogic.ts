@@ -92,7 +92,6 @@ export function useSearchPageLogic() {
   // 기본 검색 (타입이 'all'인 경우) - 무한 스크롤 없음
   const {
     data: basicSearchData,
-    isLoading: isBasicLoading,
     isFetching: isBasicFetching,
     isError: isBasicError,
     error: basicError,
@@ -206,12 +205,6 @@ export function useSearchPageLogic() {
     }
   };
 
-  // 장르 클릭
-  const handleGenreClick = (genre: string) => {
-    setSearchTerm(genre);
-    updateSearchParams(genre);
-  };
-
   // URL 쿼리 파라미터 변경 감지
   useEffect(() => {
     if (queryParam) {
@@ -242,42 +235,6 @@ export function useSearchPageLogic() {
     return () => clearTimeout(timer);
   }, [searchTerm, queryParam, updateSearchParams]);
 
-  // 무한 스크롤 다음 페이지 로드 함수
-  const handleFetchNextPage = useCallback(() => {
-    if (!isFetchingNextPage && hasNextPage) {
-      console.log("다음 페이지 로드 시작", {
-        type: searchType,
-        currentItems:
-          searchType === "artist"
-            ? allArtists.length
-            : searchType === "track"
-            ? allTracks.length
-            : allAlbums.length,
-      });
-
-      fetchNextPage()
-        .then(() => {
-          console.log("다음 페이지 로드 완료");
-        })
-        .catch((error) => {
-          console.error("다음 페이지 로드 오류:", error);
-        });
-    } else {
-      console.log("다음 페이지 로드 조건 미충족", {
-        isFetchingNextPage,
-        hasNextPage,
-      });
-    }
-  }, [
-    fetchNextPage,
-    isFetchingNextPage,
-    hasNextPage,
-    searchType,
-    allArtists.length,
-    allTracks.length,
-    allAlbums.length,
-  ]);
-
   return {
     // 상태
     searchTerm,
@@ -304,8 +261,7 @@ export function useSearchPageLogic() {
     handlePopularSearchClick,
     handleSearchSubmit,
     handleTypeChange,
-    handleGenreClick,
-    fetchNextPage: handleFetchNextPage,
+    fetchNextPage,
 
     // 유틸리티
     popularSearches,
