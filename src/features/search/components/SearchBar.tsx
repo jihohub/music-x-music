@@ -56,7 +56,7 @@ export const SearchBar = ({
           <input
             ref={inputRef}
             type="text"
-            className="bg-transparent w-full py-1 text-text-primary focus:outline-none placeholder-text-secondary/70 text-sm font-medium tracking-wide"
+            className="bg-transparent w-full py-1 text-text-primary focus:outline-none placeholder-text-secondary/70 font-medium tracking-wide text-base md:text-sm"
             placeholder="곡, 아티스트, 앨범 검색..."
             value={searchTerm}
             onChange={onSearchChange}
