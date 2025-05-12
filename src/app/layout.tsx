@@ -9,6 +9,13 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "DJSETLIST - 스포티파이 API 기반 음악 앱",
   description: "스포티파이 API를 사용한 음악 탐색 및 재생 앱",
+  viewport: {
+    width: "device-width",
+    initialScale: 1.0,
+    maximumScale: 1.0,
+    userScalable: false,
+    viewportFit: "cover",
+  },
 };
 
 export default function RootLayout({
@@ -47,7 +54,13 @@ export default function RootLayout({
           <AuthProvider>
             <QueryProvider>
               <Header />
-              <main className="container mx-auto !pt-16 !pb-16 min-h-screen">
+              <main
+                className="container mx-auto !pt-16 !pb-16 min-h-screen"
+                style={{
+                  paddingLeft: "var(--safe-area-inset-left)",
+                  paddingRight: "var(--safe-area-inset-right)",
+                }}
+              >
                 {children}
               </main>
               <Footer />
