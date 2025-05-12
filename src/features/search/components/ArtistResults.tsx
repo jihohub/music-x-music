@@ -53,7 +53,7 @@ export const ArtistResults = ({
               {artist.name}
             </h3>
             <p className="text-sm text-text-secondary truncate text-center">
-              아티스트
+              {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
             </p>
           </Link>
         ))}
