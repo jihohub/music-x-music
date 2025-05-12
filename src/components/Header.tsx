@@ -9,7 +9,14 @@ export default function Header({ title }: { title?: string }) {
   const isHome = pathname === "/";
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-opacity-90 bg-background border-b border-border-color">
+    <header
+      className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-opacity-90 bg-background border-b border-border-color"
+      style={{
+        paddingTop: "var(--safe-area-inset-top)",
+        paddingLeft: "var(--safe-area-inset-left)",
+        paddingRight: "var(--safe-area-inset-right)",
+      }}
+    >
       <div className="container h-16 flex justify-between items-center px-4">
         <div className="w-12">
           {!isHome ? (
