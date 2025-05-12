@@ -1,33 +1,33 @@
 "use client";
 
-import { SpotifyArtist } from "@/types/spotify";
+import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-interface ArtistResultsProps {
-  artists: SpotifyArtist[];
+interface AlbumGridProps {
+  albums: SpotifyAlbum[];
   showMoreLink?: boolean;
   onShowMore?: () => void;
 }
 
-export const ArtistResults = ({
-  artists,
+export const AlbumGrid = ({
+  albums,
   showMoreLink = false,
   onShowMore,
-}: ArtistResultsProps) => {
-  if (artists.length === 0) return null;
+}: AlbumGridProps) => {
+  if (!albums || albums.length === 0) return null;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, delay: 0.2 }}
       className="space-y-4"
     >
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">아티스트</h2>
+        <h2 className="text-xl font-bold">앨범</h2>
         {showMoreLink && (
           <button
             onClick={onShowMore}
@@ -38,22 +38,20 @@ export const ArtistResults = ({
         )}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {artists.map((artist) => (
-          <Link href={`/artist/${artist.id}`} key={artist.id} className="group">
-            <div className="overflow-hidden rounded-full aspect-square relative bg-card-bg">
+        {albums.map((album) => (
+          <Link href={`/album/${album.id}`} key={album.id} className="group">
+            <div className="overflow-hidden rounded-md aspect-square relative bg-card-bg">
               <Image
-                src={getSafeImageUrl(artist.images)}
-                alt={artist.name}
+                src={getSafeImageUrl(album.images, "lg")}
+                alt={album.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                className="object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="mt-2 font-semibold truncate text-center">
-              {artist.name}
-            </h3>
-            <p className="text-sm text-text-secondary truncate text-center">
-              {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
+            <h3 className="mt-2 font-semibold truncate">{album.name}</h3>
+            <p className="text-sm text-text-secondary truncate">
+              {album.artists.map((a) => a.name).join(", ")}
             </p>
           </Link>
         ))}
@@ -61,5 +59,3 @@ export const ArtistResults = ({
     </motion.div>
   );
 };
-
-export default ArtistResults;

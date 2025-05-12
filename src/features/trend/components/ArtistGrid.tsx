@@ -6,18 +6,18 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-interface ArtistResultsProps {
+interface ArtistGridProps {
   artists: SpotifyArtist[];
   showMoreLink?: boolean;
   onShowMore?: () => void;
 }
 
-export const ArtistResults = ({
+export const ArtistGrid = ({
   artists,
   showMoreLink = false,
   onShowMore,
-}: ArtistResultsProps) => {
-  if (artists.length === 0) return null;
+}: ArtistGridProps) => {
+  if (!artists || artists.length === 0) return null;
 
   return (
     <motion.div
@@ -42,7 +42,7 @@ export const ArtistResults = ({
           <Link href={`/artist/${artist.id}`} key={artist.id} className="group">
             <div className="overflow-hidden rounded-full aspect-square relative bg-card-bg">
               <Image
-                src={getSafeImageUrl(artist.images)}
+                src={getSafeImageUrl(artist.images, "lg")}
                 alt={artist.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -61,5 +61,3 @@ export const ArtistResults = ({
     </motion.div>
   );
 };
-
-export default ArtistResults;
