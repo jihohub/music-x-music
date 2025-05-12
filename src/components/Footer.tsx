@@ -9,10 +9,10 @@ import {
   IoFlameOutline,
   IoHome,
   IoHomeOutline,
-  IoPerson,
-  IoPersonOutline,
   IoSearch,
   IoSearchOutline,
+  IoSettings,
+  IoSettingsOutline,
 } from "react-icons/io5";
 
 interface NavItem {
@@ -51,10 +51,10 @@ export default function Footer() {
       activeIcon: <IoCompass size={24} />,
     },
     {
-      name: "프로필",
-      path: "/profile",
-      icon: <IoPersonOutline size={24} />,
-      activeIcon: <IoPerson size={24} />,
+      name: "설정",
+      path: "/settings",
+      icon: <IoSettingsOutline size={24} />,
+      activeIcon: <IoSettings size={24} />,
     },
   ];
 
