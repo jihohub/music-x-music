@@ -23,7 +23,6 @@ export const TrackHeader = ({ track }: TrackHeaderProps) => {
           fill
           sizes="100vw"
           className="object-cover -z-10 opacity-50"
-          quality={90}
           priority
         />
       </div>
