@@ -32,46 +32,46 @@ export const RECOMMENDED_TRACK_IDS = [
  * 트렌드 페이지에 표시될 아티스트 ID 목록
  */
 export const TREND_ARTIST_IDS = [
-  "4YRxDV8wJFPHPTeXepOstw", // Arijit Singh
   "06HL4z0CvFAxyc27GXpf02", // Taylor Swift
-  "6eUKZXaKkcviH0Ku9w2n3V", // Ed Sheeran
+  "0du5cEVh5yTK9QJze8zA0C", // Bruno Mars
+  "1Xyo4u8uXC1ZmMpatF05PJ", // The Weeknd
   "6qqNVTkY8uBg9cP3Jd7DAH", // Billie Eilish
   "66CXWjxzNUsdJxJ2JdwvnR", // Ariana Grande
-  "1Xyo4u8uXC1ZmMpatF05PJ", // The Weeknd
-  "7dGJo4pcD2V6oG8kP0tJRR", // Eminem
-  "3TVXtAsR1Inumwj472S9r4", // Drake
+  "2YZyLoL8N0Wb9xBt1NhZWg", // Kendrick Lamar
+  "699OTQXzgjhIYAHMy9RyPD", // Playboi Carti
+  "74KM79TiuVKeVCqs8QtB0B", // Sabrina Carpenter
   "4q3ewBCX7sLwd24euuV69X", // Bad Bunny
-  "1uNFoZAHBGtllmzznpCI3s", // Justin Bieber
+  "1HY2Jd0NmPuamShAr6KMms", // Lady Gaga
 ];
 
 /**
  * 트렌드 페이지에 표시될 트랙 ID 목록
  */
 export const TREND_TRACK_IDS = [
-  "1hA697u7e1jX2XM8sWA6Uy", // Apna Bana Le - Arijit Singh
-  "1BxfuPKGuaTgP7aM0Bbdwr", // Cruel Summer - Taylor Swift
-  "0GRc3eGTg8HBdWLRGYgqIc", // Azizam - Ed Sheeran
+  "45J4avUb9Ni0bnETYaYFVJ", // luther (with sza) - Kendrick Lamar
+  "6ZWalyzfVcNCc1XwKnnyyn", // Not Like Us - Kendrick Lamar
+  "2plbrEY59IikOBgBGLjaoe", // Die With A Smile - Lady Gaga, Bruno Mars
   "6dOtVTDdiauQNBQEDOtlAB", // BIRDS OF A FEATHER - Billie Eilish
   "51ZQ1vr10ffzbwIjDCwqm4", // we can't be friends (wait for your love) - Ariana Grande
   "0FIDCNYYjNvPVimz5icugS", // Timeless (feat Playboi Carti) - The Weeknd
-  "7lQ8MOhq6IN2w8EYcFNSUk", // Without Me - Eminem
-  "2u9S9JJ6hTZS3Vf22HOZKg", // NOKIA - Drake
+  "2vDkR3ctidSd17d2CygVzS", // APT. - ROSE, Bruno Mars
+  "6qqrTXSdwiJaq8SO0X2lSe", // Ordinary - Alex Warren
   "3sK8wGT43QFpWrvNQsrQya", // DtMF - Bad Bunny
-  "6QFCMUUq1T2Vf5sFUXcuQ7", // Beauty And A Beat - Justin Bieber
+  "6iycYUk3oB0NPMdaDUrN1w", // EVIL J0RDAN - Playboi Carti
 ];
 
 /**
  * 트렌드 페이지에 표시될 앨범 ID 목록
  */
 export const TREND_ALBUM_IDS = [
-  "1pw0xzpe4O0OMohBwau50L", // Bhediya (Original Motion Picture Soundtrack) - Arijit Singh
-  "1NAmidJlEaVgA3MpcPFYGq", // Lover - Taylor Swift
-  "37HwcDtLqY2WXN7NArODvI", // Azizam - Ed Sheeran
+  "0hvT3yIEysuuvkK73vgdcW", // GNX - Kendrick Lamar
+  "0fSfkmx0tdPqFYkJuNX74a", // Music - Playboi Carti
+  "3VQkNrG74QPY4rHBPoyZYZ", // SOS Deluxe: LANA - SZA
   "7aJuG4TFXa2hmE4z1yxc3n", // HIT ME HARD AND SOFT - Billie Eilish
   "5EYKrEDnKhhcNxGedaRQeK", // eternal sunshine - Ariana Grande
   "3OxfaVgvTxUTy7276t7SPU", // Hurry Up Tomorrow - The Weeknd
-  "2cWBwpqMsDJC1ZUwz813lo", // The Eminem Show - Eminem
+  "3w32SV56JvtJXsrYtThwzP", // So Close To What - Tate McRae
   "6Rl6YoCarF2GHPSQmmFjuR", // $ome $exy $ongs 4 U - Drake
   "5K79FLRUCSysQnVESLcTdb", // DeBÍ TiRAR MáS FOToS - Bad Bunny
-  "5cxMa6oLINJzmZ8lF7wWQN", // BelieveJustin Bieber
+  "2MHUaRi9OCyTN02SoyRRBJ", // MAYHEM - Lady Gaga
 ];
