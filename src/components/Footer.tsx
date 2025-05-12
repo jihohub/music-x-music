@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  IoCompass,
+  IoCompassOutline,
   IoFlame,
   IoFlameOutline,
   IoHome,
   IoHomeOutline,
-  IoNewspaper,
-  IoNewspaperOutline,
   IoPerson,
   IoPersonOutline,
   IoSearch,
@@ -47,8 +47,8 @@ export default function Footer() {
     {
       name: "신곡",
       path: "/new",
-      icon: <IoNewspaperOutline size={24} />,
-      activeIcon: <IoNewspaper size={24} />,
+      icon: <IoCompassOutline size={24} />,
+      activeIcon: <IoCompass size={24} />,
     },
     {
       name: "프로필",
