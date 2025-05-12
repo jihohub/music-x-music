@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  IoHeart,
-  IoHeartOutline,
+  IoFlame,
+  IoFlameOutline,
   IoHome,
   IoHomeOutline,
+  IoNewspaper,
+  IoNewspaperOutline,
   IoPerson,
   IoPersonOutline,
   IoSearch,
   IoSearchOutline,
-  IoTrendingUp,
-  IoTrendingUpOutline,
 } from "react-icons/io5";
 
 interface NavItem {
@@ -41,14 +41,14 @@ export default function Footer() {
     {
       name: "트렌드",
       path: "/trend",
-      icon: <IoTrendingUpOutline size={24} />,
-      activeIcon: <IoTrendingUp size={24} />,
+      icon: <IoFlameOutline size={24} />,
+      activeIcon: <IoFlame size={24} />,
     },
     {
-      name: "좋아요",
-      path: "/likes",
-      icon: <IoHeartOutline size={24} />,
-      activeIcon: <IoHeart size={24} />,
+      name: "신곡",
+      path: "/new",
+      icon: <IoNewspaperOutline size={24} />,
+      activeIcon: <IoNewspaper size={24} />,
     },
     {
       name: "프로필",
