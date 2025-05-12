@@ -83,7 +83,6 @@ export const NewReleaseGrid = ({
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
-                quality={90}
               />
             </div>
             <h3 className="mt-2 font-semibold truncate">{album.name}</h3>

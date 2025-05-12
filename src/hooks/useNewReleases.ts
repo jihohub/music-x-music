@@ -30,8 +30,18 @@ export function useInfiniteNewReleases(limit: number = 20) {
       if (lastPage.length < limit) {
         return undefined;
       }
-      return allPages.length * limit;
+
+      // 실제 로드된 아이템 수 계산
+      let loadedItemsCount = 0;
+      allPages.forEach((page) => {
+        loadedItemsCount += page.length;
+      });
+
+      return loadedItemsCount;
     },
     staleTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1,
   });
 }
