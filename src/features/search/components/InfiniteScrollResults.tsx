@@ -94,12 +94,8 @@ export function InfiniteScrollResults({
         dataLength={currentItems.length}
         next={handleNext}
         hasMore={!!hasNextPage}
-        loader={<p className="text-center py-4">로딩 중...</p>}
-        endMessage={
-          <p className="text-center py-4 text-gray-500">
-            모든 결과를 불러왔습니다
-          </p>
-        }
+        loader={null}
+        endMessage={null}
         className="space-y-6"
         scrollThreshold={0.5}
         scrollableTarget="search-page-container"
