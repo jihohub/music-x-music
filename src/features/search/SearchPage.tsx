@@ -73,7 +73,6 @@ export function SearchPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
       ref={scrollContainerRef}
-      id="search-page-container"
     >
       {/* 헤더 영역: 검색 입력과 탭 */}
       <SearchHeader
