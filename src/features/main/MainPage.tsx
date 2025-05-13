@@ -8,9 +8,12 @@ export function MainPage() {
   return (
     <div className="py-6 space-y-8">
       <HeroSection />
-      <FeaturedArtists />
-      <RecommendedTracks />
-      {/* <GenreSection /> */}
+      <div className="container px-4 mt-12 space-y-6">
+        <FeaturedArtists />
+        <RecommendedTracks />
+
+        {/* <GenreSection /> */}
+      </div>
     </div>
   );
 }
