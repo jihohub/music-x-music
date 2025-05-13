@@ -98,7 +98,6 @@ export function InfiniteScrollResults({
         endMessage={null}
         className="space-y-6"
         scrollThreshold={0.5}
-        scrollableTarget="search-page-container"
         style={{ overflow: "visible" }}
       >
         {/* 결과 컴포넌트 - 즉시 렌더링 */}
