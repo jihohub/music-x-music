@@ -2,9 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import BasicSearchResults from "./components/BasicSearchResults";
-import ErrorDisplay from "./components/ErrorDisplay";
 import InfiniteScrollResults from "./components/InfiniteScrollResults";
-import LoadingIndicator from "./components/LoadingIndicator";
 import NoResults from "./components/NoResults";
 import PopularSearches from "./components/PopularSearches";
 import SearchHeader from "./components/SearchHeader";
@@ -86,10 +84,9 @@ export function SearchPage() {
       />
 
       {/* 초기 로딩 상태 */}
-      <AnimatePresence mode="wait">
+      {/* <AnimatePresence mode="wait">
         {showLoading && <LoadingIndicator key="loading" size="large" />}
 
-        {/* 에러 표시 */}
         {isError && (
           <motion.div
             key="error"
@@ -101,7 +98,7 @@ export function SearchPage() {
             <ErrorDisplay message={error?.message} />
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* 검색 결과 영역 */}
       <div className="space-y-8">
