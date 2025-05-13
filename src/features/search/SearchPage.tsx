@@ -5,7 +5,7 @@ import BasicSearchResults from "./components/BasicSearchResults";
 import InfiniteScrollResults from "./components/InfiniteScrollResults";
 import NoResults from "./components/NoResults";
 import PopularSearches from "./components/PopularSearches";
-import SearchHeader from "./components/SearchHeader";
+// import SearchHeader from "./components/SearchHeader";
 import { useSearchPageLogic } from "./hooks/useSearchPageLogic";
 
 export function SearchPage() {
@@ -74,14 +74,14 @@ export function SearchPage() {
       id="search-page-container"
     >
       {/* 헤더 영역: 검색 입력과 탭 */}
-      <SearchHeader
+      {/* <SearchHeader
         searchTerm={searchTerm}
         searchType={searchType}
         handleSearchChange={handleSearchChange}
         clearSearch={clearSearch}
         handleSearchSubmit={handleSearchSubmit}
         handleTypeChange={handleTypeChange}
-      />
+      /> */}
 
       {/* 초기 로딩 상태 */}
       {/* <AnimatePresence mode="wait">
