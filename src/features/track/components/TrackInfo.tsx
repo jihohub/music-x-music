@@ -53,7 +53,7 @@ export const TrackInfo = ({ track }: TrackInfoProps) => {
           <IoTimeOutline className="text-primary mt-1" size={18} />
           <div>
             <h3 className="font-medium">재생 시간</h3>
-            <p className="text-text-secondary">
+            <p className="text-text-secondary monospace-nums">
               {Math.floor(track.duration_ms / 60000)}:
               {((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}
             </p>
