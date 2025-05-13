@@ -75,7 +75,7 @@ export const TrackList = ({ album }: TrackListProps) => {
                 ))}
               </div>
             </div>
-            <div className="text-text-secondary text-right w-10 shrink-0">
+            <div className="text-text-secondary text-right w-10 shrink-0 monospace-nums">
               {Math.floor(track.duration_ms / 60000)}:
               {((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}
             </div>

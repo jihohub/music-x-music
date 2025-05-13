@@ -74,6 +74,14 @@ button {
   touch-action: manipulation; /* 터치 액션 처리 방식 변경 */
 }
 
+/* 숫자 폭을 일정하게 유지하는 클래스 (iOS에서 시간 표시 등에 유용) */
+.monospace-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  font-feature-settings: "tnum";
+}
+
 /* 레이아웃 */
 .container {
   width: 100%;
