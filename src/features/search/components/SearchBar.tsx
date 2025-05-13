@@ -45,7 +45,7 @@ export const SearchBar = ({
         initial={{ opacity: 0.8, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="relative bg-card-bg/80 backdrop-blur-md rounded-full border border-gray-200/10 px-4 py-2.5 shadow-sm"
+        className="relative bg-card-bg rounded-full border border-gray-200/10 px-4 py-2.5 shadow-sm"
         whileTap={{ scale: 0.99 }}
       >
         <div className="flex items-center">
