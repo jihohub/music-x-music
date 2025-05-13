@@ -68,12 +68,16 @@ export function SearchPage() {
 
   return (
     <motion.div
-      className="py-6 space-y-6 px-4 min-h-screen"
+      className="py-6 space-y-6 px-4 min-h-screen backdrop-fix"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
       ref={scrollContainerRef}
       id="search-page-container"
+      style={{
+        WebkitBackfaceVisibility: "hidden",
+        backfaceVisibility: "hidden",
+      }}
     >
       {/* 헤더 영역: 검색 입력과 탭 */}
       <SearchHeader
