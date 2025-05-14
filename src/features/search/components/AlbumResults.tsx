@@ -60,9 +60,7 @@ export const AlbumResults = ({
               </div>
               <div className="mt-2 flex items-center gap-1">
                 <h3 className="font-semibold truncate">{album.name}</h3>
-                {album.explicit && (
-                  <ExplicitBadge className="ml-1 flex-shrink-0" />
-                )}
+                {album.explicit && <ExplicitBadge />}
               </div>
               <p className="text-sm text-text-secondary truncate">
                 {album.artists.map((a) => a.name).join(", ")}

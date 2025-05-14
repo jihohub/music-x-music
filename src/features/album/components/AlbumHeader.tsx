@@ -55,9 +55,7 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
                   {album.name}
                 </h1>
-                {album.explicit && (
-                  <ExplicitBadge className="ml-2 flex-shrink-0" />
-                )}
+                {album.explicit && <ExplicitBadge />}
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
                 {album.artists.map((albumArtist, index) => (
