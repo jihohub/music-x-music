@@ -8,6 +8,21 @@ export async function getAlbumById(id: string): Promise<SpotifyAlbum> {
   try {
     const album = await spotifyFetch<SpotifyAlbum>(`/albums/${id}`);
     console.log(`앨범 정보를 성공적으로 가져왔습니다: ${album.name}`);
+
+    // 트랙 정보 로깅
+    if (album.tracks && album.tracks.items && album.tracks.items.length > 0) {
+      console.log(`앨범 트랙 개수: ${album.tracks.items.length}`);
+      const firstTrack = album.tracks.items[0];
+      console.log(`첫 번째 트랙 정보:`, firstTrack);
+      console.log(`첫 번째 트랙 explicit 값:`, firstTrack.explicit);
+
+      // explicit 필드 존재 확인
+      const explicitTracks = album.tracks.items.filter(
+        (track) => track.explicit
+      );
+      console.log(`Explicit 트랙 수: ${explicitTracks.length}`);
+    }
+
     return album;
   } catch (error: any) {
     console.error(
