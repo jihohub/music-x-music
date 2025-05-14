@@ -1,5 +1,6 @@
 "use client";
 
+import { ExplicitBadge } from "@/components/ExplicitBadge";
 import { SpotifyBadge } from "@/components/SpotifyBadge";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
@@ -50,9 +51,14 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
             style={{ height: "160px" }}
           >
             <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
-                {album.name}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
+                  {album.name}
+                </h1>
+                {album.explicit && (
+                  <ExplicitBadge className="ml-2 flex-shrink-0" />
+                )}
+              </div>
               <div className="flex flex-wrap gap-2 mt-3">
                 {album.artists.map((albumArtist, index) => (
                   <Link

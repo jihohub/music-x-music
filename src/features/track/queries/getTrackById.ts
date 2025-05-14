@@ -8,6 +8,7 @@ export async function getTrackById(id: string): Promise<SpotifyTrack> {
   try {
     const track = await spotifyFetch<SpotifyTrack>(`/tracks/${id}`);
     console.log(`트랙 정보를 성공적으로 가져왔습니다: ${track.name}`);
+
     return track;
   } catch (error: any) {
     console.error(

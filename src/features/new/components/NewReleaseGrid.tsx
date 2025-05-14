@@ -1,5 +1,6 @@
 "use client";
 
+import { ExplicitBadge } from "@/components/ExplicitBadge";
 import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
@@ -87,7 +88,12 @@ export const NewReleaseGrid = ({
                 className="object-cover"
               />
             </div>
-            <h3 className="mt-2 font-semibold truncate">{album.name}</h3>
+            <div className="mt-2 flex items-center gap-1">
+              <h3 className="font-semibold truncate">{album.name}</h3>
+              {album.explicit && (
+                <ExplicitBadge className="ml-1 flex-shrink-0" />
+              )}
+            </div>
             <p className="text-sm text-text-secondary truncate">
               {album.artists?.map((a) => a.name).join(", ")}
             </p>
