@@ -26,7 +26,8 @@ export const ArtistInfo = ({ artists }: ArtistInfoProps) => {
           <div key={artist.id} className="flex items-center gap-3">
             <Link
               href={`/artist/${artist.id}`}
-              className="block relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0"
+              className="block relative w-12 h-12 rounded-sm overflow-hidden flex-shrink-0"
+              style={{ borderRadius: "4px" }}
             >
               <Image
                 src={getSafeImageUrl(artist.images, "sm")}

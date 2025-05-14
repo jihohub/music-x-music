@@ -1,8 +1,10 @@
 "use client";
 
+import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { getFeaturedArtists } from "@/features/main/queries";
 import { SpotifyArtist } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -42,26 +44,19 @@ export const FeaturedArtists = () => {
       {loading && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="group bg-card-bg rounded-lg overflow-hidden"
-            >
-              <div className="relative aspect-square w-full overflow-hidden">
-                <div
-                  className="absolute inset-0 animate-pulse"
-                  style={{ backgroundColor: "var(--skeleton-bg)" }}
-                />
-              </div>
-              <div className="h-[64px] p-3">
-                <div
-                  className="h-4 rounded w-3/4 mb-2 animate-pulse"
-                  style={{ backgroundColor: "var(--skeleton-bg)" }}
-                />
-                <div
-                  className="h-3 rounded w-1/2 animate-pulse"
-                  style={{ backgroundColor: "var(--skeleton-bg)" }}
-                />
-              </div>
+            <div key={i} className="animate-pulse">
+              <div
+                className="aspect-square rounded-sm w-full"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-5 mt-2 rounded w-3/4"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-4 mt-1 rounded w-1/2"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
             </div>
           ))}
         </div>
@@ -73,30 +68,32 @@ export const FeaturedArtists = () => {
 
       {!loading && !error && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {artists.map((artist) => (
-            <Link
-              href={`/artist/${artist.id}`}
+          {artists.map((artist, index) => (
+            <motion.div
               key={artist.id}
-              className="group bg-card-bg rounded-lg overflow-hidden hover:bg-gray-700/10 transition-colors"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <div className="relative aspect-square w-full overflow-hidden">
-                <Image
-                  src={getSafeImageUrl(artist.images, "lg")}
-                  alt={artist.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                  className="object-cover transition-transform group-hover:scale-105"
-                />
-              </div>
-              <div className="p-3">
-                <h3 className="font-medium text-sm line-clamp-1">
+              <Link href={`/artist/${artist.id}`} className="group">
+                <SpotifyLogo />
+                <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+                  <Image
+                    src={getSafeImageUrl(artist.images, "lg")}
+                    alt={artist.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
+                    className="object-cover"
+                  />
+                </div>
+                <h3 className="mt-2 font-semibold truncate text-sm">
                   {artist.name}
                 </h3>
-                <p className="text-text-secondary text-xs line-clamp-1 mt-1">
+                <p className="text-sm text-text-secondary truncate">
                   {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
                 </p>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
         </div>
       )}

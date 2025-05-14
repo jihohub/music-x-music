@@ -54,7 +54,7 @@ export function BasicSearchResults({
           transition={{ duration: 0.2, delay: 0.1 }}
         >
           <TrackResults
-            tracks={allTracks.slice(0, 5)}
+            tracks={allTracks.slice(0, 4)}
             showMoreLink={true}
             onShowMore={() => handleTypeChange("track")}
           />

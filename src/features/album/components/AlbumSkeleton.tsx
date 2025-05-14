@@ -3,11 +3,11 @@
 export const AlbumSkeleton = () => {
   return (
     <div className="py-6">
-      {/* 앨범 배너 및 커버 영역 */}
-      <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
+      {/* 앨범 헤더 스켈레톤 */}
+      <section className="relative bg-background">
+        <div className="container px-4 pb-6">
           <div
-            className="absolute inset-0 animate-pulse"
+            className="h-[160px] rounded animate-pulse"
             style={{ backgroundColor: "var(--skeleton-bg)" }}
           />
         </div>

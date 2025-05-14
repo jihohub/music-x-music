@@ -1,5 +1,7 @@
 "use client";
 
+import { SpotifyBadge } from "@/components/SpotifyBadge";
+import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -19,6 +21,9 @@ export const TrackList = ({
 }: TrackListProps) => {
   if (!tracks || tracks.length === 0) return null;
 
+  // 표시할 트랙 수 제한 (최대 20개)
+  const displayTracks = tracks.slice(0, 20);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -29,39 +34,43 @@ export const TrackList = ({
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">트랙</h2>
         {showMoreLink && (
-          <button
-            onClick={onShowMore}
-            className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded-full transition-all duration-200"
-          >
-            더 보기
-          </button>
+          <SpotifyBadge href="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M" />
         )}
       </div>
-      <div className="space-y-2">
-        {tracks.map((track) => (
-          <Link
-            href={`/track/${track.id}`}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {displayTracks.map((track, index) => (
+          <motion.div
             key={track.id}
-            className="flex items-center gap-4 p-3 rounded-md hover:bg-card-bg transition-colors"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <div className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded">
-              <Image
-                src={getSafeImageUrl(track.album?.images, "lg")}
-                alt={track.name}
-                fill
-                sizes="48px"
-                className="object-cover"
-              />
-            </div>
-            <div className="flex-grow min-w-0">
-              <h3 className="font-semibold truncate">{track.name}</h3>
-              <p className="text-text-secondary text-sm truncate">
+            <Link href={`/track/${track.id}`} className="group">
+              <SpotifyLogo />
+              <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+                <Image
+                  src={getSafeImageUrl(track.album?.images, "lg")}
+                  alt={track.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="mt-2 font-semibold truncate text-sm">
+                {track.name}
+              </h3>
+              <p className="text-sm text-text-secondary truncate">
                 {track.artists.map((a) => a.name).join(", ")}
               </p>
-            </div>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </div>
+      {showMoreLink && tracks.length > 20 && (
+        <div className="flex justify-center mt-4">
+          <SpotifyBadge href="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M" />
+        </div>
+      )}
     </motion.div>
   );
 };
