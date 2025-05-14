@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import ThemeToggle from "@/components/ThemeToggle";
-import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
 
 export default function SettingsPage() {
@@ -34,13 +33,13 @@ export default function SettingsPage() {
           </div>
 
           <div className="divide-y divide-border-color">
-            <Link href="#" className="p-4 flex justify-between items-center">
+            {/* <Link href="#" className="p-4 flex justify-between items-center">
               <span>개인정보 처리방침</span>
             </Link>
 
             <Link href="#" className="p-4 flex justify-between items-center">
               <span>서비스 이용약관</span>
-            </Link>
+            </Link> */}
 
             <div className="p-4 flex justify-between items-center">
               <span>버전</span>

@@ -5,7 +5,6 @@ import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { IoPlayCircleOutline } from "react-icons/io5";
 
 interface TopTracksProps {
   tracks: SpotifyTrack[];
@@ -24,7 +23,7 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
         <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
           <div className="w-8 text-center shrink-0">#</div>
           <div className="flex-grow min-w-0">제목</div>
-          <div className="hidden md:block w-1/3 min-w-0">앨범</div>
+          <div className="hidden md:block w-1/4 min-w-0">앨범</div>
           <div className="text-right w-10 shrink-0">시간</div>
         </div>
         {tracks.map((track, index) => (
@@ -33,10 +32,7 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
             className="flex items-center gap-2 py-2 hover:bg-gray-700/10 transition-colors group"
           >
             <div className="w-8 text-center text-text-secondary shrink-0">
-              <span className="group-hover:hidden">{index + 1}</span>
-              <button className="hidden group-hover:block mx-auto">
-                <IoPlayCircleOutline size={18} />
-              </button>
+              <span>{index + 1}</span>
             </div>
             <div className="w-10 h-10 shrink-0">
               <Image
@@ -55,7 +51,7 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
                 {track.name}
               </Link>
             </div>
-            <div className="hidden md:block w-1/3 min-w-0">
+            <div className="hidden md:block w-1/4 min-w-0">
               <Link
                 href={`/album/${track.album?.id}`}
                 className="text-text-secondary hover:text-primary block truncate"

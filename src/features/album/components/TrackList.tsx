@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
-import { IoPlayCircleOutline } from "react-icons/io5";
 
 interface TrackListProps {
   album: SpotifyAlbum;
@@ -27,7 +26,7 @@ export const TrackList = ({ album }: TrackListProps) => {
         <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
           <div className="w-8 text-center shrink-0">#</div>
           <div className="flex-grow min-w-0">제목</div>
-          <div className="hidden md:block w-1/3 min-w-0">아티스트</div>
+          <div className="hidden md:block w-1/4 min-w-0">아티스트</div>
           <div className="text-right w-10 shrink-0">시간</div>
         </div>
         {album.tracks?.items.map((track, index) => (
@@ -36,10 +35,7 @@ export const TrackList = ({ album }: TrackListProps) => {
             className="flex items-center gap-2 py-2 hover:bg-gray-700/10 transition-colors group"
           >
             <div className="w-8 text-center text-text-secondary shrink-0">
-              <span className="group-hover:hidden">{index + 1}</span>
-              <button className="hidden group-hover:block mx-auto">
-                <IoPlayCircleOutline size={18} />
-              </button>
+              <span>{index + 1}</span>
             </div>
             <div className="w-10 h-10 shrink-0">
               <Image
@@ -58,7 +54,7 @@ export const TrackList = ({ album }: TrackListProps) => {
                 {track.name}
               </Link>
             </div>
-            <div className="hidden md:block w-1/3 min-w-0">
+            <div className="hidden md:block w-1/4 min-w-0">
               <div className="text-text-secondary truncate">
                 {track.artists.map((artist, index) => (
                   <Fragment key={artist.id}>

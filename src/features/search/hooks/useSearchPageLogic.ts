@@ -133,6 +133,17 @@ export function useSearchPageLogic() {
     isSpecificTypeSearch
   );
 
+  // 디버깅을 위한 로그 추가
+  useEffect(() => {
+    if (searchTerm && searchTerm.trim().length >= 2) {
+      console.log("검색 결과 개수:", {
+        트랙: allTracks.length,
+        아티스트: allArtists.length,
+        앨범: allAlbums.length,
+      });
+    }
+  }, [allTracks.length, allArtists.length, allAlbums.length, searchTerm]);
+
   // 검색 결과가 있는지 확인
   const hasResults =
     allTracks.length > 0 || allArtists.length > 0 || allAlbums.length > 0;
