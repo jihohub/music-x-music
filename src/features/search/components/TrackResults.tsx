@@ -1,5 +1,6 @@
 "use client";
 
+import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -37,29 +38,31 @@ export const TrackResults = ({
           </button>
         )}
       </div>
-      <div className="space-y-2">
-        {tracks.map((track) => (
-          <Link
-            href={`/track/${track.id}`}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {tracks.slice(0, 20).map((track, index) => (
+          <motion.div
             key={track.id}
-            className="flex items-center gap-4 p-3 rounded-md hover:bg-card-bg transition-colors"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <div className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded">
-              <Image
-                src={getSafeImageUrl(track.album?.images, "sm")}
-                alt={track.name}
-                fill
-                sizes="48px"
-                className="object-cover"
-              />
-            </div>
-            <div className="flex-grow min-w-0">
-              <h3 className="font-semibold truncate">{track.name}</h3>
-              <p className="text-text-secondary text-sm truncate">
+            <Link href={`/track/${track.id}`} className="group">
+              <SpotifyLogo />
+              <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+                <Image
+                  src={getSafeImageUrl(track.album?.images, "lg")}
+                  alt={track.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="mt-2 font-semibold truncate">{track.name}</h3>
+              <p className="text-sm text-text-secondary truncate">
                 {track.artists.map((a) => a.name).join(", ")}
               </p>
-            </div>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </div>
     </motion.div>

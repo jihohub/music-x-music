@@ -19,7 +19,7 @@ export default function LoginPage() {
           className="w-full flex items-center justify-center py-3 px-4 rounded-full bg-primary hover:bg-primary-hover text-white font-medium transition-colors"
         >
           <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png"
+            src="/images/Spotify_Primary_Logo_RGB_Green.png"
             width={24}
             height={24}
             alt="Spotify"

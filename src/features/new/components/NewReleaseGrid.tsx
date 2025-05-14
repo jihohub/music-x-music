@@ -1,5 +1,6 @@
 "use client";
 
+import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -23,7 +24,7 @@ export const NewReleaseGrid = ({
         {Array.from({ length: 12 }).map((_, i) => (
           <div key={i} className="animate-pulse">
             <div
-              className="aspect-square bg-card-bg rounded-md w-full"
+              className="aspect-square bg-card-bg rounded-sm w-full"
               style={{ backgroundColor: "var(--skeleton-bg)" }}
             />
             <div
@@ -76,13 +77,14 @@ export const NewReleaseGrid = ({
           transition={{ duration: 0.3, delay: index * 0.05 }}
         >
           <Link href={`/album/${album.id}`} className="group">
-            <div className="overflow-hidden rounded-md aspect-square relative bg-card-bg">
+            <SpotifyLogo />
+            <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
               <Image
                 src={getSafeImageUrl(album.images, "lg")}
                 alt={album.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-cover"
               />
             </div>
             <h3 className="mt-2 font-semibold truncate">{album.name}</h3>

@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
+import { SpotifyLogo } from "@/components/SpotifyLogo";
 import {
   useTrendAlbums,
   useTrendArtists,
@@ -194,7 +195,8 @@ export default function TrendPage() {
                       key={artist.id}
                       className="group"
                     >
-                      <div className="overflow-hidden rounded-full aspect-square relative bg-card-bg">
+                      <SpotifyLogo />
+                      <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                         <Image
                           src={
                             artist.images?.[0]?.url || "/images/placeholder.png"
@@ -202,13 +204,13 @@ export default function TrendPage() {
                           alt={artist.name}
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                          className="object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover"
                         />
                       </div>
-                      <h3 className="mt-2 font-semibold truncate text-center">
+                      <h3 className="mt-2 font-semibold truncate text-sm">
                         {artist.name}
                       </h3>
-                      <p className="text-sm text-text-secondary truncate text-center">
+                      <p className="text-sm text-text-secondary truncate">
                         {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
                       </p>
                     </Link>
@@ -229,14 +231,15 @@ export default function TrendPage() {
                     더 보기
                   </button>
                 </div>
-                <div className="space-y-2">
-                  {trackData.slice(0, 5).map((track) => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {trackData.slice(0, 4).map((track) => (
                     <Link
                       href={`/track/${track.id}`}
                       key={track.id}
-                      className="flex items-center gap-4 p-3 rounded-md hover:bg-card-bg transition-colors"
+                      className="group"
                     >
-                      <div className="relative w-12 h-12 flex-shrink-0">
+                      <SpotifyLogo />
+                      <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                         <Image
                           src={
                             track.album?.images?.[0]?.url ||
@@ -244,17 +247,16 @@ export default function TrendPage() {
                           }
                           alt={track.name}
                           fill
-                          className="object-cover rounded"
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                          className="object-cover"
                         />
                       </div>
-                      <div className="flex-grow min-w-0">
-                        <h3 className="font-medium text-ellipsis">
-                          {track.name}
-                        </h3>
-                        <p className="text-text-secondary text-sm">
-                          {track.artists.map((a) => a.name).join(", ")}
-                        </p>
-                      </div>
+                      <h3 className="mt-2 font-semibold truncate text-sm">
+                        {track.name}
+                      </h3>
+                      <p className="text-sm text-text-secondary truncate">
+                        {track.artists.map((artist) => artist.name).join(", ")}
+                      </p>
                     </Link>
                   ))}
                 </div>
@@ -278,26 +280,26 @@ export default function TrendPage() {
                     <Link
                       href={`/album/${album.id}`}
                       key={album.id}
-                      className="card relative"
+                      className="group"
                     >
-                      <div className="relative aspect-square w-full overflow-hidden">
+                      <SpotifyLogo />
+                      <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                         <Image
                           src={
                             album.images?.[0]?.url || "/images/placeholder.png"
                           }
                           alt={album.name}
                           fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                           className="object-cover"
                         />
                       </div>
-                      <div className="p-3">
-                        <h3 className="font-semibold text-sm text-ellipsis">
-                          {album.name}
-                        </h3>
-                        <p className="text-text-secondary text-xs">
-                          {album.artists.map((a) => a.name).join(", ")}
-                        </p>
-                      </div>
+                      <h3 className="mt-2 font-semibold truncate text-sm">
+                        {album.name}
+                      </h3>
+                      <p className="text-sm text-text-secondary truncate">
+                        {album.artists.map((a) => a.name).join(", ")}
+                      </p>
                     </Link>
                   ))}
                 </div>
@@ -315,14 +317,15 @@ export default function TrendPage() {
             transition={{ duration: 0.3 }}
           >
             <h2 className="text-xl font-bold">트랙</h2>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {trackData.map((track) => (
                 <Link
                   href={`/track/${track.id}`}
                   key={track.id}
-                  className="flex items-center gap-4 p-2 rounded-md hover:bg-card-bg transition-colors"
+                  className="group"
                 >
-                  <div className="relative w-12 h-12 flex-shrink-0">
+                  <SpotifyLogo />
+                  <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                     <Image
                       src={
                         track.album?.images?.[0]?.url ||
@@ -330,15 +333,16 @@ export default function TrendPage() {
                       }
                       alt={track.name}
                       fill
-                      className="object-cover rounded"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                      className="object-cover"
                     />
                   </div>
-                  <div className="flex-grow min-w-0">
-                    <h3 className="font-medium text-ellipsis">{track.name}</h3>
-                    <p className="text-text-secondary text-sm">
-                      {track.artists.map((a) => a.name).join(", ")}
-                    </p>
-                  </div>
+                  <h3 className="mt-2 font-semibold truncate text-sm">
+                    {track.name}
+                  </h3>
+                  <p className="text-sm text-text-secondary truncate">
+                    {track.artists.map((a) => a.name).join(", ")}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -359,21 +363,22 @@ export default function TrendPage() {
                 <Link
                   href={`/artist/${artist.id}`}
                   key={artist.id}
-                  className="group relative"
+                  className="group"
                 >
-                  <div className="overflow-hidden rounded-full aspect-square relative bg-card-bg">
+                  <SpotifyLogo />
+                  <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                     <Image
                       src={artist.images?.[0]?.url || "/images/placeholder.png"}
                       alt={artist.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                      className="object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover"
                     />
                   </div>
-                  <h3 className="mt-2 font-semibold truncate text-center">
+                  <h3 className="mt-2 font-semibold truncate text-sm">
                     {artist.name}
                   </h3>
-                  <p className="text-sm text-text-secondary truncate text-center">
+                  <p className="text-sm text-text-secondary truncate">
                     {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
                   </p>
                 </Link>
@@ -391,29 +396,29 @@ export default function TrendPage() {
             transition={{ duration: 0.3 }}
           >
             <h2 className="text-xl font-bold">앨범</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {albumData.map((album) => (
                 <Link
                   href={`/album/${album.id}`}
                   key={album.id}
-                  className="card relative"
+                  className="group"
                 >
-                  <div className="relative aspect-square w-full overflow-hidden">
+                  <SpotifyLogo />
+                  <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                     <Image
                       src={album.images?.[0]?.url || "/images/placeholder.png"}
                       alt={album.name}
                       fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                       className="object-cover"
                     />
                   </div>
-                  <div className="p-3">
-                    <h3 className="font-semibold text-sm text-ellipsis">
-                      {album.name}
-                    </h3>
-                    <p className="text-text-secondary text-xs">
-                      {album.artists.map((a) => a.name).join(", ")}
-                    </p>
-                  </div>
+                  <h3 className="mt-2 font-semibold truncate text-sm">
+                    {album.name}
+                  </h3>
+                  <p className="text-sm text-text-secondary truncate">
+                    {album.artists.map((a) => a.name).join(", ")}
+                  </p>
                 </Link>
               ))}
             </div>

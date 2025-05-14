@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import BasicSearchResults from "./components/BasicSearchResults";
-import InfiniteScrollResults from "./components/InfiniteScrollResults";
+import ScrollResults from "./components/InfiniteScrollResults";
 import NoResults from "./components/NoResults";
 import PopularSearches from "./components/PopularSearches";
 import SearchHeader from "./components/SearchHeader";
@@ -125,24 +125,21 @@ export function SearchPage() {
             </motion.div>
           )}
 
-          {/* 검색 타입이 'all'이 아닐 때 무한 스크롤 결과 표시 */}
+          {/* 검색 타입이 'all'이 아닐 때 스크롤 결과 표시 */}
           {showInfiniteResults && (
             <motion.div
-              key={`infinite-results-${searchType}-${searchTerm}`}
+              key={`scroll-results-${searchType}-${searchTerm}`}
               initial={{ opacity: 0.8 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <InfiniteScrollResults
+              <ScrollResults
                 searchType={searchType}
                 searchTerm={searchTerm}
                 allArtists={allArtists}
                 allTracks={allTracks}
                 allAlbums={allAlbums}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                fetchNextPage={fetchNextPage}
               />
             </motion.div>
           )}

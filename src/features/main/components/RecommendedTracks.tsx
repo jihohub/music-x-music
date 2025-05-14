@@ -1,7 +1,9 @@
 "use client";
 
+import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { useRecommendedTracks } from "@/hooks/useSpotifyData";
 import { getSafeImageUrl } from "@/utils/image";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,33 +22,26 @@ export const RecommendedTracks = () => {
       {isLoading && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="group bg-card-bg rounded-lg overflow-hidden"
-            >
-              <div className="relative aspect-square w-full overflow-hidden">
-                <div
-                  className="absolute inset-0 animate-pulse"
-                  style={{ backgroundColor: "var(--skeleton-bg)" }}
-                />
-              </div>
-              <div className="h-[64px] p-3">
-                <div
-                  className="h-4 rounded w-3/4 mb-2 animate-pulse"
-                  style={{ backgroundColor: "var(--skeleton-bg)" }}
-                />
-                <div
-                  className="h-3 rounded w-1/2 animate-pulse"
-                  style={{ backgroundColor: "var(--skeleton-bg)" }}
-                />
-              </div>
+            <div key={i} className="animate-pulse">
+              <div
+                className="aspect-square rounded-sm w-full"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-5 mt-2 rounded w-3/4"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-4 mt-1 rounded w-1/2"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
             </div>
           ))}
         </div>
       )}
 
       {!isLoading && (tracks?.length === 0 || isError) && (
-        <div className="p-6 text-center rounded-md bg-card-bg">
+        <div className="text-center py-6">
           <p>추천 트랙을 불러올 수 없습니다.</p>
           <p className="text-sm text-text-secondary mt-2">
             {isError
@@ -58,31 +53,33 @@ export const RecommendedTracks = () => {
 
       {!isLoading && tracks && tracks.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {tracks.map((track) => (
-            <Link
-              href={`/track/${track.id}`}
+          {tracks.map((track, index) => (
+            <motion.div
               key={track.id}
-              className="group bg-card-bg rounded-lg overflow-hidden hover:bg-gray-700/10 transition-colors"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <div className="relative aspect-square w-full overflow-hidden">
-                <Image
-                  src={getSafeImageUrl(track.album?.images, "lg")}
-                  alt={track.album?.name || "앨범 이미지"}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                  className="object-cover transition-transform group-hover:scale-105"
-                  priority={track === tracks[0]}
-                />
-              </div>
-              <div className="p-3">
-                <h3 className="font-medium text-sm line-clamp-1">
+              <Link href={`/track/${track.id}`} className="group">
+                <SpotifyLogo />
+                <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+                  <Image
+                    src={getSafeImageUrl(track.album?.images, "lg")}
+                    alt={track.album?.name || "앨범 이미지"}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
+                    className="object-cover"
+                    priority={track === tracks[0]}
+                  />
+                </div>
+                <h3 className="mt-2 font-semibold truncate text-sm">
                   {track.name}
                 </h3>
-                <p className="text-text-secondary text-xs line-clamp-1 mt-1">
+                <p className="text-sm text-text-secondary truncate">
                   {track.artists.map((artist) => artist.name).join(", ")}
                 </p>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
         </div>
       )}

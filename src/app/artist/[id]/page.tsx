@@ -50,7 +50,9 @@ export default function ArtistPageContainer({
 
   return (
     <>
-      <Header title={artist?.name || ""} />
+      <Header
+        title={loading ? "아티스트 로딩 중..." : artist?.name || "아티스트"}
+      />
       <ArtistPage
         artist={artist as SpotifyArtist}
         topTracks={topTracks}

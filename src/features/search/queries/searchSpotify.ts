@@ -29,6 +29,16 @@ export async function searchSpotify(
         query
       )}&type=${searchType}&offset=${offset}&limit=${limit}`
     );
+
+    // 디버깅: API 응답에서 트랙 개수 로깅
+    if (response.tracks && response.tracks.items) {
+      console.log(
+        `검색어 "${query}" 트랙 API 응답 개수:`,
+        response.tracks.items.length
+      );
+      console.log(`검색어 "${query}" 트랙 총 개수:`, response.tracks.total);
+    }
+
     return response;
   } catch (error: any) {
     console.error(
