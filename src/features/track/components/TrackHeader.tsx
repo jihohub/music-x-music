@@ -55,9 +55,7 @@ export const TrackHeader = ({ track }: TrackHeaderProps) => {
                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
                   {track.name}
                 </h1>
-                {track.explicit && (
-                  <ExplicitBadge className="ml-2 flex-shrink-0" />
-                )}
+                {track.explicit && <ExplicitBadge />}
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
                 {track.artists.map((trackArtist, index) => (
