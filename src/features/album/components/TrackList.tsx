@@ -1,5 +1,6 @@
 "use client";
 
+import { ExplicitBadge } from "@/components/ExplicitBadge";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -47,12 +48,15 @@ export const TrackList = ({ album }: TrackListProps) => {
               />
             </div>
             <div className="flex-grow min-w-0">
-              <Link
-                href={`/track/${track.id}`}
-                className="hover:text-primary block line-clamp-2"
-              >
-                {track.name}
-              </Link>
+              <div className="flex items-center gap-1">
+                <Link
+                  href={`/track/${track.id}`}
+                  className="hover:text-primary line-clamp-2"
+                >
+                  {track.name}
+                </Link>
+                {track.explicit && <ExplicitBadge />}
+              </div>
             </div>
             <div className="hidden md:block w-1/4 min-w-0">
               <div className="text-text-secondary truncate">
