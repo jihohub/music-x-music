@@ -52,9 +52,7 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
                 >
                   {track.name}
                 </Link>
-                {track.explicit && (
-                  <ExplicitBadge className="ml-1 flex-shrink-0" />
-                )}
+                {track.explicit && <ExplicitBadge />}
               </div>
             </div>
             <div className="hidden md:block w-1/4 min-w-0">
