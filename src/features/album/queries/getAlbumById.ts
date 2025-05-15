@@ -14,13 +14,6 @@ export async function getAlbumById(id: string): Promise<SpotifyAlbum> {
       console.log(`앨범 트랙 개수: ${album.tracks.items.length}`);
       const firstTrack = album.tracks.items[0];
       console.log(`첫 번째 트랙 정보:`, firstTrack);
-      console.log(`첫 번째 트랙 explicit 값:`, firstTrack.explicit);
-
-      // explicit 필드 존재 확인
-      const explicitTracks = album.tracks.items.filter(
-        (track) => track.explicit
-      );
-      console.log(`Explicit 트랙 수: ${explicitTracks.length}`);
     }
 
     return album;

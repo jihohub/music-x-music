@@ -1,8 +1,5 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
-import { SpotifyBadge } from "@/components/SpotifyBadge";
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -34,9 +31,6 @@ export const AlbumGrid = ({
     >
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">앨범</h2>
-        {showMoreLink && (
-          <SpotifyBadge href="https://open.spotify.com/browse/featured-releases" />
-        )}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayAlbums.map((album, index) => (
@@ -47,7 +41,6 @@ export const AlbumGrid = ({
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
             <Link href={`/album/${album.id}`} className="group">
-              <SpotifyLogo />
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <Image
                   src={getSafeImageUrl(album.images, "lg")}
@@ -57,9 +50,8 @@ export const AlbumGrid = ({
                   className="object-cover"
                 />
               </div>
-              <div className="mt-2 flex items-center gap-1">
+              <div className="mt-2">
                 <h3 className="font-semibold truncate text-sm">{album.name}</h3>
-                {album.explicit && <ExplicitBadge />}
               </div>
               <p className="text-sm text-text-secondary truncate">
                 {album.artists.map((a) => a.name).join(", ")}
@@ -68,11 +60,6 @@ export const AlbumGrid = ({
           </motion.div>
         ))}
       </div>
-      {showMoreLink && albums.length > 20 && (
-        <div className="flex justify-center mt-4">
-          <SpotifyBadge href="https://open.spotify.com/browse/featured-releases" />
-        </div>
-      )}
     </motion.div>
   );
 };

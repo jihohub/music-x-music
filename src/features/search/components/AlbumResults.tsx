@@ -1,7 +1,5 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -40,33 +38,24 @@ export const AlbumResults = ({
         )}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {albums.slice(0, 20).map((album, index) => (
-          <motion.div
-            key={album.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-          >
-            <Link href={`/album/${album.id}`} className="group">
-              <SpotifyLogo />
-              <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                <Image
-                  src={getSafeImageUrl(album.images)}
-                  alt={album.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="mt-2 flex items-center gap-1">
-                <h3 className="font-semibold truncate">{album.name}</h3>
-                {album.explicit && <ExplicitBadge />}
-              </div>
-              <p className="text-sm text-text-secondary truncate">
-                {album.artists.map((a) => a.name).join(", ")}
-              </p>
-            </Link>
-          </motion.div>
+        {albums.map((album) => (
+          <Link href={`/album/${album.id}`} key={album.id} className="group">
+            <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+              <Image
+                src={getSafeImageUrl(album.images)}
+                alt={album.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="mt-2">
+              <h3 className="font-semibold truncate">{album.name}</h3>
+            </div>
+            <p className="text-sm text-text-secondary truncate">
+              {album.artists.map((a) => a.name).join(", ")}
+            </p>
+          </Link>
         ))}
       </div>
     </motion.div>

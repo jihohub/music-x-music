@@ -1,7 +1,5 @@
 "use client";
 
-import { SpotifyBadge } from "@/components/SpotifyBadge";
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyArtist } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -33,9 +31,6 @@ export const ArtistGrid = ({
     >
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">아티스트</h2>
-        {showMoreLink && (
-          <SpotifyBadge href="https://open.spotify.com/genre/discover-page-feature" />
-        )}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayArtists.map((artist, index) => (
@@ -46,7 +41,6 @@ export const ArtistGrid = ({
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
             <Link href={`/artist/${artist.id}`} className="group">
-              <SpotifyLogo />
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <Image
                   src={getSafeImageUrl(artist.images, "lg")}
@@ -66,11 +60,6 @@ export const ArtistGrid = ({
           </motion.div>
         ))}
       </div>
-      {showMoreLink && artists.length > 20 && (
-        <div className="flex justify-center mt-4">
-          <SpotifyBadge href="https://open.spotify.com/genre/discover-page-feature" />
-        </div>
-      )}
     </motion.div>
   );
 };

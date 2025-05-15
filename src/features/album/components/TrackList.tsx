@@ -1,12 +1,10 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment } from "react";
 
 interface TrackListProps {
   album: SpotifyAlbum;
@@ -48,36 +46,31 @@ export const TrackList = ({ album }: TrackListProps) => {
               />
             </div>
             <div className="flex-grow min-w-0">
-              <div className="flex items-center gap-1">
-                <Link
-                  href={`/track/${track.id}`}
-                  className="hover:text-primary line-clamp-2"
-                >
-                  {track.name}
-                </Link>
-                {track.explicit && <ExplicitBadge />}
-              </div>
+              <Link
+                href={`/track/${track.id}`}
+                className="hover:text-primary line-clamp-2"
+              >
+                {track.name}
+              </Link>
             </div>
-            <div className="hidden md:block w-1/4 min-w-0">
-              <div className="text-text-secondary truncate">
-                {track.artists.map((artist, index) => (
-                  <Fragment key={artist.id}>
-                    <Link
-                      href={`/artist/${artist.id}`}
-                      className="hover:text-primary"
-                    >
-                      {artist.name}
-                    </Link>
-                    {index < track.artists.length - 1 && (
-                      <span className="mx-1">, </span>
-                    )}
-                  </Fragment>
-                ))}
-              </div>
+            <div className="hidden md:block w-1/4 text-text-secondary line-clamp-1 min-w-0">
+              {track.artists.map((artist, idx) => (
+                <span key={artist.id}>
+                  <Link
+                    href={`/artist/${artist.id}`}
+                    className="hover:text-primary"
+                  >
+                    {artist.name}
+                  </Link>
+                  {idx < track.artists.length - 1 && ", "}
+                </span>
+              ))}
             </div>
-            <div className="text-text-secondary text-right w-10 shrink-0 monospace-nums">
+            <div className="text-right w-10 text-text-secondary shrink-0">
               {Math.floor(track.duration_ms / 60000)}:
-              {((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}
+              {(Math.floor(track.duration_ms / 1000) % 60)
+                .toString()
+                .padStart(2, "0")}
             </div>
           </div>
         ))}

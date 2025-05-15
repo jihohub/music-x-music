@@ -1,6 +1,5 @@
 "use client";
 
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { useRecommendedTracks } from "@/hooks/useSpotifyData";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -61,7 +60,6 @@ export const RecommendedTracks = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <Link href={`/track/${track.id}`} className="group">
-                <SpotifyLogo />
                 <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                   <Image
                     src={getSafeImageUrl(track.album?.images, "lg")}

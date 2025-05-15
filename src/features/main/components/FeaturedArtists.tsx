@@ -1,6 +1,5 @@
 "use client";
 
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { getFeaturedArtists } from "@/features/main/queries";
 import { SpotifyArtist } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
@@ -76,7 +75,6 @@ export const FeaturedArtists = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <Link href={`/artist/${artist.id}`} className="group">
-                <SpotifyLogo />
                 <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                   <Image
                     src={getSafeImageUrl(artist.images, "lg")}

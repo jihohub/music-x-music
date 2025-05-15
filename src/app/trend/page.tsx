@@ -1,12 +1,12 @@
 "use client";
 
 import Header from "@/components/Header";
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import {
   useTrendAlbums,
   useTrendArtists,
   useTrendTracks,
 } from "@/hooks/useTrendData";
+import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -195,12 +195,9 @@ export default function TrendPage() {
                       key={artist.id}
                       className="group"
                     >
-                      <SpotifyLogo />
                       <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                         <Image
-                          src={
-                            artist.images?.[0]?.url || "/images/placeholder.png"
-                          }
+                          src={getSafeImageUrl(artist.images)}
                           alt={artist.name}
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -238,13 +235,9 @@ export default function TrendPage() {
                       key={track.id}
                       className="group"
                     >
-                      <SpotifyLogo />
                       <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                         <Image
-                          src={
-                            track.album?.images?.[0]?.url ||
-                            "/images/placeholder.png"
-                          }
+                          src={getSafeImageUrl(track.album?.images)}
                           alt={track.name}
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -282,12 +275,9 @@ export default function TrendPage() {
                       key={album.id}
                       className="group"
                     >
-                      <SpotifyLogo />
                       <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                         <Image
-                          src={
-                            album.images?.[0]?.url || "/images/placeholder.png"
-                          }
+                          src={getSafeImageUrl(album.images)}
                           alt={album.name}
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -324,13 +314,9 @@ export default function TrendPage() {
                   key={track.id}
                   className="group"
                 >
-                  <SpotifyLogo />
                   <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                     <Image
-                      src={
-                        track.album?.images?.[0]?.url ||
-                        "/images/placeholder.png"
-                      }
+                      src={getSafeImageUrl(track.album?.images)}
                       alt={track.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -365,10 +351,9 @@ export default function TrendPage() {
                   key={artist.id}
                   className="group"
                 >
-                  <SpotifyLogo />
                   <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                     <Image
-                      src={artist.images?.[0]?.url || "/images/placeholder.png"}
+                      src={getSafeImageUrl(artist.images)}
                       alt={artist.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -403,10 +388,9 @@ export default function TrendPage() {
                   key={album.id}
                   className="group"
                 >
-                  <SpotifyLogo />
                   <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                     <Image
-                      src={album.images?.[0]?.url || "/images/placeholder.png"}
+                      src={getSafeImageUrl(album.images)}
                       alt={album.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"

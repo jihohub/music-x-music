@@ -1,12 +1,32 @@
 "use client";
 
-import { SpotifyBadge } from "@/components/SpotifyBadge";
-import { useNewReleases } from "@/hooks/useNewReleases";
+import { useInfiniteNewReleases, useNewReleases } from "@/hooks/useNewReleases";
+import { SpotifyAlbum } from "@/types/spotify";
+import { useEffect, useState } from "react";
+import { InfiniteNewReleases } from "./components/InfiniteNewReleases";
 import { NewReleaseGrid } from "./components/NewReleaseGrid";
 
 export function NewPage() {
-  // 기본 신규 릴리스 (최대 20개)
-  const { data: newReleases, isLoading, error } = useNewReleases(20);
+  const [displayedAlbums, setDisplayedAlbums] = useState<SpotifyAlbum[]>([]);
+
+  // 기본 신규 릴리스 (첫 페이지)
+  const { data: newReleases, isLoading, error } = useNewReleases();
+
+  // 무한 스크롤을 위한 쿼리
+  const {
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteNewReleases();
+
+  // 모든 페이지의 데이터를 하나의 배열로 결합
+  useEffect(() => {
+    if (!infiniteData) return;
+
+    const allAlbums = infiniteData.pages.flat();
+    setDisplayedAlbums(allAlbums);
+  }, [infiniteData]);
 
   if (isLoading) {
     return (
@@ -30,13 +50,15 @@ export function NewPage() {
   return (
     <div className="py-6 px-4 space-y-6">
       <div className="space-y-6">
-        {newReleases && (
-          <>
-            <NewReleaseGrid albums={newReleases} />
-            <div className="flex justify-center mt-8">
-              <SpotifyBadge href="https://open.spotify.com/genre/new-releases-page" />
-            </div>
-          </>
+        {displayedAlbums.length > 0 ? (
+          <InfiniteNewReleases
+            albums={displayedAlbums}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+          />
+        ) : (
+          newReleases && <NewReleaseGrid albums={newReleases} />
         )}
       </div>
     </div>
