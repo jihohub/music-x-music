@@ -8,30 +8,34 @@ import Link from "next/link";
 
 interface ArtistGridProps {
   artists: SpotifyArtist[];
-  showMoreLink?: boolean;
-  onShowMore?: () => void;
+  limit?: number;
+  showPreview?: boolean;
+  onViewMore?: () => void;
 }
 
 export const ArtistGrid = ({
   artists,
-  showMoreLink = false,
-  onShowMore,
+  limit,
+  showPreview = false,
+  onViewMore,
 }: ArtistGridProps) => {
-  if (!artists || artists.length === 0) return null;
-
-  // 표시할 아티스트 수 제한 (최대 20개)
-  const displayArtists = artists.slice(0, 20);
+  const displayArtists = limit ? artists.slice(0, limit) : artists;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">아티스트</h2>
-      </div>
+    <div className="space-y-4">
+      {showPreview && (
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">아티스트</h2>
+          {onViewMore && (
+            <button
+              onClick={onViewMore}
+              className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded-full transition-all duration-200"
+            >
+              더 보기
+            </button>
+          )}
+        </div>
+      )}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayArtists.map((artist, index) => (
           <motion.div
@@ -43,7 +47,7 @@ export const ArtistGrid = ({
             <Link href={`/artist/${artist.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <Image
-                  src={getSafeImageUrl(artist.images, "lg")}
+                  src={getSafeImageUrl(artist.images)}
                   alt={artist.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -60,6 +64,8 @@ export const ArtistGrid = ({
           </motion.div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
+
+export default ArtistGrid;
