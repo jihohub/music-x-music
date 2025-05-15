@@ -1,2 +1,2 @@
-export { getAlbumById } from "./getAlbumById";
-export { getAlbumTracks } from "./getAlbumTracks";
+export { getAlbumById, useAlbumById } from "./getAlbumById";
+export { getAlbumTracks, useAlbumTracks } from "./getAlbumTracks";
