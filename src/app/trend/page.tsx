@@ -5,7 +5,7 @@ import {
   useTrendAlbums,
   useTrendArtists,
   useTrendTracks,
-} from "@/hooks/useTrendData";
+} from "@/features/trend/queries";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -119,19 +119,19 @@ export default function TrendPage() {
 
   // API 데이터 가져오기
   const {
-    data: trackData,
+    data: trackData = [],
     isLoading: isLoadingTracks,
     error: trackError,
   } = useTrendTracks();
 
   const {
-    data: artistData,
+    data: artistData = [],
     isLoading: isLoadingArtists,
     error: artistError,
   } = useTrendArtists();
 
   const {
-    data: albumData,
+    data: albumData = [],
     isLoading: isLoadingAlbums,
     error: albumError,
   } = useTrendAlbums();
@@ -189,7 +189,7 @@ export default function TrendPage() {
                   </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {artistData.slice(0, 4).map((artist) => (
+                  {artistData.slice(0, 4).map((artist: SpotifyArtist) => (
                     <Link
                       href={`/artist/${artist.id}`}
                       key={artist.id}
