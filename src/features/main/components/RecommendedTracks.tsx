@@ -1,6 +1,6 @@
 "use client";
 
-import { useRecommendedTracks } from "@/hooks/useSpotifyData";
+import { useRecommendedTracks } from "@/features/main/queries";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
