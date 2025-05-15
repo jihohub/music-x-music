@@ -65,13 +65,13 @@ export const TREND_TRACK_IDS = [
   "6dOtVTDdiauQNBQEDOtlAB", // BIRDS OF A FEATHER - Billie Eilish
   "51ZQ1vr10ffzbwIjDCwqm4", // we can't be friends (wait for your love) - Ariana Grande
   "0FIDCNYYjNvPVimz5icugS", // Timeless (feat Playboi Carti) - The Weeknd
-  "2vDkR3ctidSd17d2CygVzS", // APT. - ROSE, Bruno Mars
+  "4FF0Te5R85sLW8MNvehHKK", // That’s So True - Gracie Abrams
   "6qqrTXSdwiJaq8SO0X2lSe", // Ordinary - Alex Warren
   "3sK8wGT43QFpWrvNQsrQya", // DtMF - Bad Bunny
   "6iycYUk3oB0NPMdaDUrN1w", // EVIL J0RDAN - Playboi Carti
   // 새로 추가된 인기 트랙 (2025년 5월 현재)
   "7DY756WOLyOz2Xnhw4EFiC", // São Paulo - The Weeknd & Anitta
-  "6qqrTXSdwiJaq8SO0X2lSe", // Ordinary - Alex Warren
+  "4AajxCEwGEsmHmT4H1TwjY", // undressed - sombr
   "0DC62SYIRKMFgx2f7OyvwD", // like JENNIE - JENNIE
   "1vLqigPHwiFnXsfrLMehV1", // Espresso - Sabrina Carpenter
   "1SC5rEoYDGUK4NfG82494W", // MONTERO (Call Me By Your Name) - Lil Nas X
