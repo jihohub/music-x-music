@@ -1,5 +1,5 @@
 import { spotifyFetch } from "@/lib/spotify-api-client";
-import { SpotifyTrack } from "@/types/spotify";
+import { SpotifyArtist, SpotifyTrack } from "@/types/spotify";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -7,8 +7,24 @@ import { useQuery } from "@tanstack/react-query";
  */
 export async function getTrackById(id: string): Promise<SpotifyTrack> {
   try {
+    // 트랙 기본 정보 가져오기
     const track = await spotifyFetch<SpotifyTrack>(`/tracks/${id}`);
     console.log(`트랙 정보를 성공적으로 가져왔습니다: ${track.name}`);
+
+    // 아티스트 ID 목록 추출
+    const artistIds = track.artists.map((artist) => artist.id);
+
+    if (artistIds.length > 0) {
+      // 여러 아티스트 정보를 한 번에 가져오기
+      const fullArtists = await spotifyFetch<{ artists: SpotifyArtist[] }>(
+        `/artists?ids=${artistIds.join(",")}`
+      );
+
+      // 아티스트 정보 업데이트 (이미지 포함)
+      if (fullArtists.artists && fullArtists.artists.length > 0) {
+        track.artists = fullArtists.artists;
+      }
+    }
 
     return track;
   } catch (error: any) {

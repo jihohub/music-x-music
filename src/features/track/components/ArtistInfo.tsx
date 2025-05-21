@@ -13,6 +13,9 @@ interface ArtistInfoProps {
 export const ArtistInfo = ({ artists }: ArtistInfoProps) => {
   if (artists.length === 0) return null;
 
+  // 아티스트 데이터 디버깅을 위한 로그
+  console.log("Artists data:", JSON.stringify(artists, null, 2));
+
   return (
     <motion.section
       initial={{ y: 20, opacity: 0 }}
