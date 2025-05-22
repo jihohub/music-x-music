@@ -4,13 +4,12 @@ export const ArtistSkeleton = () => {
   return (
     <div className="py-6">
       {/* 아티스트 헤더 스켈레톤 */}
-      <section className="relative bg-background">
-        <div className="container px-4 pb-6">
-          <div
-            className="h-[160px] rounded animate-pulse"
-            style={{ backgroundColor: "var(--skeleton-bg)" }}
-          />
-        </div>
+      <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
+        {/* 헤더 영역 전체를 네모로 표시 */}
+        <div
+          className="absolute inset-0 animate-pulse"
+          style={{ backgroundColor: "var(--skeleton-bg)" }}
+        />
       </section>
 
       {/* 컨텐츠 영역 */}
@@ -20,24 +19,28 @@ export const ArtistSkeleton = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* 인기 트랙 */}
             <div className="bg-card-bg rounded-lg py-5">
+              {/* 제목 영역 */}
               <div
-                className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                className="h-6 rounded w-24 mb-4 animate-pulse"
                 style={{ backgroundColor: "var(--skeleton-bg)" }}
               />
+              {/* 트랙 목록 영역 전체를 네모로 표시 */}
               <div
-                className="h-[300px] rounded animate-pulse"
+                className="h-[250px] rounded animate-pulse"
                 style={{ backgroundColor: "var(--skeleton-bg)" }}
               />
             </div>
 
             {/* 앨범 및 싱글 */}
             <div className="bg-card-bg rounded-lg py-5">
+              {/* 제목 영역 */}
               <div
-                className="h-6 rounded w-1/4 mb-4 animate-pulse"
+                className="h-6 rounded w-24 mb-4 animate-pulse"
                 style={{ backgroundColor: "var(--skeleton-bg)" }}
               />
+              {/* 앨범 목록 영역 전체를 네모로 표시 */}
               <div
-                className="h-[400px] rounded animate-pulse"
+                className="h-[350px] rounded animate-pulse"
                 style={{ backgroundColor: "var(--skeleton-bg)" }}
               />
             </div>
@@ -47,10 +50,12 @@ export const ArtistSkeleton = () => {
           <div className="space-y-6">
             {/* 아티스트 정보 */}
             <div className="bg-card-bg rounded-lg py-5">
+              {/* 제목 영역 */}
               <div
-                className="h-6 rounded w-1/3 mb-4 animate-pulse"
+                className="h-6 rounded w-28 mb-4 animate-pulse"
                 style={{ backgroundColor: "var(--skeleton-bg)" }}
               />
+              {/* 아티스트 정보 영역 전체를 네모로 표시 */}
               <div
                 className="h-[200px] rounded animate-pulse"
                 style={{ backgroundColor: "var(--skeleton-bg)" }}
