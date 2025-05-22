@@ -63,9 +63,9 @@ export default function Footer() {
       className="fixed bottom-0 left-0 w-full z-50 bg-background border-t border-border-color"
       style={{
         backgroundColor: "var(--background)",
-        paddingBottom: "var(--safe-area-inset-bottom)",
-        paddingLeft: "var(--safe-area-inset-left)",
-        paddingRight: "var(--safe-area-inset-right)",
+        // paddingBottom: "var(--safe-area-inset-bottom)",
+        // paddingLeft: "var(--safe-area-inset-left)",
+        // paddingRight: "var(--safe-area-inset-right)",
       }}
     >
       <nav className="container">

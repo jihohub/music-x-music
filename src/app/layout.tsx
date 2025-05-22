@@ -102,10 +102,12 @@ export default function RootLayout({
               <main
                 className="container mx-auto !pt-16 !pb-16 min-h-screen"
                 id="main-content"
-                style={{
-                  paddingLeft: "var(--safe-area-inset-left)",
-                  paddingRight: "var(--safe-area-inset-right)",
-                }}
+                style={
+                  {
+                    // paddingLeft: "var(--safe-area-inset-left)",
+                    // paddingRight: "var(--safe-area-inset-right)",
+                  }
+                }
               >
                 {children}
               </main>
