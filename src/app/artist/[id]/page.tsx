@@ -3,12 +3,11 @@
 import Header from "@/components/Header";
 import { ArtistPage } from "@/features/artist/ArtistPage";
 import {
-  getArtistAlbums,
-  getArtistById,
-  getArtistTopTracks,
+  useArtistAlbums,
+  useArtistById,
+  useArtistTopTracks,
 } from "@/features/artist/queries";
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 export default function ArtistPageContainer({
   params,
@@ -17,49 +16,38 @@ export default function ArtistPageContainer({
 }) {
   const resolvedParams = React.use(params);
   const artistId = resolvedParams.id;
-  const [artist, setArtist] = useState<SpotifyArtist | null>(null);
-  const [topTracks, setTopTracks] = useState<SpotifyTrack[]>([]);
-  const [albums, setAlbums] = useState<SpotifyAlbum[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchArtistData() {
-      try {
-        setLoading(true);
-        const [artistData, topTracksData, albumsData] = await Promise.all([
-          getArtistById(artistId),
-          getArtistTopTracks(artistId),
-          getArtistAlbums(artistId),
-        ]);
+  // React Query 훅을 사용하여 데이터 가져오기
+  const {
+    data: artist,
+    isLoading: isArtistLoading,
+    error: artistError,
+  } = useArtistById(artistId);
 
-        setArtist(artistData);
-        setTopTracks(topTracksData);
-        setAlbums(albumsData);
-        setError(null);
-      } catch (err) {
-        console.error("아티스트 정보를 가져오는데 실패했습니다:", err);
-        setError("아티스트 정보를 가져오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    }
+  const { data: topTracks = [], isLoading: isTracksLoading } =
+    useArtistTopTracks(artistId);
 
-    fetchArtistData();
-  }, [artistId]);
+  const { data: albums = [], isLoading: isAlbumsLoading } =
+    useArtistAlbums(artistId);
+
+  // 로딩 및 에러 상태 통합
+  const isLoading = isArtistLoading || isTracksLoading || isAlbumsLoading;
+  const error = artistError ? "아티스트 정보를 가져오는데 실패했습니다." : null;
 
   return (
     <>
       <Header
-        title={loading ? "아티스트 로딩 중..." : artist?.name || "아티스트"}
+        title={isLoading ? "아티스트 로딩 중..." : artist?.name || "아티스트"}
       />
-      <ArtistPage
-        artist={artist as SpotifyArtist}
-        topTracks={topTracks}
-        albums={albums}
-        isLoading={loading}
-        error={error}
-      />
+      {artist && (
+        <ArtistPage
+          artist={artist}
+          topTracks={topTracks}
+          albums={albums}
+          isLoading={isLoading}
+          error={error}
+        />
+      )}
     </>
   );
 }

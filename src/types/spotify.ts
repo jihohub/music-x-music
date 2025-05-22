@@ -26,7 +26,6 @@ export interface SpotifyAlbum {
   tracks?: {
     items: SpotifyTrack[];
   };
-  explicit?: boolean;
 }
 
 export interface SpotifyTrack {
@@ -37,7 +36,6 @@ export interface SpotifyTrack {
   duration_ms: number;
   preview_url?: string;
   popularity?: number;
-  explicit?: boolean;
 }
 
 export interface SpotifySearchResult {

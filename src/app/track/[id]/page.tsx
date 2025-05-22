@@ -1,11 +1,9 @@
 "use client";
 
 import Header from "@/components/Header";
-import { getArtistById } from "@/features/artist/queries";
 import { TrackPage } from "@/features/track/TrackPage";
-import { getTrackById } from "@/features/track/queries";
-import { SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import React, { useEffect, useState } from "react";
+import { useTrackById } from "@/features/track/queries";
+import React from "react";
 
 export default function TrackPageRoute({
   params,
@@ -14,54 +12,25 @@ export default function TrackPageRoute({
 }) {
   const resolvedParams = React.use(params);
   const trackId = resolvedParams.id;
-  const [track, setTrack] = useState<SpotifyTrack | null>(null);
-  const [artists, setArtists] = useState<SpotifyArtist[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // 트랙 정보 가져오기
-  useEffect(() => {
-    async function fetchTrackData() {
-      try {
-        setLoading(true);
-        const trackData = await getTrackById(trackId);
-        setTrack(trackData);
+  // React Query 훅을 사용하여 트랙 데이터 가져오기
+  const {
+    data: track,
+    isLoading: isTrackLoading,
+    error: trackError,
+  } = useTrackById(trackId);
 
-        // 트랙의 모든 아티스트 정보 가져오기
-        if (trackData.artists && trackData.artists.length > 0) {
-          try {
-            const artistPromises = trackData.artists.map((artist) =>
-              getArtistById(artist.id)
-            );
-            const artistData = await Promise.all(artistPromises);
-            setArtists(artistData);
-          } catch (artistError) {
-            console.error(
-              "아티스트 정보를 가져오는데 실패했습니다:",
-              artistError
-            );
-          }
-        }
-
-        setError(null);
-      } catch (err) {
-        console.error("트랙 정보를 가져오는데 실패했습니다:", err);
-        setError("트랙 정보를 가져오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchTrackData();
-  }, [trackId]);
+  // 로딩 및 에러 상태 처리
+  const isLoading = isTrackLoading;
+  const error = trackError ? "트랙 정보를 가져오는데 실패했습니다." : null;
 
   return (
     <>
-      <Header title={loading ? "트랙 로딩 중..." : track?.name || "트랙"} />
+      <Header title={isLoading ? "트랙 로딩 중..." : track?.name || "트랙"} />
       <TrackPage
-        track={track}
-        artists={artists}
-        isLoading={loading}
+        track={track || null}
+        artists={track?.artists || []}
+        isLoading={isLoading}
         error={error}
       />
     </>

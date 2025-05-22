@@ -42,6 +42,17 @@ export const TREND_ARTIST_IDS = [
   "74KM79TiuVKeVCqs8QtB0B", // Sabrina Carpenter
   "4q3ewBCX7sLwd24euuV69X", // Bad Bunny
   "1HY2Jd0NmPuamShAr6KMms", // Lady Gaga
+  // 새로 추가된 인기 아티스트 (2025년 5월 현재)
+  "2h93pZq0e7k5yf4dywlkpM", // Frank Ocean
+  "5cj0lLjcoR7YOSnhnX0Po5", // Doja Cat
+  "246dkjvS1zLTtiykXe5h60", // Post Malone
+  "45dkTj5sMRSjrmBSBeiHym", // Tate McRae
+  "6eUKZXaKkcviH0Ku9w2n3V", // Ed Sheeran
+  "7tYKF4w9nC0nq9CsPZTHyP", // SZA
+  "1McMsnEElThX1knmY4oliG", // Olivia Rodrigo
+  "2tIP7SsRs7vjIcLrU85W8J", // The Kid LAROI
+  "0Y5tJX1MQlPlqiwlOH1tJY", // Travis Scott
+  "3TVXtAsR1Inumwj472S9r4", // Drake
 ];
 
 /**
@@ -54,10 +65,21 @@ export const TREND_TRACK_IDS = [
   "6dOtVTDdiauQNBQEDOtlAB", // BIRDS OF A FEATHER - Billie Eilish
   "51ZQ1vr10ffzbwIjDCwqm4", // we can't be friends (wait for your love) - Ariana Grande
   "0FIDCNYYjNvPVimz5icugS", // Timeless (feat Playboi Carti) - The Weeknd
-  "2vDkR3ctidSd17d2CygVzS", // APT. - ROSE, Bruno Mars
+  "4FF0Te5R85sLW8MNvehHKK", // That’s So True - Gracie Abrams
   "6qqrTXSdwiJaq8SO0X2lSe", // Ordinary - Alex Warren
   "3sK8wGT43QFpWrvNQsrQya", // DtMF - Bad Bunny
   "6iycYUk3oB0NPMdaDUrN1w", // EVIL J0RDAN - Playboi Carti
+  // 새로 추가된 인기 트랙 (2025년 5월 현재)
+  "7DY756WOLyOz2Xnhw4EFiC", // São Paulo - The Weeknd & Anitta
+  "4AajxCEwGEsmHmT4H1TwjY", // undressed - sombr
+  "0DC62SYIRKMFgx2f7OyvwD", // like JENNIE - JENNIE
+  "1vLqigPHwiFnXsfrLMehV1", // Espresso - Sabrina Carpenter
+  "1SC5rEoYDGUK4NfG82494W", // MONTERO (Call Me By Your Name) - Lil Nas X
+  "6wf7Yu7cxBSPrRlWeSeK0Q", // What Was I Made For? - Billie Eilish
+  "0kE09o4Jdeu7vqjmkV1YJP", // Wild Ones - Jessie Murph, Jelly Roll
+  "0sTBOp1hdayTjw6UOyPyi6", // Open Hearts - The Weeknd
+  "1Iq8oo9XkmmvCQiGOfORiz", // Is It Over Now? (Taylor's Version) - Taylor Swift
+  "4xhsWYTOGcal8zt0J161CU", // Lovin On Me - Jack Harlow
 ];
 
 /**
@@ -74,4 +96,15 @@ export const TREND_ALBUM_IDS = [
   "6Rl6YoCarF2GHPSQmmFjuR", // $ome $exy $ongs 4 U - Drake
   "5K79FLRUCSysQnVESLcTdb", // DeBÍ TiRAR MáS FOToS - Bad Bunny
   "2MHUaRi9OCyTN02SoyRRBJ", // MAYHEM - Lady Gaga
+  // 새로 추가된 인기 앨범 (2025년 5월 현재)
+  "3iPSVi54hsacKKl1xIR2eH", // Short n' Sweet - Sabrina Carpenter
+  "6BzxX6zkDsYKFJ04ziU5xQ", // COWBOY CARTER - Beyoncé
+  "61kmTToW5kSwlQn3z3Qyew", // Eusexua - FKA twigs
+  "37HwcDtLqY2WXN7NArODvI", // Azizam - Ed Sheeran
+  "1o59UpKw81iHR0HPiSkJR0", // 1989 (Taylor's Version) - Taylor Swift
+  "1xJHno7SmdVtZAtXbdbDZp", // GUTS - Olivia Rodrigo
+  "1lS7FeRcSUuIGqyg99UGpj", // Even in Arcadia – Sleep Token
+  "34Q2W5StgW4WC6HhbsNWnv", // rosie - ROSÉ
+  "1W7dufIS79lk01w3tBAGe5", // Ruby - JENNIE
+  "2PFJKjBqXpYrRcdClhfcnX", // Skeletá - Ghost
 ];

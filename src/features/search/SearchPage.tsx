@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import BasicSearchResults from "./components/BasicSearchResults";
-import ScrollResults from "./components/InfiniteScrollResults";
+import InfiniteScrollResults from "./components/InfiniteScrollResults";
 import NoResults from "./components/NoResults";
 import PopularSearches from "./components/PopularSearches";
 import SearchHeader from "./components/SearchHeader";
@@ -134,12 +134,15 @@ export function SearchPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ScrollResults
+              <InfiniteScrollResults
                 searchType={searchType}
                 searchTerm={searchTerm}
                 allArtists={allArtists}
                 allTracks={allTracks}
                 allAlbums={allAlbums}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
               />
             </motion.div>
           )}

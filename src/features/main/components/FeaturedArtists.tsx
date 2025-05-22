@@ -1,36 +1,13 @@
 "use client";
 
-import { SpotifyLogo } from "@/components/SpotifyLogo";
-import { getFeaturedArtists } from "@/features/main/queries";
-import { SpotifyArtist } from "@/types/spotify";
+import { useFeaturedArtists } from "@/features/main/queries";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 export const FeaturedArtists = () => {
-  const [artists, setArtists] = useState<SpotifyArtist[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchArtists() {
-      try {
-        setLoading(true);
-        const data = await getFeaturedArtists();
-        setArtists(data);
-        setError(null);
-      } catch (err) {
-        console.error("아티스트 정보를 가져오는데 실패했습니다:", err);
-        setError("아티스트 정보를 가져오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchArtists();
-  }, []);
+  const { data: artists = [], isLoading, error } = useFeaturedArtists();
 
   return (
     <section>
@@ -41,7 +18,7 @@ export const FeaturedArtists = () => {
         </Link> */}
       </div>
 
-      {loading && (
+      {isLoading && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="animate-pulse">
@@ -63,10 +40,12 @@ export const FeaturedArtists = () => {
       )}
 
       {error && (
-        <div className="text-center text-text-secondary py-8">{error}</div>
+        <div className="text-center text-text-secondary py-8">
+          아티스트 정보를 가져오는데 실패했습니다.
+        </div>
       )}
 
-      {!loading && !error && (
+      {!isLoading && !error && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {artists.map((artist, index) => (
             <motion.div
@@ -76,7 +55,6 @@ export const FeaturedArtists = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <Link href={`/artist/${artist.id}`} className="group">
-                <SpotifyLogo />
                 <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                   <Image
                     src={getSafeImageUrl(artist.images, "lg")}

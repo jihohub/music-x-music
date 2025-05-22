@@ -1,6 +1,5 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
 import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -45,25 +44,22 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
               />
             </div>
             <div className="flex-grow min-w-0">
-              <div className="flex items-center gap-1">
-                <Link
-                  href={`/track/${track.id}`}
-                  className="hover:text-primary line-clamp-2"
-                >
-                  {track.name}
-                </Link>
-                {track.explicit && <ExplicitBadge />}
-              </div>
+              <Link
+                href={`/track/${track.id}`}
+                className="hover:text-primary line-clamp-2"
+              >
+                {track.name}
+              </Link>
             </div>
             <div className="hidden md:block w-1/4 min-w-0">
               <Link
                 href={`/album/${track.album?.id}`}
-                className="text-text-secondary hover:text-primary block truncate"
+                className="line-clamp-2 text-text-secondary hover:text-primary"
               >
                 {track.album?.name}
               </Link>
             </div>
-            <div className="text-text-secondary text-right w-10 shrink-0 monospace-nums">
+            <div className="text-text-secondary text-right w-10 shrink-0">
               {Math.floor(track.duration_ms / 60000)}:
               {((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}
             </div>
