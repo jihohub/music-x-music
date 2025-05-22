@@ -26,10 +26,10 @@
   --warning: #ffae00;
 
   /* iOS SafeArea 변수 - 기본값 */
-  --safe-area-inset-top: env(safe-area-inset-top, 0px);
-  --safe-area-inset-right: env(safe-area-inset-right, 0px);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-right: env(safe-area-inset-right);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  --safe-area-inset-left: env(safe-area-inset-left);
 }
 
 [data-theme="dark"] {
@@ -63,6 +63,8 @@ body {
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   /* 모바일에서 확대 방지 추가 */
   touch-action: manipulation;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
 }
 
 /* 모바일 입력 필드 확대 방지 */
@@ -179,4 +181,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+/* 높이 조정용 클래스 - 내용물에 맞게 높이 조정 */
+.min-h-fit {
+  min-height: fit-content !important;
+  height: auto !important;
 }

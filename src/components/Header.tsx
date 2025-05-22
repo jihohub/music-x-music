@@ -31,7 +31,7 @@ export default function Header({ title }: { title?: string }) {
         </div>
 
         <h1 className="text-lg font-bold text-center flex-1">
-          {title || "플리앱"}
+          {title || "MUSIC X MUSIC"}
         </h1>
 
         <div className="w-12">
