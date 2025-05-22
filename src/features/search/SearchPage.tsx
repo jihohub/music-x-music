@@ -66,7 +66,7 @@ export function SearchPage() {
 
   return (
     <motion.div
-      className="py-6 space-y-6 px-4 min-h-screen"
+      className="py-6 space-y-6 px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
