@@ -1,12 +1,11 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
-import { SpotifyAlbum } from "@/types/spotify";
+import { useAlbumTracks } from "@/features/album/queries";
+import { SpotifyAlbum, SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment } from "react";
 
 interface TrackListProps {
   album: SpotifyAlbum;
@@ -14,6 +13,31 @@ interface TrackListProps {
 
 export const TrackList = ({ album }: TrackListProps) => {
   const albumImage = getSafeImageUrl(album.images, "sm");
+
+  // 앨범 트랙을 React Query로 가져오기 - 앨범 내 트랙이 있으면 해당 데이터를 우선 사용
+  const { data: tracksData, isLoading } = useAlbumTracks(album.id, 50);
+
+  // 앨범 객체 내의, API 응답으로 가져온 트랙 데이터 합치기 (둘 중 더 많은 데이터 사용)
+  const tracks =
+    album.tracks?.items && album.tracks.items.length > 0
+      ? album.tracks.items // 앨범 객체 내 트랙 데이터 사용
+      : tracksData?.items || []; // API로 가져온 트랙 데이터 사용
+
+  if (isLoading && tracks.length === 0) {
+    return (
+      <motion.section
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-card-bg rounded-lg py-5"
+      >
+        <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
+        <div className="p-4 text-center text-text-secondary">
+          트랙 로딩 중...
+        </div>
+      </motion.section>
+    );
+  }
 
   return (
     <motion.section
@@ -30,7 +54,7 @@ export const TrackList = ({ album }: TrackListProps) => {
           <div className="hidden md:block w-1/4 min-w-0">아티스트</div>
           <div className="text-right w-10 shrink-0">시간</div>
         </div>
-        {album.tracks?.items.map((track, index) => (
+        {tracks.map((track: SpotifyTrack, index: number) => (
           <div
             key={track.id}
             className="flex items-center gap-2 py-2 hover:bg-gray-700/10 transition-colors group"
@@ -48,36 +72,31 @@ export const TrackList = ({ album }: TrackListProps) => {
               />
             </div>
             <div className="flex-grow min-w-0">
-              <div className="flex items-center gap-1">
-                <Link
-                  href={`/track/${track.id}`}
-                  className="hover:text-primary line-clamp-2"
-                >
-                  {track.name}
-                </Link>
-                {track.explicit && <ExplicitBadge />}
-              </div>
+              <Link
+                href={`/track/${track.id}`}
+                className="hover:text-primary line-clamp-2"
+              >
+                {track.name}
+              </Link>
             </div>
-            <div className="hidden md:block w-1/4 min-w-0">
-              <div className="text-text-secondary truncate">
-                {track.artists.map((artist, index) => (
-                  <Fragment key={artist.id}>
-                    <Link
-                      href={`/artist/${artist.id}`}
-                      className="hover:text-primary"
-                    >
-                      {artist.name}
-                    </Link>
-                    {index < track.artists.length - 1 && (
-                      <span className="mx-1">, </span>
-                    )}
-                  </Fragment>
-                ))}
-              </div>
+            <div className="hidden md:block w-1/4 text-text-secondary line-clamp-1 min-w-0">
+              {track.artists.map((artist, idx) => (
+                <span key={artist.id}>
+                  <Link
+                    href={`/artist/${artist.id}`}
+                    className="hover:text-primary"
+                  >
+                    {artist.name}
+                  </Link>
+                  {idx < track.artists.length - 1 && ", "}
+                </span>
+              ))}
             </div>
-            <div className="text-text-secondary text-right w-10 shrink-0 monospace-nums">
+            <div className="text-right w-10 text-text-secondary shrink-0">
               {Math.floor(track.duration_ms / 60000)}:
-              {((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}
+              {(Math.floor(track.duration_ms / 1000) % 60)
+                .toString()
+                .padStart(2, "0")}
             </div>
           </div>
         ))}

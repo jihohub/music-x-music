@@ -1,2 +1,5 @@
-export { getFeaturedArtists } from "./getFeaturedArtists";
-export { getRecommendedTracks } from "./getRecommendedTracks";
+export { getFeaturedArtists, useFeaturedArtists } from "./getFeaturedArtists";
+export {
+  getRecommendedTracks,
+  useRecommendedTracks,
+} from "./getRecommendedTracks";

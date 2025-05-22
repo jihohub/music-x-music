@@ -1,7 +1,5 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -40,33 +38,24 @@ export const TrackResults = ({
         )}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {tracks.slice(0, 20).map((track, index) => (
-          <motion.div
-            key={track.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-          >
-            <Link href={`/track/${track.id}`} className="group">
-              <SpotifyLogo />
-              <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                <Image
-                  src={getSafeImageUrl(track.album?.images, "lg")}
-                  alt={track.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="mt-2 flex items-center gap-1">
-                <h3 className="font-semibold truncate">{track.name}</h3>
-                {track.explicit && <ExplicitBadge />}
-              </div>
-              <p className="text-sm text-text-secondary truncate">
-                {track.artists.map((a) => a.name).join(", ")}
-              </p>
-            </Link>
-          </motion.div>
+        {tracks.map((track) => (
+          <Link href={`/track/${track.id}`} key={track.id} className="group">
+            <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+              <Image
+                src={getSafeImageUrl(track.album?.images, "lg")}
+                alt={track.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="mt-2">
+              <h3 className="font-semibold truncate">{track.name}</h3>
+            </div>
+            <p className="text-sm text-text-secondary truncate">
+              {track.artists.map((a) => a.name).join(", ")}
+            </p>
+          </Link>
         ))}
       </div>
     </motion.div>

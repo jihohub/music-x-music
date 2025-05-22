@@ -1,3 +1,3 @@
-export { getTrackAnalysis } from "./getTrackAnalysis";
-export { getTrackById } from "./getTrackById";
-export { getTrackFeatures } from "./getTrackFeatures";
+export { getTrackAnalysis, useTrackAnalysis } from "./getTrackAnalysis";
+export { getTrackById, useTrackById } from "./getTrackById";
+export { getTrackFeatures, useTrackFeatures } from "./getTrackFeatures";

@@ -1,31 +1,31 @@
 "use client";
 
-import { SpotifyAlbum } from "@/types/spotify";
+import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-interface AlbumGridProps {
-  albums: SpotifyAlbum[];
+interface TrackGridProps {
+  tracks: SpotifyTrack[];
   limit?: number;
   showPreview?: boolean;
   onViewMore?: () => void;
 }
 
-export const AlbumGrid = ({
-  albums,
+export const TrackGrid = ({
+  tracks,
   limit,
   showPreview = false,
   onViewMore,
-}: AlbumGridProps) => {
-  const displayAlbums = limit ? albums.slice(0, limit) : albums;
+}: TrackGridProps) => {
+  const displayTracks = limit ? tracks.slice(0, limit) : tracks;
 
   return (
     <div className="space-y-4">
       {showPreview && (
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">앨범</h2>
+          <h2 className="text-xl font-bold">트랙</h2>
           {onViewMore && (
             <button
               onClick={onViewMore}
@@ -37,28 +37,28 @@ export const AlbumGrid = ({
         </div>
       )}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {displayAlbums.map((album, index) => (
+        {displayTracks.map((track, index) => (
           <motion.div
-            key={album.id}
+            key={track.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <Link href={`/album/${album.id}`} className="group">
+            <Link href={`/track/${track.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <Image
-                  src={getSafeImageUrl(album.images)}
-                  alt={album.name}
+                  src={getSafeImageUrl(track.album?.images)}
+                  alt={track.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                   className="object-cover"
                 />
               </div>
               <h3 className="mt-2 font-semibold truncate text-sm">
-                {album.name}
+                {track.name}
               </h3>
               <p className="text-sm text-text-secondary truncate">
-                {album.artists.map((artist) => artist.name).join(", ")}
+                {track.artists.map((artist) => artist.name).join(", ")}
               </p>
             </Link>
           </motion.div>
@@ -68,4 +68,4 @@ export const AlbumGrid = ({
   );
 };
 
-export default AlbumGrid;
+export default TrackGrid;

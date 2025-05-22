@@ -42,6 +42,26 @@ export function InfiniteNewReleases({
     fetchNextPage();
   }, [albums.length, fetchNextPage]);
 
+  // 수동 스크롤 감지 추가
+  useEffect(() => {
+    const handleScroll = () => {
+      // 스크롤 위치 확인
+      if (!hasNextPage || isFetchingNextPage) return;
+
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const clientHeight = window.innerHeight;
+
+      // 페이지 하단에 근접했을 때 추가 데이터 로드 (300px 전에 로드 시작)
+      if (scrollHeight - scrollTop - clientHeight < 300) {
+        handleNext();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasNextPage, isFetchingNextPage, handleNext]);
+
   // 데이터가 없는 경우 렌더링하지 않음
   if (!albums.length) return null;
 
@@ -54,7 +74,7 @@ export function InfiniteNewReleases({
         loader={null}
         endMessage={null}
         className="space-y-6"
-        scrollThreshold={0.5}
+        scrollThreshold={0.9}
         style={{ overflow: "visible" }}
       >
         <NewReleaseGrid albums={albums} />

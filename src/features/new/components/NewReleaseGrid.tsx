@@ -1,7 +1,5 @@
 "use client";
 
-import { ExplicitBadge } from "@/components/ExplicitBadge";
-import { SpotifyLogo } from "@/components/SpotifyLogo";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
 import { motion } from "framer-motion";
@@ -64,40 +62,54 @@ export const NewReleaseGrid = ({
     );
   }
 
+  // 스크롤 중에 로드된 앨범인지 확인하기 위한 계산
+  // 첫 20개는 초기 로드로 간주하고, 나머지는 무한 스크롤로 로드된 것으로 간주
+  const initialLoadCount = 20;
+  const isInfiniteScrolled = albums.length > initialLoadCount;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
     >
-      {albums.map((album, index) => (
-        <motion.div
-          key={album.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.05 }}
-        >
-          <Link href={`/album/${album.id}`} className="group">
-            <SpotifyLogo />
-            <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-              <Image
-                src={getSafeImageUrl(album.images, "lg")}
-                alt={album.name}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                className="object-cover"
-              />
-            </div>
-            <div className="mt-2 flex items-center gap-1">
-              <h3 className="font-semibold truncate">{album.name}</h3>
-              {album.explicit && <ExplicitBadge />}
-            </div>
-            <p className="text-sm text-text-secondary truncate">
-              {album.artists?.map((a) => a.name).join(", ")}
-            </p>
-          </Link>
-        </motion.div>
-      ))}
+      {albums.map((album, index) => {
+        // 무한 스크롤로 로드된 앨범의 경우 애니메이션 지연 줄이기
+        const isNewlyLoaded = isInfiniteScrolled && index >= albums.length - 20;
+        const delayValue = isNewlyLoaded
+          ? Math.min(0.02 * (index % 20), 0.1)
+          : 0;
+
+        return (
+          <motion.div
+            key={album.id}
+            initial={{ opacity: 0, y: isNewlyLoaded ? 10 : 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.2,
+              delay: delayValue,
+            }}
+          >
+            <Link href={`/album/${album.id}`} className="group">
+              <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+                <Image
+                  src={getSafeImageUrl(album.images, "lg")}
+                  alt={album.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="mt-2">
+                <h3 className="font-semibold truncate">{album.name}</h3>
+              </div>
+              <p className="text-sm text-text-secondary truncate">
+                {album.artists?.map((a) => a.name).join(", ")}
+              </p>
+            </Link>
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 };
