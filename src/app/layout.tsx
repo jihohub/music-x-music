@@ -35,12 +35,6 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        {/* iOS 웹뷰 최적화를 위한 메타 태그들 */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-touch-fullscreen" content="yes" />
-        <meta name="mobile-web-app-capable" content="yes" />
-
         {/* 초기 테마 깜빡임 방지를 위한 인라인 스크립트 */}
         <script
           dangerouslySetInnerHTML={{
