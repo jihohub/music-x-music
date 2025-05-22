@@ -9,8 +9,8 @@ import "./globals.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1.0,
-  maximumScale: 5.0,
-  userScalable: true,
+  maximumScale: 1.0,
+  userScalable: false,
   viewportFit: "cover",
 };
 
