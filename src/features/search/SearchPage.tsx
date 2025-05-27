@@ -41,10 +41,11 @@ export function SearchPage() {
   } = useSearchPageLogic();
 
   // 탭 변경 시 즉시 결과를 표시하기 위한 최적화된 조건
-  const showBasicResults = searchType === "all" && hasResults;
+  const showBasicResults = searchType === "all" && (hasResults || isFetching);
   const showInfiniteResults =
     searchType !== "all" &&
-    ((searchType === "artist" && allArtists.length > 0) ||
+    (isFetching ||
+      (searchType === "artist" && allArtists.length > 0) ||
       (searchType === "track" && allTracks.length > 0) ||
       (searchType === "album" && allAlbums.length > 0));
   const showNoResults =
@@ -110,6 +111,7 @@ export function SearchPage() {
               shouldShowTracks={shouldShowTracks}
               shouldShowAlbums={shouldShowAlbums}
               handleTypeChange={handleTypeChange}
+              isLoading={isFetching}
             />
           </div>
         )}
@@ -126,6 +128,7 @@ export function SearchPage() {
               hasNextPage={hasNextPage}
               isFetchingNextPage={isFetchingNextPage}
               fetchNextPage={fetchNextPage}
+              isLoading={isFetching}
             />
           </div>
         )}

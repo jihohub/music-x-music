@@ -22,17 +22,19 @@ export const NewReleaseGrid = ({
         {Array.from({ length: 12 }).map((_, i) => (
           <div key={i} className="animate-pulse">
             <div
-              className="aspect-square bg-card-bg rounded-sm w-full"
+              className="aspect-square overflow-hidden rounded-sm bg-card-bg relative w-full"
               style={{ backgroundColor: "var(--skeleton-bg)" }}
             />
-            <div
-              className="h-4 mt-2 rounded w-3/4"
-              style={{ backgroundColor: "var(--skeleton-bg)" }}
-            />
-            <div
-              className="h-3 mt-1 rounded w-1/2"
-              style={{ backgroundColor: "var(--skeleton-bg)" }}
-            />
+            <div className="mt-2.5">
+              <div
+                className="h-[1.125rem] rounded w-[85%]"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-[0.875rem] mt-1 rounded w-[65%]"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+            </div>
           </div>
         ))}
       </div>

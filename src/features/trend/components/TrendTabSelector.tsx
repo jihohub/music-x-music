@@ -20,10 +20,34 @@ export const TrendTabSelector = ({
   // URL에서 탭 파라미터 가져오기 및 적용
   useEffect(() => {
     const typeParam = searchParams.get("type") as TrendTab | null;
+    // 유효한 탭 타입인 경우에만 변경
     if (typeParam && ["track", "artist", "album"].includes(typeParam)) {
       onChange(typeParam);
+    } else if (!typeParam && activeTab !== "all") {
+      // type 파라미터가 없는 경우 "all" 탭으로 설정
+      onChange("all");
     }
-  }, [searchParams, onChange]);
+  }, [searchParams, onChange, activeTab]);
+
+  // 히스토리 API를 사용하여 URL 파라미터 업데이트
+  const updateUrlParam = (type: TrendTab) => {
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (type === "all") {
+        url.searchParams.delete("type");
+      } else {
+        url.searchParams.set("type", type);
+      }
+      window.history.pushState({}, "", url.toString());
+    }
+  };
+
+  // 탭 클릭 핸들러
+  const handleTabClick = (type: TrendTab, e: React.MouseEvent) => {
+    e.preventDefault();
+    onChange(type);
+    updateUrlParam(type);
+  };
 
   return (
     <div className="mb-4">
@@ -36,16 +60,7 @@ export const TrendTabSelector = ({
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
-            onClick={(e) => {
-              e.preventDefault();
-              onChange("all");
-              // URL 파라미터 업데이트 (히스토리 API 사용)
-              if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
-                url.searchParams.delete("type");
-                window.history.pushState({}, "", url.toString());
-              }
-            }}
+            onClick={(e) => handleTabClick("all", e)}
           >
             전체
             {activeTab === "all" && (
@@ -59,16 +74,7 @@ export const TrendTabSelector = ({
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
-            onClick={(e) => {
-              e.preventDefault();
-              onChange("artist");
-              // URL 파라미터 업데이트 (히스토리 API 사용)
-              if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
-                url.searchParams.set("type", "artist");
-                window.history.pushState({}, "", url.toString());
-              }
-            }}
+            onClick={(e) => handleTabClick("artist", e)}
           >
             아티스트
             {activeTab === "artist" && (
@@ -82,16 +88,7 @@ export const TrendTabSelector = ({
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
-            onClick={(e) => {
-              e.preventDefault();
-              onChange("track");
-              // URL 파라미터 업데이트 (히스토리 API 사용)
-              if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
-                url.searchParams.set("type", "track");
-                window.history.pushState({}, "", url.toString());
-              }
-            }}
+            onClick={(e) => handleTabClick("track", e)}
           >
             트랙
             {activeTab === "track" && (
@@ -105,16 +102,7 @@ export const TrendTabSelector = ({
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
-            onClick={(e) => {
-              e.preventDefault();
-              onChange("album");
-              // URL 파라미터 업데이트 (히스토리 API 사용)
-              if (typeof window !== "undefined") {
-                const url = new URL(window.location.href);
-                url.searchParams.set("type", "album");
-                window.history.pushState({}, "", url.toString());
-              }
-            }}
+            onClick={(e) => handleTabClick("album", e)}
           >
             앨범
             {activeTab === "album" && (

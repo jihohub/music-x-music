@@ -10,6 +10,7 @@ interface TrackGridProps {
   limit?: number;
   showPreview?: boolean;
   onViewMore?: () => void;
+  isLoading?: boolean;
 }
 
 export const TrackGrid = ({
@@ -17,30 +18,69 @@ export const TrackGrid = ({
   limit,
   showPreview = false,
   onViewMore,
+  isLoading = false,
 }: TrackGridProps) => {
-  const displayTracks = limit ? tracks.slice(0, limit) : tracks;
+  // 전체 탭에서는 4개, 각 탭에서는 8개씩 표시
+  const itemLimit = showPreview ? limit || 4 : 8;
+  const displayTracks = limit ? tracks.slice(0, itemLimit) : tracks;
+
+  // 스켈레톤 UI
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div
+            className="h-7 w-24 rounded"
+            style={{ backgroundColor: "var(--skeleton-bg)" }}
+          ></div>
+          {onViewMore && (
+            <div
+              className="h-6 w-16 rounded"
+              style={{ backgroundColor: "var(--skeleton-bg)" }}
+            ></div>
+          )}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Array.from({ length: itemLimit }).map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div
+                className="aspect-square overflow-hidden rounded-sm bg-card-bg relative w-full"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="mt-2 h-5 rounded w-[85%]"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+              <div
+                className="h-4 mt-1 rounded w-[65%]"
+                style={{ backgroundColor: "var(--skeleton-bg)" }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {showPreview && (
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">트랙</h2>
-          {onViewMore && (
-            <Link
-              href="/trend?type=track"
-              className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded-full transition-all duration-200"
-              onClick={(e) => {
-                if (onViewMore) {
-                  e.preventDefault();
-                  onViewMore();
-                }
-              }}
-            >
-              더 보기
-            </Link>
-          )}
-        </div>
-      )}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">트랙</h2>
+        {onViewMore && (
+          <Link
+            href="/trend?type=track"
+            className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded transition-all duration-200"
+            onClick={(e) => {
+              if (onViewMore) {
+                e.preventDefault();
+                onViewMore();
+              }
+            }}
+          >
+            더 보기
+          </Link>
+        )}
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayTracks.map((track, index) => (
           <div key={track.id}>
