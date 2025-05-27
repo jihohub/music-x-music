@@ -12,11 +12,21 @@ import {
   useTrendArtists,
   useTrendTracks,
 } from "@/features/trend/queries";
-import { motion } from "framer-motion";
-import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 export default function TrendPage() {
   const [activeTab, setActiveTab] = useState<TrendTab>("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // 초기 URL 파라미터에서 탭 설정
+  useEffect(() => {
+    const typeParam = searchParams.get("type");
+    if (typeParam) {
+      setActiveTab(typeParam as TrendTab);
+    }
+  }, [searchParams]);
 
   // API 데이터 가져오기
   const {
@@ -39,18 +49,23 @@ export default function TrendPage() {
 
   // 현재 탭에 따른 로딩 상태
   const isLoading =
-    (activeTab === "tracks" && isLoadingTracks) ||
-    (activeTab === "artists" && isLoadingArtists) ||
-    (activeTab === "albums" && isLoadingAlbums) ||
+    (activeTab === "track" && isLoadingTracks) ||
+    (activeTab === "artist" && isLoadingArtists) ||
+    (activeTab === "album" && isLoadingAlbums) ||
     (activeTab === "all" &&
       (isLoadingTracks || isLoadingArtists || isLoadingAlbums));
 
   // 현재 탭에 따른 에러 상태
   const error =
-    (activeTab === "tracks" && trackError) ||
-    (activeTab === "artists" && artistError) ||
-    (activeTab === "albums" && albumError) ||
+    (activeTab === "track" && trackError) ||
+    (activeTab === "artist" && artistError) ||
+    (activeTab === "album" && albumError) ||
     (activeTab === "all" && (trackError || artistError || albumError));
+
+  // 더 보기 버튼 클릭 핸들러 - URL 파라미터 설정
+  const handleViewMore = (type: TrendTab) => {
+    router.push(`/trend?type=${type}`);
+  };
 
   return (
     <>
@@ -71,19 +86,14 @@ export default function TrendPage() {
 
         {/* 전체 탭 - 각 카테고리별 미리보기 */}
         {activeTab === "all" && !error && (
-          <motion.div
-            className="space-y-16"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <div className="space-y-16">
             {/* 아티스트 섹션 */}
             {artistData && (
               <ArtistGrid
                 artists={artistData}
                 limit={4}
                 showPreview={true}
-                onViewMore={() => setActiveTab("artists")}
+                onViewMore={() => handleViewMore("artist")}
               />
             )}
 
@@ -93,7 +103,7 @@ export default function TrendPage() {
                 tracks={trackData}
                 limit={4}
                 showPreview={true}
-                onViewMore={() => setActiveTab("tracks")}
+                onViewMore={() => handleViewMore("track")}
               />
             )}
 
@@ -103,43 +113,31 @@ export default function TrendPage() {
                 albums={albumData}
                 limit={4}
                 showPreview={true}
-                onViewMore={() => setActiveTab("albums")}
+                onViewMore={() => handleViewMore("album")}
               />
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* 트랙 트렌드 */}
-        {activeTab === "tracks" && !isLoading && !error && trackData && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+        {activeTab === "track" && !isLoading && !error && trackData && (
+          <div>
             <TrackGrid tracks={trackData} />
-          </motion.div>
+          </div>
         )}
 
         {/* 아티스트 트렌드 */}
-        {activeTab === "artists" && !isLoading && !error && artistData && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+        {activeTab === "artist" && !isLoading && !error && artistData && (
+          <div>
             <ArtistGrid artists={artistData} />
-          </motion.div>
+          </div>
         )}
 
         {/* 앨범 트렌드 */}
-        {activeTab === "albums" && !isLoading && !error && albumData && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+        {activeTab === "album" && !isLoading && !error && albumData && (
+          <div>
             <AlbumGrid albums={albumData} />
-          </motion.div>
+          </div>
         )}
       </div>
     </>

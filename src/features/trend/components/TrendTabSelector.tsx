@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-export type TrendTab = "all" | "tracks" | "artists" | "albums";
+export type TrendTab = "all" | "track" | "artist" | "album";
 
 interface TrendTabSelectorProps {
   activeTab: TrendTab;
@@ -60,41 +60,41 @@ export const TrendTabSelector = ({
             )}
           </button>
           <button
-            onClick={() => handleTypeChange("artists")}
+            onClick={() => handleTypeChange("artist")}
             className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
-              activeTab === "artists"
+              activeTab === "artist"
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
           >
             아티스트
-            {activeTab === "artists" && (
+            {activeTab === "artist" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
             )}
           </button>
           <button
-            onClick={() => handleTypeChange("tracks")}
+            onClick={() => handleTypeChange("track")}
             className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
-              activeTab === "tracks"
+              activeTab === "track"
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
           >
             트랙
-            {activeTab === "tracks" && (
+            {activeTab === "track" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
             )}
           </button>
           <button
-            onClick={() => handleTypeChange("albums")}
+            onClick={() => handleTypeChange("album")}
             className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
-              activeTab === "albums"
+              activeTab === "album"
                 ? "text-primary font-semibold"
                 : "text-gray-500 hover:text-gray-800"
             }`}
           >
             앨범
-            {activeTab === "albums" && (
+            {activeTab === "album" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
             )}
           </button>

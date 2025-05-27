@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface NewReleaseGridProps {
@@ -68,11 +67,7 @@ export const NewReleaseGrid = ({
   const isInfiniteScrolled = albums.length > initialLoadCount;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-    >
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {albums.map((album, index) => {
         // 무한 스크롤로 로드된 앨범의 경우 애니메이션 지연 줄이기
         const isNewlyLoaded = isInfiniteScrolled && index >= albums.length - 20;
@@ -81,19 +76,11 @@ export const NewReleaseGrid = ({
           : 0;
 
         return (
-          <motion.div
-            key={album.id}
-            initial={{ opacity: 0, y: isNewlyLoaded ? 10 : 0 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.2,
-              delay: delayValue,
-            }}
-          >
+          <div key={album.id}>
             <Link href={`/album/${album.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                <Image
-                  src={getSafeImageUrl(album.images, "lg")}
+                <UnoptimizedImage
+                  src={getSafeImageUrl(album.images, "md")}
                   alt={album.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
@@ -107,9 +94,9 @@ export const NewReleaseGrid = ({
                 {album.artists?.map((a) => a.name).join(", ")}
               </p>
             </Link>
-          </motion.div>
+          </div>
         );
       })}
-    </motion.div>
+    </div>
   );
 };

@@ -1,9 +1,9 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import Header from "@/components/Header";
 import ThemeToggle from "@/components/ThemeToggle";
 import { DEFAULT_IMAGE_SM } from "@/constants/images";
-import Image from "next/image";
 import Link from "next/link";
 import {
   IoCalendarOutline,
@@ -33,7 +33,7 @@ export default function ProfilePage() {
         {/* 프로필 헤더 */}
         <section className="flex flex-col items-center">
           <div className="relative w-28 h-28 rounded-full overflow-hidden mb-4">
-            <Image
+            <UnoptimizedImage
               src={profile.image}
               alt={profile.name}
               fill

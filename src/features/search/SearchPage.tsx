@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import BasicSearchResults from "./components/BasicSearchResults";
 import InfiniteScrollResults from "./components/InfiniteScrollResults";
 import NoResults from "./components/NoResults";
@@ -65,11 +64,8 @@ export function SearchPage() {
     !hasResults;
 
   return (
-    <motion.div
+    <div
       className="py-6 space-y-6 px-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2 }}
       ref={scrollContainerRef}
       id="search-page-container"
     >
@@ -88,7 +84,7 @@ export function SearchPage() {
         {showLoading && <LoadingIndicator key="loading" size="large" />}
 
         {isError && (
-          <motion.div
+          <div
             key="error"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -96,96 +92,65 @@ export function SearchPage() {
             transition={{ duration: 0.2 }}
           >
             <ErrorDisplay message={error?.message} />
-          </motion.div>
+          </div>
         )}
       </AnimatePresence> */}
 
       {/* 검색 결과 영역 */}
       <div className="space-y-8">
         {/* 검색 타입이 'all'일 때 결과 표시 */}
-        <AnimatePresence mode="wait">
-          {showBasicResults && (
-            <motion.div
-              key={`basic-results-${searchTerm}`}
-              initial={{ opacity: 0.8 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <BasicSearchResults
-                searchTerm={searchTerm}
-                allArtists={allArtists}
-                allTracks={allTracks}
-                allAlbums={allAlbums}
-                shouldShowArtists={shouldShowArtists}
-                shouldShowTracks={shouldShowTracks}
-                shouldShowAlbums={shouldShowAlbums}
-                handleTypeChange={handleTypeChange}
-              />
-            </motion.div>
-          )}
+        {showBasicResults && (
+          <div key={`basic-results-${searchTerm}`}>
+            <BasicSearchResults
+              searchTerm={searchTerm}
+              allArtists={allArtists}
+              allTracks={allTracks}
+              allAlbums={allAlbums}
+              shouldShowArtists={shouldShowArtists}
+              shouldShowTracks={shouldShowTracks}
+              shouldShowAlbums={shouldShowAlbums}
+              handleTypeChange={handleTypeChange}
+            />
+          </div>
+        )}
 
-          {/* 검색 타입이 'all'이 아닐 때 스크롤 결과 표시 */}
-          {showInfiniteResults && (
-            <motion.div
-              key={`scroll-results-${searchType}-${searchTerm}`}
-              initial={{ opacity: 0.8 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <InfiniteScrollResults
-                searchType={searchType}
-                searchTerm={searchTerm}
-                allArtists={allArtists}
-                allTracks={allTracks}
-                allAlbums={allAlbums}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                fetchNextPage={fetchNextPage}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* 검색 타입이 'all'이 아닐 때 스크롤 결과 표시 */}
+        {showInfiniteResults && (
+          <div key={`scroll-results-${searchType}-${searchTerm}`}>
+            <InfiniteScrollResults
+              searchType={searchType}
+              searchTerm={searchTerm}
+              allArtists={allArtists}
+              allTracks={allTracks}
+              allAlbums={allAlbums}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
+            />
+          </div>
+        )}
       </div>
 
       {/* 결과 없음 메시지 */}
-      <AnimatePresence>
-        {showNoResults && (
-          <motion.div
-            key="no-results"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <NoResults
-              searchTerm={searchTerm}
-              searchType={searchType}
-              isLoading={isFetching}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showNoResults && (
+        <div key="no-results">
+          <NoResults
+            searchTerm={searchTerm}
+            searchType={searchType}
+            isLoading={isFetching}
+          />
+        </div>
+      )}
 
       {/* 인기 검색어 (검색어가 없을 때) */}
-      <AnimatePresence>
-        {showPopularSearches && (
-          <motion.div
-            key="popular-searches"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-6 mt-4"
-          >
-            <PopularSearches
-              popularSearches={popularSearches}
-              onSearchClick={handlePopularSearchClick}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {showPopularSearches && (
+        <div key="popular-searches" className="space-y-6 mt-4">
+          <PopularSearches
+            popularSearches={popularSearches}
+            onSearchClick={handlePopularSearchClick}
+          />
+        </div>
+      )}
+    </div>
   );
 }

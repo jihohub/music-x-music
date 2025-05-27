@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { SpotifyArtist } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface ArtistResultsProps {
@@ -20,12 +19,7 @@ export const ArtistResults = ({
   if (artists.length === 0) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">아티스트</h2>
         {showMoreLink && (
@@ -41,8 +35,8 @@ export const ArtistResults = ({
         {artists.map((artist) => (
           <Link href={`/artist/${artist.id}`} key={artist.id} className="group">
             <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-              <Image
-                src={getSafeImageUrl(artist.images)}
+              <UnoptimizedImage
+                src={getSafeImageUrl(artist.images, "md")}
                 alt={artist.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -56,7 +50,7 @@ export const ArtistResults = ({
           </Link>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

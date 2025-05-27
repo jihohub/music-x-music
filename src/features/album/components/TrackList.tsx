@@ -1,10 +1,9 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { useAlbumTracks } from "@/features/album/queries";
 import { SpotifyAlbum, SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface TrackListProps {
@@ -25,27 +24,17 @@ export const TrackList = ({ album }: TrackListProps) => {
 
   if (isLoading && tracks.length === 0) {
     return (
-      <motion.section
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-card-bg rounded-lg py-5"
-      >
+      <section className="bg-card-bg rounded-lg py-5">
         <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
         <div className="p-4 text-center text-text-secondary">
           트랙 로딩 중...
         </div>
-      </motion.section>
+      </section>
     );
   }
 
   return (
-    <motion.section
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
-      className="bg-card-bg rounded-lg py-5"
-    >
+    <section className="bg-card-bg rounded-lg py-5">
       <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
       <div>
         <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
@@ -63,7 +52,7 @@ export const TrackList = ({ album }: TrackListProps) => {
               <span>{index + 1}</span>
             </div>
             <div className="w-10 h-10 shrink-0">
-              <Image
+              <UnoptimizedImage
                 src={albumImage}
                 alt={album.name}
                 width={40}
@@ -101,6 +90,6 @@ export const TrackList = ({ album }: TrackListProps) => {
           </div>
         ))}
       </div>
-    </motion.section>
+    </section>
   );
 };

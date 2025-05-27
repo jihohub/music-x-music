@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { useRecommendedTracks } from "@/features/main/queries";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 export const RecommendedTracks = () => {
@@ -53,16 +52,11 @@ export const RecommendedTracks = () => {
       {!isLoading && tracks && tracks.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {tracks.map((track, index) => (
-            <motion.div
-              key={track.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-            >
+            <div key={track.id}>
               <Link href={`/track/${track.id}`} className="group">
                 <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                  <Image
-                    src={getSafeImageUrl(track.album?.images, "lg")}
+                  <UnoptimizedImage
+                    src={getSafeImageUrl(track.album?.images, "md")}
                     alt={track.album?.name || "앨범 이미지"}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
@@ -77,7 +71,7 @@ export const RecommendedTracks = () => {
                   {track.artists.map((artist) => artist.name).join(", ")}
                 </p>
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

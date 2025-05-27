@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface AlbumGridProps {
@@ -27,27 +26,28 @@ export const AlbumGrid = ({
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">앨범</h2>
           {onViewMore && (
-            <button
-              onClick={onViewMore}
+            <Link
+              href="/trend?type=album"
               className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded-full transition-all duration-200"
+              onClick={(e) => {
+                if (onViewMore) {
+                  e.preventDefault();
+                  onViewMore();
+                }
+              }}
             >
               더 보기
-            </button>
+            </Link>
           )}
         </div>
       )}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayAlbums.map((album, index) => (
-          <motion.div
-            key={album.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-          >
+          <div key={album.id}>
             <Link href={`/album/${album.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                <Image
-                  src={getSafeImageUrl(album.images)}
+                <UnoptimizedImage
+                  src={getSafeImageUrl(album.images, "md")}
                   alt={album.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -61,7 +61,7 @@ export const AlbumGrid = ({
                 {album.artists.map((artist) => artist.name).join(", ")}
               </p>
             </Link>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

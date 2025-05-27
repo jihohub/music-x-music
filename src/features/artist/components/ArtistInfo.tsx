@@ -1,7 +1,6 @@
 "use client";
 
 import { SpotifyArtist } from "@/types/spotify";
-import { motion } from "framer-motion";
 import {
   IoHeartOutline,
   IoMusicalNotesOutline,
@@ -14,12 +13,7 @@ interface ArtistInfoProps {
 
 export const ArtistInfo = ({ artist }: ArtistInfoProps) => {
   return (
-    <motion.section
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, delay: 0.3 }}
-      className="bg-card-bg rounded-lg py-5"
-    >
+    <section className="bg-card-bg rounded-lg py-5">
       <h2 className="text-lg font-bold mb-4">아티스트 정보</h2>
       <div className="space-y-3">
         {artist.genres && artist.genres.length > 0 && (
@@ -61,6 +55,6 @@ export const ArtistInfo = ({ artist }: ArtistInfoProps) => {
           </div>
         )}
       </div>
-    </motion.section>
+    </section>
   );
 };

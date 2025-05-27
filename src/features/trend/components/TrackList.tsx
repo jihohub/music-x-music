@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface TrackListProps {
@@ -23,27 +22,17 @@ export const TrackList = ({
   const displayTracks = tracks.slice(0, 20);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-      className="space-y-4"
-    >
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">트랙</h2>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayTracks.map((track, index) => (
-          <motion.div
-            key={track.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-          >
+          <div key={track.id}>
             <Link href={`/track/${track.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                <Image
-                  src={getSafeImageUrl(track.album?.images, "lg")}
+                <UnoptimizedImage
+                  src={getSafeImageUrl(track.album?.images, "md")}
                   alt={track.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -57,9 +46,9 @@ export const TrackList = ({
                 {track.artists.map((a) => a.name).join(", ")}
               </p>
             </Link>
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
