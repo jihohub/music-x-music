@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { SearchType } from "../queries/searchSpotify";
 import SearchBar from "./SearchBar";
 
@@ -35,58 +36,74 @@ export function SearchHeader({
         <div className="mt-6 mb-4">
           <div className="flex justify-center">
             <div className="inline-flex gap-4 px-1">
-              <button
-                onClick={() => handleTypeChange("all")}
+              <Link
+                href={`/search?q=${encodeURIComponent(searchTerm)}`}
                 className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
                   searchType === "all"
                     ? "text-primary font-semibold"
                     : "text-gray-500 hover:text-gray-800"
                 }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTypeChange("all");
+                }}
               >
                 전체
                 {searchType === "all" && (
                   <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
                 )}
-              </button>
-              <button
-                onClick={() => handleTypeChange("artist")}
+              </Link>
+              <Link
+                href={`/search?q=${encodeURIComponent(searchTerm)}&type=artist`}
                 className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
                   searchType === "artist"
                     ? "text-primary font-semibold"
                     : "text-gray-500 hover:text-gray-800"
                 }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTypeChange("artist");
+                }}
               >
                 아티스트
                 {searchType === "artist" && (
                   <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
                 )}
-              </button>
-              <button
-                onClick={() => handleTypeChange("track")}
+              </Link>
+              <Link
+                href={`/search?q=${encodeURIComponent(searchTerm)}&type=track`}
                 className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
                   searchType === "track"
                     ? "text-primary font-semibold"
                     : "text-gray-500 hover:text-gray-800"
                 }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTypeChange("track");
+                }}
               >
                 트랙
                 {searchType === "track" && (
                   <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
                 )}
-              </button>
-              <button
-                onClick={() => handleTypeChange("album")}
+              </Link>
+              <Link
+                href={`/search?q=${encodeURIComponent(searchTerm)}&type=album`}
                 className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
                   searchType === "album"
                     ? "text-primary font-semibold"
                     : "text-gray-500 hover:text-gray-800"
                 }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTypeChange("album");
+                }}
               >
                 앨범
                 {searchType === "album" && (
                   <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
                 )}
-              </button>
+              </Link>
             </div>
           </div>
           <div className="w-full h-px bg-gray-200 mt-0.5"></div>

@@ -23,12 +23,18 @@ export const AlbumResults = ({
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">앨범</h2>
         {showMoreLink && (
-          <button
-            onClick={onShowMore}
+          <Link
+            href="/search?type=album"
             className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded-full transition-all duration-200"
+            onClick={(e) => {
+              if (onShowMore) {
+                e.preventDefault();
+                onShowMore();
+              }
+            }}
           >
             더 보기
-          </button>
+          </Link>
         )}
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

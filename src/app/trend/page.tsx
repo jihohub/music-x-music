@@ -12,21 +12,18 @@ import {
   useTrendArtists,
   useTrendTracks,
 } from "@/features/trend/queries";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
 
-export default function TrendPage() {
-  const [activeTab, setActiveTab] = useState<TrendTab>("all");
+// 탭 컨텐츠를 담당하는 별도 컴포넌트
+const TrendContent = ({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: TrendTab;
+  setActiveTab: (tab: TrendTab) => void;
+}) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // 초기 URL 파라미터에서 탭 설정
-  useEffect(() => {
-    const typeParam = searchParams.get("type");
-    if (typeParam) {
-      setActiveTab(typeParam as TrendTab);
-    }
-  }, [searchParams]);
 
   // API 데이터 가져오기
   const {
@@ -67,6 +64,81 @@ export default function TrendPage() {
     router.push(`/trend?type=${type}`);
   };
 
+  if (error) {
+    return (
+      <div className="text-center py-20 text-error">
+        <p>데이터를 불러오는 중 오류가 발생했습니다.</p>
+        <p className="text-sm mt-2">{error.toString()}</p>
+      </div>
+    );
+  }
+
+  if (activeTab === "all") {
+    return (
+      <div className="space-y-16">
+        {/* 아티스트 섹션 */}
+        {artistData && (
+          <ArtistGrid
+            artists={artistData}
+            limit={4}
+            showPreview={true}
+            onViewMore={() => handleViewMore("artist")}
+          />
+        )}
+
+        {/* 트랙 섹션 */}
+        {trackData && (
+          <TrackGrid
+            tracks={trackData}
+            limit={4}
+            showPreview={true}
+            onViewMore={() => handleViewMore("track")}
+          />
+        )}
+
+        {/* 앨범 섹션 */}
+        {albumData && (
+          <AlbumGrid
+            albums={albumData}
+            limit={4}
+            showPreview={true}
+            onViewMore={() => handleViewMore("album")}
+          />
+        )}
+      </div>
+    );
+  }
+
+  if (activeTab === "track" && !isLoading && trackData) {
+    return (
+      <div>
+        <TrackGrid tracks={trackData} />
+      </div>
+    );
+  }
+
+  if (activeTab === "artist" && !isLoading && artistData) {
+    return (
+      <div>
+        <ArtistGrid artists={artistData} />
+      </div>
+    );
+  }
+
+  if (activeTab === "album" && !isLoading && albumData) {
+    return (
+      <div>
+        <AlbumGrid albums={albumData} />
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default function TrendPage() {
+  const [activeTab, setActiveTab] = useState<TrendTab>("all");
+
   return (
     <>
       <Header title="트렌드" />
@@ -76,69 +148,8 @@ export default function TrendPage() {
           <TrendTabSelector activeTab={activeTab} onChange={setActiveTab} />
         </Suspense>
 
-        {/* 에러 상태 */}
-        {error && (
-          <div className="text-center py-20 text-error">
-            <p>데이터를 불러오는 중 오류가 발생했습니다.</p>
-            <p className="text-sm mt-2">{error.toString()}</p>
-          </div>
-        )}
-
-        {/* 전체 탭 - 각 카테고리별 미리보기 */}
-        {activeTab === "all" && !error && (
-          <div className="space-y-16">
-            {/* 아티스트 섹션 */}
-            {artistData && (
-              <ArtistGrid
-                artists={artistData}
-                limit={4}
-                showPreview={true}
-                onViewMore={() => handleViewMore("artist")}
-              />
-            )}
-
-            {/* 트랙 섹션 */}
-            {trackData && (
-              <TrackGrid
-                tracks={trackData}
-                limit={4}
-                showPreview={true}
-                onViewMore={() => handleViewMore("track")}
-              />
-            )}
-
-            {/* 앨범 섹션 */}
-            {albumData && (
-              <AlbumGrid
-                albums={albumData}
-                limit={4}
-                showPreview={true}
-                onViewMore={() => handleViewMore("album")}
-              />
-            )}
-          </div>
-        )}
-
-        {/* 트랙 트렌드 */}
-        {activeTab === "track" && !isLoading && !error && trackData && (
-          <div>
-            <TrackGrid tracks={trackData} />
-          </div>
-        )}
-
-        {/* 아티스트 트렌드 */}
-        {activeTab === "artist" && !isLoading && !error && artistData && (
-          <div>
-            <ArtistGrid artists={artistData} />
-          </div>
-        )}
-
-        {/* 앨범 트렌드 */}
-        {activeTab === "album" && !isLoading && !error && albumData && (
-          <div>
-            <AlbumGrid albums={albumData} />
-          </div>
-        )}
+        {/* 콘텐츠 영역 */}
+        <TrendContent activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
     </>
   );
