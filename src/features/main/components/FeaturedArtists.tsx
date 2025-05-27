@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { useFeaturedArtists } from "@/features/main/queries";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 export const FeaturedArtists = () => {
@@ -48,16 +47,11 @@ export const FeaturedArtists = () => {
       {!isLoading && !error && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {artists.map((artist, index) => (
-            <motion.div
-              key={artist.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-            >
+            <div key={artist.id}>
               <Link href={`/artist/${artist.id}`} className="group">
                 <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-                  <Image
-                    src={getSafeImageUrl(artist.images, "lg")}
+                  <UnoptimizedImage
+                    src={getSafeImageUrl(artist.images, "md")}
                     alt={artist.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
@@ -71,7 +65,7 @@ export const FeaturedArtists = () => {
                   {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
                 </p>
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

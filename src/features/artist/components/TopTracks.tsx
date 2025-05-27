@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { SpotifyTrack } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface TopTracksProps {
@@ -12,12 +11,7 @@ interface TopTracksProps {
 
 export const TopTracks = ({ tracks }: TopTracksProps) => {
   return (
-    <motion.section
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
-      className="bg-card-bg rounded-lg py-5"
-    >
+    <section className="bg-card-bg rounded-lg py-5">
       <h2 className="text-lg font-bold mb-4">인기 트랙</h2>
       <div>
         <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
@@ -35,7 +29,7 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
               <span>{index + 1}</span>
             </div>
             <div className="w-10 h-10 shrink-0">
-              <Image
+              <UnoptimizedImage
                 src={getSafeImageUrl(track.album?.images, "sm")}
                 alt={track.album?.name || "앨범 이미지"}
                 width={40}
@@ -66,6 +60,6 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
           </div>
         ))}
       </div>
-    </motion.section>
+    </section>
   );
 };

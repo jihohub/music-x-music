@@ -1,7 +1,7 @@
 "use client";
 
 import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { SearchType } from "../queries/searchSpotify";
 import AlbumResults from "./AlbumResults";
@@ -17,6 +17,7 @@ interface InfiniteScrollResultsProps {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
+  isLoading?: boolean;
 }
 
 export function InfiniteScrollResults({
@@ -28,11 +29,14 @@ export function InfiniteScrollResults({
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
+  isLoading = false,
 }: InfiniteScrollResultsProps) {
   // 마지막 데이터 요청 시간 추적
   const lastFetchTimeRef = useRef<number>(0);
   // 스크롤 컨테이너 참조
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  // 최초 로딩 여부 추적
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   // 현재 검색 유형에 맞는 데이터 선택
   const currentItems =
@@ -41,6 +45,18 @@ export function InfiniteScrollResults({
       : searchType === "track"
       ? allTracks
       : allAlbums;
+
+  // 데이터가 로드되면 isFirstLoad를 false로 설정
+  useEffect(() => {
+    if (currentItems.length > 0 && isFirstLoad) {
+      setIsFirstLoad(false);
+    }
+  }, [currentItems.length, isFirstLoad]);
+
+  // 검색어나 검색 타입이 변경되면 isFirstLoad를 true로 재설정
+  useEffect(() => {
+    setIsFirstLoad(true);
+  }, [searchTerm, searchType]);
 
   // 스크롤 복원 비활성화 및 브라우저의 스크롤 조정 방지
   useEffect(() => {
@@ -85,8 +101,11 @@ export function InfiniteScrollResults({
 
   if (searchType === "all") return null;
 
-  // 데이터가 없는 경우 렌더링하지 않음
-  if (!currentItems.length) return null;
+  // 데이터가 없는 경우에도 로딩 중일 때는 스켈레톤 표시 (최초 로딩 시에만)
+  if (!currentItems.length && !isLoading) return null;
+
+  // 스켈레톤을 표시할지 결정하는 조건: 최초 로딩 시에만 표시
+  const shouldShowSkeleton = isLoading && isFirstLoad;
 
   return (
     <div className="min-h-[300px]">
@@ -103,15 +122,27 @@ export function InfiniteScrollResults({
       >
         {/* 결과 컴포넌트 - 즉시 렌더링 */}
         {searchType === "artist" && (
-          <ArtistResults artists={allArtists} showMoreLink={false} />
+          <ArtistResults
+            artists={allArtists}
+            limit={4}
+            isLoading={shouldShowSkeleton}
+          />
         )}
 
         {searchType === "track" && (
-          <TrackResults tracks={allTracks} showMoreLink={false} />
+          <TrackResults
+            tracks={allTracks}
+            limit={4}
+            isLoading={shouldShowSkeleton}
+          />
         )}
 
         {searchType === "album" && (
-          <AlbumResults albums={allAlbums} showMoreLink={false} />
+          <AlbumResults
+            albums={allAlbums}
+            limit={4}
+            isLoading={shouldShowSkeleton}
+          />
         )}
       </InfiniteScroll>
     </div>

@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 export type TrendTab = "all" | "artists" | "tracks" | "albums";
 
 interface TabSelectorProps {
@@ -24,10 +22,7 @@ export const TabSelector = ({ activeTab, onChange }: TabSelectorProps) => {
           >
             전체
             {activeTab === "all" && (
-              <motion.div
-                className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"
-                layoutId="tab-indicator"
-              />
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />
             )}
           </button>
           <button
@@ -40,10 +35,7 @@ export const TabSelector = ({ activeTab, onChange }: TabSelectorProps) => {
           >
             아티스트
             {activeTab === "artists" && (
-              <motion.div
-                className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"
-                layoutId="tab-indicator"
-              />
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />
             )}
           </button>
           <button
@@ -56,10 +48,7 @@ export const TabSelector = ({ activeTab, onChange }: TabSelectorProps) => {
           >
             트랙
             {activeTab === "tracks" && (
-              <motion.div
-                className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"
-                layoutId="tab-indicator"
-              />
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />
             )}
           </button>
           <button
@@ -72,10 +61,7 @@ export const TabSelector = ({ activeTab, onChange }: TabSelectorProps) => {
           >
             앨범
             {activeTab === "albums" && (
-              <motion.div
-                className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"
-                layoutId="tab-indicator"
-              />
+              <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />
             )}
           </button>
         </div>

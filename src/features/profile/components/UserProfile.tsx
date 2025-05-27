@@ -1,7 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function UserProfile() {
@@ -28,7 +28,7 @@ export default function UserProfile() {
   return (
     <div className="flex items-center gap-2">
       {session.user?.image ? (
-        <Image
+        <UnoptimizedImage
           src={session.user.image}
           alt={session.user.name || "사용자"}
           width={32}

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { IoCloseCircleOutline, IoSearchOutline } from "react-icons/io5";
 
@@ -40,13 +39,9 @@ export const SearchBar = ({
 
   return (
     <div className="relative max-w-xl mx-auto">
-      <motion.form
+      <form
         onSubmit={handleSubmit}
-        initial={{ opacity: 0.8, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
         className="relative bg-card-bg rounded-full border border-gray-200/10 px-4 py-2.5 shadow-sm"
-        whileTap={{ scale: 0.99 }}
       >
         <div className="flex items-center">
           <IoSearchOutline
@@ -64,27 +59,18 @@ export const SearchBar = ({
             spellCheck="false"
           />
           {searchTerm && (
-            <motion.button
+            <button
               type="button"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.15 }}
               className="flex items-center justify-center ml-2 h-5 w-5 rounded-full bg-gray-400/30 text-white flex-shrink-0"
               onClick={onClearSearch}
               aria-label="검색어 지우기"
-              whileTap={{ scale: 0.9 }}
             >
               <IoCloseCircleOutline size={14} />
-            </motion.button>
+            </button>
           )}
         </div>
-      </motion.form>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.3 }}
-        className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-[90%] h-1.5 bg-black/20 blur-md rounded-full"
-      />
+      </form>
+      <div className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-[90%] h-1.5 bg-black/20 blur-md rounded-full" />
     </div>
   );
 };

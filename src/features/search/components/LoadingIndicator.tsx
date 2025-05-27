@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 interface LoadingIndicatorProps {
@@ -34,16 +33,11 @@ export function LoadingIndicator({
       : "h-6 w-6 border-b-2";
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex justify-center items-center py-4"
-    >
+    <div className="flex justify-center items-center py-4">
       <div
         className={`animate-spin rounded-full ${sizeClass} border-primary`}
       ></div>
-    </motion.div>
+    </div>
   );
 }
 

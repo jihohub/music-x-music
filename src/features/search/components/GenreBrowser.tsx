@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 interface GenreBrowserProps {
   onGenreClick: (genre: string) => void;
 }
@@ -15,11 +13,7 @@ export const GenreBrowser = ({ onGenreClick }: GenreBrowserProps) => {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-    >
+    <div>
       <h2 className="text-xl font-bold mb-4">장르 및 분위기</h2>
       <div className="grid grid-cols-2 gap-3">
         {genres.map((genre) => (
@@ -32,7 +26,7 @@ export const GenreBrowser = ({ onGenreClick }: GenreBrowserProps) => {
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

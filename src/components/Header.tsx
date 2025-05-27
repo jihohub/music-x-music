@@ -32,7 +32,7 @@ export default function Header({ title }: { title?: string }) {
           ) : null}
         </div>
 
-        <h1 className="text-lg font-bold text-center flex-1">
+        <h1 className="text-lg font-bold text-center flex-1 truncate">
           {title || "MUSIC X MUSIC"}
         </h1>
 

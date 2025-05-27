@@ -1,9 +1,8 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { SpotifyAlbum } from "@/types/spotify";
 import { getSafeImageUrl } from "@/utils/image";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 
 interface AlbumHeaderProps {
@@ -12,13 +11,13 @@ interface AlbumHeaderProps {
 
 export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
   // 앨범 이미지 URL 가져오기
-  const albumImage = getSafeImageUrl(album.images, "lg");
+  const albumImage = getSafeImageUrl(album.images, "md");
   const bannerImage = getSafeImageUrl(album.images, "lg");
 
   return (
     <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
-        <Image
+        <UnoptimizedImage
           src={bannerImage}
           alt={album.name}
           fill
@@ -29,12 +28,7 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 container px-4 pb-6">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-end gap-6"
-        >
+        <div className="flex items-end gap-6">
           <div
             className="relative overflow-hidden aspect-square rounded-sm"
             style={{
@@ -49,7 +43,7 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
             <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
             <div className="absolute inset-0">
-              <Image
+              <UnoptimizedImage
                 src={albumImage}
                 alt={album.name}
                 fill
@@ -80,7 +74,7 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
