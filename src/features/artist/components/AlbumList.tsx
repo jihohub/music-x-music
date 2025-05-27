@@ -19,7 +19,7 @@ export const AlbumList = ({ albums }: AlbumListProps) => {
             <Link href={`/album/${album.id}`} className="group">
               <div className="relative aspect-square bg-card-bg rounded-sm overflow-hidden">
                 <UnoptimizedImage
-                  src={getSafeImageUrl(album.images, "sm")}
+                  src={getSafeImageUrl(album.images, "md")}
                   alt={album.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
