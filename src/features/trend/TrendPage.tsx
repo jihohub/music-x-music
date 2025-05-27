@@ -10,7 +10,7 @@ import {
   useTrendTracks,
 } from "@/features/trend/queries";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 // 트렌드 탭 타입 정의
 export type TrendTab = "all" | "track" | "artist" | "album";
@@ -99,7 +99,8 @@ const getInitialTabFromUrl = (params: URLSearchParams | null): TrendTab => {
   return "all";
 };
 
-export function TrendPage() {
+// useSearchParams를 사용하는 부분을 별도 컴포넌트로 분리
+const TrendPageContent = () => {
   const searchParams = useSearchParams();
 
   // 초기 상태를 URL에서 바로 가져옴
@@ -126,6 +127,22 @@ export function TrendPage() {
         <TrendContent activeTab={activeTab} />
       </div>
     </>
+  );
+};
+
+// 메인 컴포넌트에서는 Suspense로 감싸기
+export function TrendPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-6 space-y-6 px-4">
+          <Header title="트렌드" />
+          <div className="text-center py-10">로딩 중...</div>
+        </div>
+      }
+    >
+      <TrendPageContent />
+    </Suspense>
   );
 }
 
