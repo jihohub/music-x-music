@@ -30,12 +30,12 @@ export const TrackGrid = ({
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <div
-            className="h-7 w-24 rounded"
+            className="h-7 w-20 rounded"
             style={{ backgroundColor: "var(--skeleton-bg)" }}
           ></div>
           {onViewMore && (
             <div
-              className="h-6 w-16 rounded"
+              className="h-5 w-12 mr-2 rounded"
               style={{ backgroundColor: "var(--skeleton-bg)" }}
             ></div>
           )}
