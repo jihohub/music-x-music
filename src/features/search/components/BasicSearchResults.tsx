@@ -1,7 +1,6 @@
 "use client";
 
 import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import { motion } from "framer-motion";
 import AlbumResults from "./AlbumResults";
 import ArtistResults from "./ArtistResults";
 import TrackResults from "./TrackResults";
@@ -15,6 +14,7 @@ interface BasicSearchResultsProps {
   shouldShowTracks: boolean;
   shouldShowAlbums: boolean;
   handleTypeChange: (type: any) => void;
+  isLoading?: boolean;
 }
 
 export function BasicSearchResults({
@@ -26,55 +26,44 @@ export function BasicSearchResults({
   shouldShowTracks,
   shouldShowAlbums,
   handleTypeChange,
+  isLoading = false,
 }: BasicSearchResultsProps) {
   return (
     <div className="space-y-16">
       {/* 아티스트 결과 */}
-      {shouldShowArtists && allArtists.length > 0 && (
-        <motion.div
-          key={`artist-results-${searchTerm}`}
-          initial={{ opacity: 0.8, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {(shouldShowArtists || isLoading) && (
+        <div key={`artist-results-${searchTerm}`}>
           <ArtistResults
             artists={allArtists.slice(0, 4)}
-            showMoreLink={true}
+            showMoreLink
             onShowMore={() => handleTypeChange("artist")}
+            isLoading={isLoading}
           />
-        </motion.div>
+        </div>
       )}
 
       {/* 트랙 결과 */}
-      {shouldShowTracks && allTracks.length > 0 && (
-        <motion.div
-          key={`track-results-${searchTerm}`}
-          initial={{ opacity: 0.8, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.1 }}
-        >
+      {(shouldShowTracks || isLoading) && (
+        <div key={`track-results-${searchTerm}`}>
           <TrackResults
             tracks={allTracks.slice(0, 4)}
-            showMoreLink={true}
+            showMoreLink
             onShowMore={() => handleTypeChange("track")}
+            isLoading={isLoading}
           />
-        </motion.div>
+        </div>
       )}
 
       {/* 앨범 결과 */}
-      {shouldShowAlbums && allAlbums.length > 0 && (
-        <motion.div
-          key={`album-results-${searchTerm}`}
-          initial={{ opacity: 0.8, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.2 }}
-        >
+      {(shouldShowAlbums || isLoading) && (
+        <div key={`album-results-${searchTerm}`}>
           <AlbumResults
             albums={allAlbums.slice(0, 4)}
-            showMoreLink={true}
+            showMoreLink
             onShowMore={() => handleTypeChange("album")}
+            isLoading={isLoading}
           />
-        </motion.div>
+        </div>
       )}
     </div>
   );

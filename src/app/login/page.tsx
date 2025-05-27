@@ -1,7 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 
 export default function LoginPage() {
   return (
@@ -18,7 +18,7 @@ export default function LoginPage() {
           onClick={() => signIn("spotify", { callbackUrl: "/" })}
           className="w-full flex items-center justify-center py-3 px-4 rounded-full bg-primary hover:bg-primary-hover text-white font-medium transition-colors"
         >
-          <Image
+          <UnoptimizedImage
             src="/images/Spotify_Primary_Logo_RGB_Green.png"
             width={24}
             height={24}

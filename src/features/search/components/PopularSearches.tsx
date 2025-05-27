@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 interface PopularSearchesProps {
   popularSearches: string[];
   onSearchClick: (term: string) => void;
@@ -12,11 +10,7 @@ export const PopularSearches = ({
   onSearchClick,
 }: PopularSearchesProps) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div>
       <h2 className="text-xl font-bold mb-4">인기 검색어</h2>
       <div className="flex flex-wrap gap-2">
         {popularSearches.map((term, index) => (
@@ -29,7 +23,7 @@ export const PopularSearches = ({
           </button>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

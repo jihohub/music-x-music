@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { SearchType } from "../queries/searchSpotify";
 
@@ -50,12 +49,7 @@ export function NoResults({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="text-center py-8"
-    >
+    <div className="text-center py-8">
       {searchType === "artist" && (
         <>
           <p className="text-lg text-text-secondary">
@@ -99,7 +93,7 @@ export function NoResults({
           </p>
         </>
       )}
-    </motion.div>
+    </div>
   );
 }
 

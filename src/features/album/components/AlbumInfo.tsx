@@ -1,7 +1,6 @@
 "use client";
 
 import { SpotifyAlbum } from "@/types/spotify";
-import { motion } from "framer-motion";
 import {
   IoCalendarOutline,
   IoMusicalNotesOutline,
@@ -14,12 +13,7 @@ interface AlbumInfoProps {
 
 export const AlbumInfo = ({ album }: AlbumInfoProps) => {
   return (
-    <motion.section
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-      className="bg-card-bg rounded-lg py-5"
-    >
+    <section className="bg-card-bg rounded-lg py-5">
       <h2 className="text-lg font-bold mb-4">앨범 정보</h2>
       <div className="space-y-3">
         <div className="flex items-start gap-3">
@@ -54,6 +48,6 @@ export const AlbumInfo = ({ album }: AlbumInfoProps) => {
           </div>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 };
