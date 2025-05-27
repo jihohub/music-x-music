@@ -1,48 +1,22 @@
 "use client";
 
 import Header from "@/components/Header";
-import AlbumGrid from "@/features/trend/components/AlbumGrid";
-import ArtistGrid from "@/features/trend/components/ArtistGrid";
-import TrackGrid from "@/features/trend/components/TrackGrid";
-import TrendTabSelector, {
-  TrendTab,
-} from "@/features/trend/components/TrendTabSelector";
+import AllTrendResults from "@/features/trend/components/AllTrendResults";
+import SingleTrendResults from "@/features/trend/components/SingleTrendResults";
+import TrendHeader from "@/features/trend/components/TrendHeader";
 import {
   useTrendAlbums,
   useTrendArtists,
   useTrendTracks,
 } from "@/features/trend/queries";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-// 초기 탭 상태를 결정하는 컴포넌트
-const TabInitializer = ({
-  setActiveTab,
-}: {
-  setActiveTab: (tab: TrendTab) => void;
-}) => {
-  const searchParams = useSearchParams();
+// 트렌드 탭 타입 정의
+export type TrendTab = "all" | "track" | "artist" | "album";
 
-  useEffect(() => {
-    const typeParam = searchParams.get("type") as TrendTab | null;
-    if (typeParam && ["track", "artist", "album"].includes(typeParam)) {
-      setActiveTab(typeParam);
-    }
-  }, [searchParams, setActiveTab]);
-
-  return null;
-};
-
-// 탭 컨텐츠를 담당하는 별도 컴포넌트
-const TrendContent = ({
-  activeTab,
-  setActiveTab,
-  initialTab,
-}: {
-  activeTab: TrendTab;
-  setActiveTab: (tab: TrendTab) => void;
-  initialTab: TrendTab;
-}) => {
+// 실제 트렌드 데이터와 UI를 처리하는 컴포넌트
+const TrendContent = ({ activeTab }: { activeTab: TrendTab }) => {
   const router = useRouter();
 
   // API 데이터 가져오기
@@ -63,14 +37,6 @@ const TrendContent = ({
     isLoading: isLoadingAlbums,
     error: albumError,
   } = useTrendAlbums();
-
-  // 현재 탭에 따른 로딩 상태
-  const isLoading =
-    (activeTab === "track" && isLoadingTracks) ||
-    (activeTab === "artist" && isLoadingArtists) ||
-    (activeTab === "album" && isLoadingAlbums) ||
-    (activeTab === "all" &&
-      (isLoadingTracks || isLoadingArtists || isLoadingAlbums));
 
   // 현재 탭에 따른 에러 상태
   const error =
@@ -93,104 +59,71 @@ const TrendContent = ({
     );
   }
 
-  // 초기 렌더링 시 전체 탭 스켈레톤이 보이지 않도록
-  if (initialTab !== "all" && initialTab !== activeTab) {
-    return null;
+  return (
+    <>
+      {/* 전체 탭일 때는 AllTrendResults 컴포넌트 사용 */}
+      {activeTab === "all" && (
+        <AllTrendResults
+          artists={artistData}
+          tracks={trackData}
+          albums={albumData}
+          isLoadingArtists={isLoadingArtists}
+          isLoadingTracks={isLoadingTracks}
+          isLoadingAlbums={isLoadingAlbums}
+          onViewMore={handleViewMore}
+        />
+      )}
+
+      {/* 개별 탭일 때는 SingleTrendResults 컴포넌트 사용 */}
+      {activeTab !== "all" && (
+        <SingleTrendResults
+          trendType={activeTab}
+          artists={artistData}
+          tracks={trackData}
+          albums={albumData}
+          isLoadingArtists={isLoadingArtists}
+          isLoadingTracks={isLoadingTracks}
+          isLoadingAlbums={isLoadingAlbums}
+        />
+      )}
+    </>
+  );
+};
+
+// URL 파라미터에서 유효한 탭 타입을 추출하는 함수
+const getInitialTabFromUrl = (params: URLSearchParams | null): TrendTab => {
+  const typeParam = params?.get("type") as TrendTab | null;
+  if (typeParam && ["track", "artist", "album"].includes(typeParam)) {
+    return typeParam;
   }
-
-  if (activeTab === "all") {
-    return (
-      <div className="space-y-16">
-        {/* 아티스트 섹션 */}
-        <div className="section-artist">
-          <ArtistGrid
-            artists={artistData}
-            limit={4}
-            showPreview
-            onViewMore={() => handleViewMore("artist")}
-            isLoading={isLoadingArtists}
-          />
-        </div>
-
-        {/* 트랙 섹션 */}
-        <div className="section-track">
-          <TrackGrid
-            tracks={trackData}
-            limit={4}
-            showPreview
-            onViewMore={() => handleViewMore("track")}
-            isLoading={isLoadingTracks}
-          />
-        </div>
-
-        {/* 앨범 섹션 */}
-        <div className="section-album">
-          <AlbumGrid
-            albums={albumData}
-            limit={4}
-            showPreview
-            onViewMore={() => handleViewMore("album")}
-            isLoading={isLoadingAlbums}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (activeTab === "track") {
-    return (
-      <div>
-        <TrackGrid tracks={trackData} isLoading={isLoadingTracks} />
-      </div>
-    );
-  }
-
-  if (activeTab === "artist") {
-    return (
-      <div>
-        <ArtistGrid artists={artistData} isLoading={isLoadingArtists} />
-      </div>
-    );
-  }
-
-  if (activeTab === "album") {
-    return (
-      <div>
-        <AlbumGrid albums={albumData} isLoading={isLoadingAlbums} />
-      </div>
-    );
-  }
-
-  return null;
+  return "all";
 };
 
 export function TrendPage() {
-  // URL 파라미터에서 초기 탭 상태 가져오기
   const searchParams = useSearchParams();
-  const typeParam = searchParams?.get("type") as TrendTab | null;
-  const initialTab =
-    typeParam && ["track", "artist", "album"].includes(typeParam)
-      ? typeParam
-      : "all";
 
-  const [activeTab, setActiveTab] = useState<TrendTab>(initialTab);
+  // 초기 상태를 URL에서 바로 가져옴
+  const [activeTab, setActiveTab] = useState<TrendTab>(() =>
+    getInitialTabFromUrl(searchParams)
+  );
+
+  // URL 변경 시 탭 상태 업데이트
+  useEffect(() => {
+    const newTab = getInitialTabFromUrl(searchParams);
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
+    }
+  }, [searchParams, activeTab]);
 
   return (
     <>
       <Header title="트렌드" />
       <div className="py-6 space-y-6 px-4">
-        {/* 탭 선택 - Suspense로 감싸서 useSearchParams 사용 */}
-        <Suspense fallback={<div className="mb-4 h-10" />}>
-          <TrendTabSelector activeTab={activeTab} onChange={setActiveTab} />
-          <TabInitializer setActiveTab={setActiveTab} />
-        </Suspense>
+        {/* 트렌드 헤더 컴포넌트 */}
+        <TrendHeader activeTab={activeTab} />
 
         {/* 콘텐츠 영역 */}
-        <TrendContent
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          initialTab={initialTab}
-        />
+        <TrendContent activeTab={activeTab} />
       </div>
     </>
   );

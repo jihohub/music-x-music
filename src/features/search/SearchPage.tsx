@@ -57,13 +57,6 @@ export function SearchPage() {
   const showPopularSearches =
     (!searchTerm || searchTerm.trim() === "") && !isFetching;
 
-  // 검색 로딩 중 상태 표시 최적화
-  const showLoading =
-    isFetching &&
-    !isFetchingNextPage &&
-    searchTerm.trim().length >= 2 &&
-    !hasResults;
-
   return (
     <div
       className="py-6 space-y-6 px-4"
@@ -79,23 +72,6 @@ export function SearchPage() {
         handleSearchSubmit={handleSearchSubmit}
         handleTypeChange={handleTypeChange}
       />
-
-      {/* 초기 로딩 상태 */}
-      {/* <AnimatePresence mode="wait">
-        {showLoading && <LoadingIndicator key="loading" size="large" />}
-
-        {isError && (
-          <div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ErrorDisplay message={error?.message} />
-          </div>
-        )}
-      </AnimatePresence> */}
 
       {/* 검색 결과 영역 */}
       <div className="space-y-8">
