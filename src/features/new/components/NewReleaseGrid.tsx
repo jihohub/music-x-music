@@ -113,6 +113,11 @@ export const NewReleaseGrid = ({
               </div>
               <p className="text-sm text-text-secondary truncate">
                 {album.attributes.artistName}
+                {album.attributes.releaseDate && (
+                  <span className="ml-1">
+                    • {album.attributes.releaseDate.split("-")[0]}
+                  </span>
+                )}
               </p>
             </Link>
           </div>

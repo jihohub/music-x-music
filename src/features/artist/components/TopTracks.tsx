@@ -41,47 +41,34 @@ export const TopTracks = ({ tracks }: TopTracksProps) => {
   return (
     <section className="bg-card-bg rounded-lg py-5">
       <h2 className="text-lg font-bold mb-4">인기 트랙</h2>
-      <div>
-        <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
-          <div className="w-8 text-center shrink-0">#</div>
-          <div className="w-10 shrink-0"></div>
-          <div className="flex-grow min-w-0">제목</div>
-          <div className="hidden md:block w-1/4 min-w-0">앨범</div>
-          <div className="text-right w-10 shrink-0">시간</div>
-        </div>
+      <div className="space-y-1">
         {tracks.slice(0, 10).map((track, index) => (
           <Link
             key={track.id}
             href={`/track/${track.id}`}
-            className="flex items-center gap-2 py-2 hover:bg-gray-700/10 transition-colors group cursor-pointer"
+            className="flex items-center gap-3 p-2 hover:bg-gray-700/10 transition-colors group cursor-pointer rounded-md"
           >
-            <div className="w-8 text-center text-text-secondary shrink-0">
-              <span>{index + 1}</span>
-            </div>
-            <div className="w-10 h-10 shrink-0">
+            <div className="w-12 h-12 shrink-0">
               <UnoptimizedImage
                 src={getAppleMusicImageUrl(track.attributes.artwork, "sm")}
                 alt={track.attributes.albumName || track.attributes.name}
-                width={40}
-                height={40}
+                width={48}
+                height={48}
                 className="rounded-md"
               />
             </div>
             <div className="flex-grow min-w-0">
-              <div className="hover:text-primary line-clamp-2">
+              <div className="font-medium hover:text-primary line-clamp-1 text-sm">
                 {track.attributes.name}
               </div>
-            </div>
-            <div className="hidden md:block w-1/4 text-text-secondary line-clamp-1 min-w-0">
-              <span className="text-text-secondary">
+              <div className="text-text-secondary text-sm line-clamp-1 mt-0.5">
                 {track.attributes.albumName || "-"}
-              </span>
-            </div>
-            <div className="text-right w-10 text-text-secondary shrink-0">
-              {Math.floor(track.attributes.durationInMillis / 60000)}:
-              {(Math.floor(track.attributes.durationInMillis / 1000) % 60)
-                .toString()
-                .padStart(2, "0")}
+                {track.attributes.releaseDate && (
+                  <span className="ml-1">
+                    • {track.attributes.releaseDate.split("-")[0]}
+                  </span>
+                )}
+              </div>
             </div>
           </Link>
         ))}

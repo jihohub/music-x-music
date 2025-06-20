@@ -30,7 +30,7 @@ function getAppleMusicImageUrl(
   size: "sm" | "md" | "lg" | "xl" = "lg"
 ): string {
   if (!artwork?.url) {
-    return "/images/default-album.png";
+    return ""; // 빈 문자열 반환하여 CSS fallback 사용
   }
 
   const sizeMap = {
@@ -81,6 +81,58 @@ export function TrackPage({
   const [isLiked, setIsLiked] = useState(false);
   const [dominantColor, setDominantColor] = useState("59, 130, 246"); // 기본 파란색
 
+  // 드래그 상태 관리
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragY, setDragY] = useState(0); // 현재 드래그 Y 위치
+  const [startY, setStartY] = useState(0); // 드래그 시작 Y 위치
+  const [isClosing, setIsClosing] = useState(false); // 닫히는 애니메이션 상태
+
+  // 드래그 임계값 - 화면 높이의 2/3
+  const closeThreshold =
+    typeof window !== "undefined" ? window.innerHeight * 0.66 : 400;
+  const maxDrag = typeof window !== "undefined" ? window.innerHeight : 600; // 화면 전체 높이까지
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isClosing) return; // 닫히는 중이면 무시
+    setIsDragging(true);
+    setStartY(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || isClosing) return;
+
+    const currentY = e.targetTouches[0].clientY;
+    const deltaY = currentY - startY;
+
+    // 아래로만 드래그 가능하도록 제한
+    if (deltaY > 0) {
+      setDragY(Math.min(deltaY, maxDrag));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isClosing) return;
+    setIsDragging(false);
+
+    // 임계값 이상 드래그했으면 닫기 애니메이션 시작
+    if (dragY > closeThreshold) {
+      setIsClosing(true);
+      // 화면 아래로 완전히 사라지는 애니메이션
+      setDragY(window.innerHeight);
+      // 애니메이션 완료 후 페이지 닫기
+      setTimeout(() => {
+        router.back();
+      }, 300);
+    } else {
+      // 원래 위치로 복귀
+      setDragY(0);
+    }
+  };
+
+  const handleClose = () => {
+    router.back();
+  };
+
   // 트랙이 로드되면 자동으로 재생하고 색상 설정
   useEffect(() => {
     if (track) {
@@ -124,22 +176,37 @@ export function TrackPage({
           rgba(${dominantColor}, 0.3) 0%, 
           rgba(${dominantColor}, 0.1) 50%, 
           rgba(0, 0, 0, 0.9) 100%)`,
+        transform: `translateY(${dragY}px)`,
+        opacity: 1 - dragY / (window.innerHeight || 600),
+        transition: isDragging
+          ? "none"
+          : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        touchAction: "none", // passive event listener 문제 해결
       }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* 상단 네비게이션 */}
-      <div className="flex items-center justify-between p-4 backdrop-blur-md bg-black/20">
+      <div className="flex items-center justify-between p-4">
         <button
-          onClick={() => router.back()}
+          onClick={handleClose}
           className="p-2 rounded-full hover:bg-white/10 transition-colors"
         >
           <IoChevronDown size={24} className="text-white" />
         </button>
 
-        <div className="text-center">
-          <p className="text-xs text-white/60 uppercase tracking-wider">
-            {isUsingMusicKit ? "Apple Music에서 재생 중" : "프리뷰 재생 중"}
-          </p>
-        </div>
+        {/* 드래그 핸들 */}
+        <button
+          onClick={handleClose}
+          className="flex flex-col items-center justify-center py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
+        >
+          <div
+            className={`w-10 h-1 bg-white/40 rounded-full transition-all duration-200 ${
+              isDragging ? "bg-white/60 w-12" : ""
+            }`}
+          ></div>
+        </button>
 
         <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
           <IoEllipsisHorizontal size={24} className="text-white" />
@@ -151,15 +218,46 @@ export function TrackPage({
         {/* 앨범 아트 */}
         <div className="relative mb-8">
           <div className="w-80 h-80 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
-            <img
-              src={getAppleMusicImageUrl(track.attributes.artwork, "xl")}
-              alt={track.attributes.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  "/images/default-album.png";
-              }}
-            />
+            {track.attributes.artwork?.url ? (
+              <img
+                src={getAppleMusicImageUrl(track.attributes.artwork, "xl")}
+                alt={track.attributes.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // 이미지 로딩 실패 시 부모 요소를 fallback으로 변경
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, rgba(${dominantColor}, 0.8) 0%, rgba(${dominantColor}, 0.4) 100%)">
+                        <div class="text-white/60">
+                          <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                          </svg>
+                        </div>
+                      </div>
+                    `;
+                  }
+                }}
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, rgba(${dominantColor}, 0.8) 0%, rgba(${dominantColor}, 0.4) 100%)`,
+                }}
+              >
+                <div className="text-white/60">
+                  <svg
+                    width="80"
+                    height="80"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 재생 중 펄스 효과 */}
