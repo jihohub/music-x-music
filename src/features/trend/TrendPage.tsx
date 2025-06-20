@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/Header";
 import AllTrendResults from "@/features/trend/components/AllTrendResults";
 import SingleTrendResults from "@/features/trend/components/SingleTrendResults";
 import TrendHeader from "@/features/trend/components/TrendHeader";
@@ -118,7 +117,6 @@ const TrendPageContent = () => {
 
   return (
     <>
-      <Header title="트렌드" />
       <div className="py-6 space-y-6 px-4">
         {/* 트렌드 헤더 컴포넌트 */}
         <TrendHeader activeTab={activeTab} />
@@ -136,7 +134,6 @@ export function TrendPage() {
     <Suspense
       fallback={
         <div className="py-6 space-y-6 px-4">
-          <Header title="트렌드" />
           <div className="text-center py-10">로딩 중...</div>
         </div>
       }

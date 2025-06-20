@@ -1,12 +1,29 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyArtist } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import { AppleMusicArtist } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-artist.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface ArtistGridProps {
-  artists: SpotifyArtist[];
+  artists: AppleMusicArtist[];
   limit?: number;
   showPreview?: boolean;
   onViewMore?: () => void;
@@ -87,18 +104,19 @@ export const ArtistGrid = ({
             <Link href={`/artist/${artist.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <UnoptimizedImage
-                  src={getSafeImageUrl(artist.images, "md")}
-                  alt={artist.name}
+                  src={getAppleMusicImageUrl(artist.attributes.artwork, "md")}
+                  alt={artist.attributes.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                  className="object-cover"
+                  className="object-cover transition-transform group-hover:scale-105"
                 />
               </div>
-              <h3 className="mt-2 font-semibold truncate text-sm">
-                {artist.name}
+              <h3 className="mt-2 font-semibold truncate text-sm group-hover:text-primary transition-colors">
+                {artist.attributes.name}
               </h3>
               <p className="text-sm text-text-secondary truncate">
-                {artist.genres?.slice(0, 2).join(", ") || "아티스트"}
+                {artist.attributes.genreNames?.slice(0, 2).join(", ") ||
+                  "아티스트"}
               </p>
             </Link>
           </div>

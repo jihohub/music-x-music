@@ -1,44 +1,43 @@
-import { RECOMMENDED_TRACK_IDS } from "@/constants/spotify";
-import { spotifyFetch } from "@/lib/spotify-api-client";
-import { SpotifyTrack } from "@/types/spotify";
+import { RECOMMENDED_TRACK_IDS } from "@/constants/apple-music";
+import { AppleMusicTrack } from "@/types/apple-music";
 import { useQuery } from "@tanstack/react-query";
 
 /**
- * 추천 트랙 정보를 가져오는 함수
+ * 추천 트랙 정보를 가져오는 함수 (Apple Music ID 사용)
  */
-export async function getRecommendedTracks(): Promise<SpotifyTrack[]> {
+export async function getRecommendedTracks(): Promise<AppleMusicTrack[]> {
   try {
-    // 여러 트랙을 한 번에 가져오는 API 호출
+    // Apple Music ID들을 콤마로 연결
     const ids = RECOMMENDED_TRACK_IDS.join(",");
-    const response = await spotifyFetch<{ tracks: SpotifyTrack[] }>(
-      `/tracks?ids=${ids}`
-    );
+    const url = `/api/apple-music/catalog/us/songs?ids=${ids}`;
 
-    console.log(
-      `트랙 ${RECOMMENDED_TRACK_IDS.length}개의 정보를 성공적으로 가져왔습니다.`
-    );
-    return response.tracks;
-  } catch (error: any) {
-    console.error(
-      "추천 트랙을 가져오는데 실패했습니다:",
-      error.response?.data || error.message
-    );
-    throw error;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recommended tracks");
+    }
+
+    const data = await response.json();
+
+    if (!data.data || data.data.length === 0) {
+      return [];
+    }
+
+    // Apple Music 데이터를 그대로 반환
+    return data.data;
+  } catch (error) {
+    console.error("추천 트랙 가져오기 오류:", error);
+    return [];
   }
 }
 
 /**
- * 추천 트랙 데이터를 가져오는 훅
- * 캐싱 기능 제공으로 중복 요청 방지 및 성능 개선
+ * 추천 트랙을 가져오는 React Query hook
  */
 export function useRecommendedTracks() {
-  return useQuery<SpotifyTrack[], Error>({
-    queryKey: ["recommendedTracks"],
+  return useQuery({
+    queryKey: ["recommended-tracks"],
     queryFn: getRecommendedTracks,
-    staleTime: 30 * 60 * 1000, // 30분 동안 캐시 유지
-    gcTime: 60 * 60 * 1000, // 1시간 동안 캐시 데이터 유지
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: 1,
+    staleTime: 1000 * 60 * 30, // 30분
   });
 }

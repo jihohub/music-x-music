@@ -1,17 +1,22 @@
 "use client";
 
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
+import { useHeader } from "@/providers/HeaderProvider";
+import {
+  AppleMusicAlbum,
+  AppleMusicArtist,
+  AppleMusicTrack,
+} from "@/types/apple-music";
+import { useEffect } from "react";
 import { AlbumList } from "./components/AlbumList";
 import { ArtistHeader } from "./components/ArtistHeader";
-import { ArtistInfo } from "./components/ArtistInfo";
 import { ArtistSkeleton } from "./components/ArtistSkeleton";
 import { ErrorState } from "./components/ErrorState";
 import { TopTracks } from "./components/TopTracks";
 
 interface ArtistPageProps {
-  artist: SpotifyArtist;
-  topTracks: SpotifyTrack[];
-  albums: SpotifyAlbum[];
+  artist: AppleMusicArtist;
+  topTracks: AppleMusicTrack[];
+  albums: AppleMusicAlbum[];
   isLoading?: boolean;
   error?: string | null;
 }
@@ -23,6 +28,20 @@ export function ArtistPage({
   isLoading = false,
   error = null,
 }: ArtistPageProps) {
+  const { setTitle } = useHeader();
+
+  // 아티스트 정보가 로드되면 Header title 설정
+  useEffect(() => {
+    if (artist?.attributes?.name) {
+      setTitle(artist.attributes.name);
+    }
+
+    // 컴포넌트 언마운트 시 기본 title로 복원
+    return () => {
+      setTitle("MUSIC X MUSIC");
+    };
+  }, [artist, setTitle]);
+
   if (isLoading) {
     return <ArtistSkeleton />;
   }
@@ -37,17 +56,9 @@ export function ArtistPage({
 
       {/* 컨텐츠 영역 */}
       <div className="container px-4 mt-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 왼쪽 및 중앙 컬럼 */}
-          <div className="lg:col-span-2 space-y-6">
-            <TopTracks tracks={topTracks} />
-            <AlbumList albums={albums} />
-          </div>
-
-          {/* 오른쪽 컬럼 */}
-          <div className="space-y-6">
-            <ArtistInfo artist={artist} />
-          </div>
+        <div className="space-y-8">
+          <TopTracks tracks={topTracks} />
+          <AlbumList albums={albums} />
         </div>
       </div>
     </div>

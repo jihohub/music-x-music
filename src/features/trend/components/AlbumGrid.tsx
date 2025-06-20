@@ -1,12 +1,29 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyAlbum } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-album.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface AlbumGridProps {
-  albums: SpotifyAlbum[];
+  albums: AppleMusicAlbum[];
   limit?: number;
   showPreview?: boolean;
   onViewMore?: () => void;
@@ -87,18 +104,18 @@ export const AlbumGrid = ({
             <Link href={`/album/${album.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <UnoptimizedImage
-                  src={getSafeImageUrl(album.images, "md")}
-                  alt={album.name}
+                  src={getAppleMusicImageUrl(album.attributes.artwork, "md")}
+                  alt={album.attributes.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                  className="object-cover"
+                  className="object-cover transition-transform group-hover:scale-105"
                 />
               </div>
-              <h3 className="mt-2 font-semibold truncate text-sm">
-                {album.name}
+              <h3 className="mt-2 font-semibold truncate text-sm group-hover:text-primary transition-colors">
+                {album.attributes.name}
               </h3>
               <p className="text-sm text-text-secondary truncate">
-                {album.artists.map((artist) => artist.name).join(", ")}
+                {album.attributes.artistName}
               </p>
             </Link>
           </div>

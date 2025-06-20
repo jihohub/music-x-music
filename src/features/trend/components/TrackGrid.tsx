@@ -1,12 +1,30 @@
 "use client";
 
+import PlayButton from "@/components/PlayButton";
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyTrack } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import { AppleMusicTrack } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-track.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface TrackGridProps {
-  tracks: SpotifyTrack[];
+  tracks: AppleMusicTrack[];
   limit?: number;
   showPreview?: boolean;
   onViewMore?: () => void;
@@ -83,24 +101,35 @@ export const TrackGrid = ({
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {displayTracks.map((track, index) => (
-          <div key={track.id}>
-            <Link href={`/track/${track.id}`} className="group">
+          <div key={track.id} className="group relative">
+            <Link href={`/track/${track.id}`}>
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <UnoptimizedImage
-                  src={getSafeImageUrl(track.album?.images, "md")}
-                  alt={track.name}
+                  src={getAppleMusicImageUrl(track.attributes.artwork, "md")}
+                  alt={track.attributes.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                  className="object-cover"
+                  className="object-cover transition-transform group-hover:scale-105"
                 />
+
+                {/* 호버 시 재생 버튼 표시 */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <PlayButton
+                    track={track}
+                    size="lg"
+                    className="transform scale-0 group-hover:scale-100 transition-transform duration-200"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
               </div>
-              <h3 className="mt-2 font-semibold truncate text-sm">
-                {track.name}
-              </h3>
-              <p className="text-sm text-text-secondary truncate">
-                {track.artists.map((artist) => artist.name).join(", ")}
-              </p>
             </Link>
+
+            <h3 className="mt-2 font-semibold truncate text-sm group-hover:text-primary transition-colors">
+              {track.attributes.name}
+            </h3>
+            <p className="text-sm text-text-secondary truncate">
+              {track.attributes.artistName}
+            </p>
           </div>
         ))}
       </div>

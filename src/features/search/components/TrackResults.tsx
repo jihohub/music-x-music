@@ -1,45 +1,50 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyTrack } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import PlayButton from "@/components/PlayButton";
+import { AppleMusicTrack } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-track.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface TrackResultsProps {
-  tracks: SpotifyTrack[];
+  tracks: AppleMusicTrack[];
   limit?: number;
-  showMoreLink?: boolean;
-  onShowMore?: () => void;
   isLoading?: boolean;
 }
 
 export const TrackResults = ({
   tracks,
   limit,
-  showMoreLink = false,
-  onShowMore,
   isLoading = false,
 }: TrackResultsProps) => {
   if (tracks.length === 0 && !isLoading) return null;
-  // 전체 탭에서는 4개, 각 탭에서는 8개씩 표시
-  const itemLimit = showMoreLink ? 4 : 8;
+  const itemLimit = 4;
 
   // 스켈레톤 UI
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div
-            className="h-7 w-20 rounded"
-            style={{ backgroundColor: "var(--skeleton-bg)" }}
-          ></div>
-          {showMoreLink && (
-            <div
-              className="h-5 w-12 mr-2 rounded"
-              style={{ backgroundColor: "var(--skeleton-bg)" }}
-            ></div>
-          )}
-        </div>
+        <div
+          className="h-7 w-20 rounded"
+          style={{ backgroundColor: "var(--skeleton-bg)" }}
+        ></div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Array.from({ length: itemLimit }).map((_, i) => (
             <div key={i} className="animate-pulse">
@@ -64,42 +69,41 @@ export const TrackResults = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">트랙</h2>
-        {showMoreLink && (
-          <Link
-            href="/search?type=track"
-            className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded transition-all duration-200"
-            onClick={(e) => {
-              if (onShowMore) {
-                e.preventDefault();
-                onShowMore();
-              }
-            }}
-          >
-            더 보기
-          </Link>
-        )}
-      </div>
+      <h2 className="text-xl font-bold">트랙</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {tracks.map((track) => (
-          <Link href={`/track/${track.id}`} key={track.id} className="group">
-            <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
-              <UnoptimizedImage
-                src={getSafeImageUrl(track.album?.images, "md")}
-                alt={track.name}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                className="object-cover"
-              />
-            </div>
+          <div key={track.id} className="group relative">
+            <Link href={`/track/${track.id}`}>
+              <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+                <UnoptimizedImage
+                  src={getAppleMusicImageUrl(track.attributes.artwork, "md")}
+                  alt={track.attributes.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                  className="object-cover"
+                />
+
+                {/* 호버 시 재생 버튼 표시 */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <PlayButton
+                    track={track}
+                    size="lg"
+                    className="transform scale-0 group-hover:scale-100 transition-transform duration-200"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
+            </Link>
+
             <div className="mt-2">
-              <h3 className="text-sm font-semibold truncate">{track.name}</h3>
+              <h3 className="text-sm font-semibold truncate">
+                {track.attributes.name}
+              </h3>
             </div>
             <p className="text-sm text-text-secondary truncate">
-              {track.artists.map((a) => a.name).join(", ")}
+              {track.attributes.artistName}
             </p>
-          </Link>
+          </div>
         ))}
       </div>
     </div>

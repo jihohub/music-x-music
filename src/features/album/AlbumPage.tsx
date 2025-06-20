@@ -1,6 +1,6 @@
 "use client";
 
-import { SpotifyAlbum } from "@/types/spotify";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import { AlbumHeader } from "./components/AlbumHeader";
 import { AlbumInfo } from "./components/AlbumInfo";
 import { AlbumSkeleton } from "./components/AlbumSkeleton";
@@ -8,7 +8,7 @@ import { ErrorState } from "./components/ErrorState";
 import { TrackList } from "./components/TrackList";
 
 interface AlbumPageProps {
-  album: SpotifyAlbum | null;
+  album: AppleMusicAlbum | null;
   isLoading?: boolean;
   error?: string | null;
 }

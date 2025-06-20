@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React from "react";
 import {
   IoCompass,
   IoCompassOutline,
@@ -9,12 +10,11 @@ import {
   IoFlameOutline,
   IoHome,
   IoHomeOutline,
+  IoPerson,
+  IoPersonOutline,
   IoSearch,
   IoSearchOutline,
-  IoSettings,
-  IoSettingsOutline,
 } from "react-icons/io5";
-
 interface NavItem {
   name: string;
   path: string;
@@ -29,67 +29,153 @@ export default function Footer() {
     {
       name: "홈",
       path: "/",
-      icon: <IoHomeOutline size={24} />,
-      activeIcon: <IoHome size={24} />,
+      icon: <IoHomeOutline size={28} />,
+      activeIcon: <IoHome size={28} />,
     },
     {
       name: "검색",
       path: "/search",
-      icon: <IoSearchOutline size={24} />,
-      activeIcon: <IoSearch size={24} />,
+      icon: <IoSearchOutline size={28} />,
+      activeIcon: <IoSearch size={28} />,
     },
     {
       name: "트렌드",
       path: "/trend",
-      icon: <IoFlameOutline size={24} />,
-      activeIcon: <IoFlame size={24} />,
+      icon: <IoFlameOutline size={28} />,
+      activeIcon: <IoFlame size={28} />,
     },
     {
       name: "신곡",
       path: "/new",
-      icon: <IoCompassOutline size={24} />,
-      activeIcon: <IoCompass size={24} />,
+      icon: <IoCompassOutline size={28} />,
+      activeIcon: <IoCompass size={28} />,
     },
     {
-      name: "설정",
-      path: "/settings",
-      icon: <IoSettingsOutline size={24} />,
-      activeIcon: <IoSettings size={24} />,
+      name: "마이페이지",
+      path: "/profile",
+      icon: <IoPersonOutline size={28} />,
+      activeIcon: <IoPerson size={28} />,
     },
   ];
 
   return (
-    <footer
-      className="fixed bottom-0 left-0 w-full z-50 bg-background border-t border-border-color"
-      style={{
-        backgroundColor: "var(--background)",
-        // paddingBottom: "var(--safe-area-inset-bottom)",
-        // paddingLeft: "var(--safe-area-inset-left)",
-        // paddingRight: "var(--safe-area-inset-right)",
-      }}
-    >
-      <nav className="container">
-        <ul className="flex h-16 w-full">
-          {navItems.map((item) => {
-            const isActive = pathname === item.path;
-            return (
-              <li key={item.path} className="flex-1">
-                <Link
-                  href={item.path}
-                  className={`flex flex-col items-center justify-center gap-1 h-full ${
-                    isActive
-                      ? "text-primary"
-                      : "text-text-secondary hover:text-text-primary"
-                  }`}
-                >
-                  {isActive ? item.activeIcon : item.icon}
-                  <span className="text-xs font-medium">{item.name}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </footer>
+    <>
+      {/* 모바일: 하단 플로팅 네비게이션 */}
+      <footer className="fixed bottom-[4vh] left-[4vw] right-[4vw] z-50 flex justify-center md:hidden">
+        <div className="relative w-[84vw] max-w-md mx-auto">
+          {/* 리퀴드글래스 배경 - 둥근 사각형 형태 */}
+          <div
+            className="absolute inset-0 backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-black/15 border border-white/10 shadow-2xl"
+            style={{
+              borderRadius: "24px",
+              boxShadow:
+                "0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-black/15"
+              style={{ borderRadius: "24px" }}
+            ></div>
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-white/5"
+              style={{ borderRadius: "24px" }}
+            ></div>
+          </div>
+
+          <nav className="relative px-3 py-2">
+            <ul className="flex items-center justify-between h-14">
+              {navItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      href={item.path}
+                      className="flex items-center justify-center"
+                    >
+                      <div
+                        className={`w-12 h-12 flex items-center justify-center transition-all duration-300 ${
+                          isActive
+                            ? "bg-white/20 text-white scale-105"
+                            : "text-white/70 hover:text-white/90 hover:scale-105 hover:bg-white/10"
+                        }`}
+                        style={{ borderRadius: "12px" }}
+                      >
+                        <div
+                          className={`transition-all duration-300 ${
+                            isActive ? "drop-shadow-lg" : ""
+                          }`}
+                        >
+                          {isActive ? item.activeIcon : item.icon}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+      </footer>
+
+      {/* 데스크탑: 왼쪽 플로팅 사이드바 - 모바일 Footer와 동일한 스타일 */}
+      <aside className="fixed left-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex">
+        <div className="relative">
+          {/* 리퀴드글래스 배경 - 세로형 */}
+          <div
+            className="absolute inset-0 backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-black/15 border border-white/10 shadow-2xl"
+            style={{
+              borderRadius: "24px",
+              boxShadow:
+                "0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-black/15"
+              style={{ borderRadius: "24px" }}
+            ></div>
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-white/5"
+              style={{ borderRadius: "24px" }}
+            ></div>
+          </div>
+
+          <nav className="relative px-2 py-3">
+            <ul
+              className="flex flex-col items-center justify-between w-14"
+              style={{ gap: "8px" }}
+            >
+              {navItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      href={item.path}
+                      className="flex items-center justify-center"
+                    >
+                      <div
+                        className={`w-12 h-12 flex items-center justify-center transition-all duration-300 ${
+                          isActive
+                            ? "bg-white/20 text-white scale-105"
+                            : "text-white/70 hover:text-white/90 hover:scale-105 hover:bg-white/10"
+                        }`}
+                        style={{ borderRadius: "12px" }}
+                      >
+                        <div
+                          className={`transition-all duration-300 ${
+                            isActive ? "drop-shadow-lg" : ""
+                          }`}
+                        >
+                          {isActive ? item.activeIcon : item.icon}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+      </aside>
+    </>
   );
 }

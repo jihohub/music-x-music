@@ -1,25 +1,42 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyAlbum } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-album.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface AlbumHeaderProps {
-  album: SpotifyAlbum;
+  album: AppleMusicAlbum;
 }
 
 export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
   // 앨범 이미지 URL 가져오기
-  const albumImage = getSafeImageUrl(album.images, "md");
-  const bannerImage = getSafeImageUrl(album.images, "lg");
+  const albumImage = getAppleMusicImageUrl(album.attributes.artwork, "md");
+  const bannerImage = getAppleMusicImageUrl(album.attributes.artwork, "lg");
 
   return (
     <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
         <UnoptimizedImage
           src={bannerImage}
-          alt={album.name}
+          alt={album.attributes.name}
           fill
           sizes="100vw"
           className="object-cover -z-10 opacity-50"
@@ -45,7 +62,7 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
             <div className="absolute inset-0">
               <UnoptimizedImage
                 src={albumImage}
-                alt={album.name}
+                alt={album.attributes.name}
                 fill
                 sizes="(max-width: 768px) 160px, 256px"
                 className="object-cover object-center"
@@ -57,19 +74,21 @@ export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h1 className="text-3xl md:text-5xl font-bold drop-shadow-lg">
-                  {album.name}
+                  {album.attributes.name}
                 </h1>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  {album.artists.map((albumArtist, index) => (
+                  {album.relationships?.artists?.data?.[0] ? (
                     <Link
-                      key={albumArtist.id}
-                      href={`/artist/${albumArtist.id}`}
+                      href={`/artist/${album.relationships.artists.data[0].id}`}
                       className="text-sm sm:text-base md:text-lg hover:text-primary"
                     >
-                      {albumArtist.name}
-                      {index < album.artists.length - 1 && ", "}
+                      {album.attributes.artistName}
                     </Link>
-                  ))}
+                  ) : (
+                    <span className="text-sm sm:text-base md:text-lg">
+                      {album.attributes.artistName}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

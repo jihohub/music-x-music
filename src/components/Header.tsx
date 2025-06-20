@@ -1,5 +1,6 @@
 "use client";
 
+import { useHeader } from "@/providers/HeaderProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { IoArrowBackOutline, IoHomeOutline } from "react-icons/io5";
 
@@ -7,6 +8,10 @@ export default function Header({ title }: { title?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const { title: contextTitle } = useHeader();
+
+  // props로 받은 title이 있으면 우선, 없으면 context title 사용
+  const displayTitle = title || contextTitle;
 
   return (
     <header
@@ -33,7 +38,7 @@ export default function Header({ title }: { title?: string }) {
         </div>
 
         <h1 className="text-lg font-bold text-center flex-1 truncate">
-          {title || "MUSIC X MUSIC"}
+          {displayTitle}
         </h1>
 
         <div className="w-12">

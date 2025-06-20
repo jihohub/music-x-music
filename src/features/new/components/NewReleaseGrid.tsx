@@ -1,12 +1,29 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyAlbum } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-album.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface NewReleaseGridProps {
-  albums: SpotifyAlbum[];
+  albums: AppleMusicAlbum[];
   isLoading?: boolean;
   error?: string | null;
 }
@@ -82,18 +99,20 @@ export const NewReleaseGrid = ({
             <Link href={`/album/${album.id}`} className="group">
               <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
                 <UnoptimizedImage
-                  src={getSafeImageUrl(album.images, "md")}
-                  alt={album.name}
+                  src={getAppleMusicImageUrl(album.attributes.artwork, "md")}
+                  alt={album.attributes.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                   className="object-cover"
                 />
               </div>
               <div className="mt-2">
-                <h3 className="font-semibold truncate">{album.name}</h3>
+                <h3 className="font-semibold truncate">
+                  {album.attributes.name}
+                </h3>
               </div>
               <p className="text-sm text-text-secondary truncate">
-                {album.artists?.map((a) => a.name).join(", ")}
+                {album.attributes.artistName}
               </p>
             </Link>
           </div>

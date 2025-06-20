@@ -1,13 +1,13 @@
 "use client";
 
 import { useInfiniteNewReleases, useNewReleases } from "@/hooks/useNewReleases";
-import { SpotifyAlbum } from "@/types/spotify";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import { useEffect, useState } from "react";
 import { InfiniteNewReleases } from "./components/InfiniteNewReleases";
 import { NewReleaseGrid } from "./components/NewReleaseGrid";
 
 export function NewPage() {
-  const [displayedAlbums, setDisplayedAlbums] = useState<SpotifyAlbum[]>([]);
+  const [displayedAlbums, setDisplayedAlbums] = useState<AppleMusicAlbum[]>([]);
 
   // 기본 신규 릴리스 (첫 페이지)
   const { data: newReleases, isLoading, error } = useNewReleases();

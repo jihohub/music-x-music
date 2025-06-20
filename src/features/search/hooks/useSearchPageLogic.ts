@@ -1,65 +1,50 @@
 import {
-  SpotifyAlbum,
-  SpotifyArtist,
-  SpotifySearchResult,
-  SpotifyTrack,
-} from "@/types/spotify";
-import { InfiniteData, useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { SearchType } from "../queries/searchSpotify";
-import {
   useBasicSearchQuery,
   useInfiniteSearchQuery,
-} from "../queries/useSearchQuery";
+} from "@/features/search/queries/useSearchQuery";
+import {
+  AppleMusicAlbum,
+  AppleMusicArtist,
+  AppleMusicSearchResult,
+  AppleMusicTrack,
+} from "@/types/apple-music";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+export type SearchType = "all" | "artist" | "track" | "album";
 
 // 검색 결과 처리 함수
 const processSearchResults = (
-  searchResults:
-    | SpotifySearchResult
-    | InfiniteData<SpotifySearchResult>
-    | undefined,
-  isSpecificTypeSearch: boolean
+  searchResults: AppleMusicSearchResult | undefined
 ) => {
-  const allTracks: SpotifyTrack[] = [];
-  const allArtists: SpotifyArtist[] = [];
-  const allAlbums: SpotifyAlbum[] = [];
+  const allTracks: AppleMusicTrack[] = searchResults?.songs?.data || [];
+  const allArtists: AppleMusicArtist[] = searchResults?.artists?.data || [];
+  const allAlbums: AppleMusicAlbum[] = searchResults?.albums?.data || [];
 
-  if (searchResults) {
-    if (isSpecificTypeSearch && "pages" in searchResults) {
-      // 무한 스크롤 결과 처리
-      const pagesData = searchResults as InfiniteData<SpotifySearchResult>;
-      pagesData.pages.forEach((page: SpotifySearchResult) => {
-        if (page.tracks?.items) {
-          allTracks.push(...page.tracks.items);
-        }
-        if (page.artists?.items) {
-          allArtists.push(...page.artists.items);
-        }
-        if (page.albums?.items) {
-          allAlbums.push(...page.albums.items);
-        }
-      });
-    } else if (!isSpecificTypeSearch) {
-      // 기본 검색 결과 처리
-      const basicData = searchResults as SpotifySearchResult;
-      if (basicData.tracks?.items) {
-        allTracks.push(...basicData.tracks.items);
-      }
-      if (basicData.artists?.items) {
-        allArtists.push(...basicData.artists.items);
-      }
-      if (basicData.albums?.items) {
-        allAlbums.push(...basicData.albums.items);
-      }
-    }
-  }
+  return { allTracks, allArtists, allAlbums };
+};
+
+// 무한 검색 결과 처리 함수
+const processInfiniteSearchResults = (pages: AppleMusicSearchResult[]) => {
+  const allTracks = pages.flatMap((page) => page.songs?.data || []);
+  const allArtists = pages.flatMap((page) => page.artists?.data || []);
+  const allAlbums = pages.flatMap((page) => page.albums?.data || []);
 
   return { allTracks, allArtists, allAlbums };
 };
 
 // 인기 검색어 목록
 const popularSearches = [
+  "Taylor Swift",
+  "BTS",
+  "NewJeans",
+  "IVE",
+  "aespa",
+  "BLACKPINK",
+  "Dua Lipa",
+  "The Weeknd",
+  "Billie Eilish",
   "Coldplay",
   "르세라핌",
   "Skrillex",
@@ -83,43 +68,49 @@ export function useSearchPageLogic() {
   const [searchTerm, setSearchTerm] = useState(queryParam);
   const [searchType, setSearchType] = useState<SearchType>(typeParam);
 
-  // 한 번에 가져올 결과 수
-  const PAGE_SIZE = 20;
-
-  // 검색 타입에 따라 다른 쿼리 훅 사용
+  // 검색 타입에 따라 다른 쿼리 실행
   const isSpecificTypeSearch = searchType !== "all";
 
-  // 기본 검색 (타입이 'all'인 경우) - 무한 스크롤 없음
+  // 기본 검색 (타입이 'all'인 경우)
   const {
     data: basicSearchData,
     isFetching: isBasicFetching,
     isError: isBasicError,
     error: basicError,
-  } = useBasicSearchQuery({
-    query: queryParam,
-    enabled: !isSpecificTypeSearch && queryParam.trim().length >= 2,
-    pageSize: PAGE_SIZE,
-  });
+  } = useBasicSearchQuery(
+    queryParam,
+    !isSpecificTypeSearch && queryParam.trim().length >= 2
+  );
 
-  // 무한 스크롤 검색 (특정 타입 선택 시)
+  // 특정 타입 검색 (무한스크롤)
+  const searchTypes = isSpecificTypeSearch
+    ? typeParam === "artist"
+      ? "artists"
+      : typeParam === "track"
+      ? "songs"
+      : typeParam === "album"
+      ? "albums"
+      : "songs,albums,artists"
+    : "songs,albums,artists";
+
+  // 개별 탭에서는 무한스크롤 사용
   const {
     data: infiniteSearchData,
-    fetchNextPage,
-    hasNextPage,
     isFetching: isInfiniteFetching,
-    isFetchingNextPage,
     isError: isInfiniteError,
     error: infiniteError,
-  } = useInfiniteSearchQuery({
-    query: queryParam,
-    type: typeParam,
-    enabled: isSpecificTypeSearch && queryParam.trim().length >= 2,
-    pageSize: PAGE_SIZE,
-  });
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteSearchQuery(
+    queryParam,
+    searchTypes,
+    isSpecificTypeSearch && queryParam.trim().length >= 2
+  );
 
   // 검색 결과 및 상태 통합
   const searchResults = isSpecificTypeSearch
-    ? infiniteSearchData
+    ? undefined // 무한스크롤에서는 다른 방식으로 처리
     : basicSearchData;
   const isFetching = isSpecificTypeSearch
     ? isInfiniteFetching
@@ -128,10 +119,43 @@ export function useSearchPageLogic() {
   const error = isSpecificTypeSearch ? infiniteError : basicError;
 
   // 결과 처리
-  const { allTracks, allArtists, allAlbums } = processSearchResults(
-    searchResults,
-    isSpecificTypeSearch
-  );
+  const { allTracks, allArtists, allAlbums } = isSpecificTypeSearch
+    ? processInfiniteSearchResults(infiniteSearchData?.pages || [])
+    : processSearchResults(searchResults);
+
+  // 전체 탭 디버깅용 로그
+  if (!isSpecificTypeSearch && searchResults) {
+    console.log("전체 탭 검색 결과:", {
+      queryParam,
+      rawResults: {
+        artists: searchResults.artists?.data?.length || 0,
+        albums: searchResults.albums?.data?.length || 0,
+        songs: searchResults.songs?.data?.length || 0,
+      },
+      processedResults: {
+        allArtists: allArtists.length,
+        allAlbums: allAlbums.length,
+        allTracks: allTracks.length,
+      },
+    });
+  }
+
+  // 디버깅용 로그 (무한스크롤 상태)
+  if (isSpecificTypeSearch) {
+    console.log("Infinite Search Debug:", {
+      queryParam,
+      searchTypes,
+      isSpecificTypeSearch,
+      pagesCount: infiniteSearchData?.pages?.length || 0,
+      hasNextPage,
+      isFetchingNextPage,
+      totalResults: {
+        allTracks: allTracks.length,
+        allArtists: allArtists.length,
+        allAlbums: allAlbums.length,
+      },
+    });
+  }
 
   // 검색 결과가 있는지 확인
   const hasResults =
@@ -175,7 +199,6 @@ export function useSearchPageLogic() {
 
     // React Query 캐시 초기화
     queryClient.removeQueries({ queryKey: ["search"] });
-    queryClient.removeQueries({ queryKey: ["infiniteSearch"] });
 
     router.push("/search");
   };
@@ -244,16 +267,20 @@ export function useSearchPageLogic() {
     allArtists,
     allAlbums,
     isFetching,
-    isFetchingNextPage,
     isError,
     error,
     hasResults,
-    hasNextPage,
 
     // 선택 상태
     shouldShowArtists,
     shouldShowTracks,
     shouldShowAlbums,
+
+    // 무한스크롤 관련
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isSpecificTypeSearch,
 
     // 핸들러
     handleSearchChange,
@@ -261,7 +288,6 @@ export function useSearchPageLogic() {
     handlePopularSearchClick,
     handleSearchSubmit,
     handleTypeChange,
-    fetchNextPage,
 
     // 유틸리티
     popularSearches,

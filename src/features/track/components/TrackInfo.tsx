@@ -1,16 +1,15 @@
 "use client";
 
-import { SpotifyTrack } from "@/types/spotify";
+import { AppleMusicTrack } from "@/types/apple-music";
 import Link from "next/link";
 import {
   IoCalendarOutline,
   IoMusicalNotesOutline,
   IoTimeOutline,
-  IoTrendingUpOutline,
 } from "react-icons/io5";
 
 interface TrackInfoProps {
-  track: SpotifyTrack;
+  track: AppleMusicTrack;
 }
 
 export const TrackInfo = ({ track }: TrackInfoProps) => {
@@ -23,12 +22,16 @@ export const TrackInfo = ({ track }: TrackInfoProps) => {
           <div>
             <h3 className="font-medium">앨범</h3>
             <p className="text-text-secondary">
-              <Link
-                href={`/album/${track.album?.id}`}
-                className="hover:text-primary"
-              >
-                {track.album?.name}
-              </Link>
+              {track.relationships?.albums?.data?.[0] ? (
+                <Link
+                  href={`/album/${track.relationships.albums.data[0].id}`}
+                  className="hover:text-primary"
+                >
+                  {track.attributes.albumName}
+                </Link>
+              ) : (
+                <span>{track.attributes.albumName}</span>
+              )}
             </p>
           </div>
         </div>
@@ -38,7 +41,7 @@ export const TrackInfo = ({ track }: TrackInfoProps) => {
           <div>
             <h3 className="font-medium">릴리즈</h3>
             <p className="text-text-secondary">
-              {track.album?.release_date || "알 수 없음"}
+              {track.attributes.releaseDate || "알 수 없음"}
             </p>
           </div>
         </div>
@@ -48,17 +51,11 @@ export const TrackInfo = ({ track }: TrackInfoProps) => {
           <div>
             <h3 className="font-medium">재생 시간</h3>
             <p className="text-text-secondary monospace-nums">
-              {Math.floor(track.duration_ms / 60000)}:
-              {((track.duration_ms % 60000) / 1000).toFixed(0).padStart(2, "0")}
+              {Math.floor(track.attributes.durationInMillis / 60000)}:
+              {((track.attributes.durationInMillis % 60000) / 1000)
+                .toFixed(0)
+                .padStart(2, "0")}
             </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <IoTrendingUpOutline className="text-primary mt-1" size={18} />
-          <div>
-            <h3 className="font-medium">인기도</h3>
-            <p className="text-text-secondary">{track.popularity || 0}</p>
           </div>
         </div>
       </div>

@@ -1,14 +1,14 @@
-import Header from "@/components/Header";
-import { NewPage } from "@/features/new/NewPage";
-import { Suspense } from "react";
+// "use client";
 
-export default function NewPageRoute() {
+// import { NewPage } from "@/features/new/NewPage";
+
+export default function Page() {
+  // return <NewPage />;
   return (
-    <>
-      <Header title="신곡" />
-      <Suspense fallback={null}>
-        <NewPage />
-      </Suspense>
-    </>
+    <div className="flex items-center justify-center min-h-screen">
+      <p className="text-lg text-text-secondary">
+        뉴 페이지는 현재 개발 중입니다.
+      </p>
+    </div>
   );
 }

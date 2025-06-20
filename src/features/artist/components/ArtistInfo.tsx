@@ -1,14 +1,10 @@
 "use client";
 
-import { SpotifyArtist } from "@/types/spotify";
-import {
-  IoHeartOutline,
-  IoMusicalNotesOutline,
-  IoTrendingUpOutline,
-} from "react-icons/io5";
+import { AppleMusicArtist } from "@/types/apple-music";
+import { IoMusicalNotesOutline } from "react-icons/io5";
 
 interface ArtistInfoProps {
-  artist: SpotifyArtist;
+  artist: AppleMusicArtist;
 }
 
 export const ArtistInfo = ({ artist }: ArtistInfoProps) => {
@@ -16,44 +12,29 @@ export const ArtistInfo = ({ artist }: ArtistInfoProps) => {
     <section className="bg-card-bg rounded-lg py-5">
       <h2 className="text-lg font-bold mb-4">아티스트 정보</h2>
       <div className="space-y-3">
-        {artist.genres && artist.genres.length > 0 && (
-          <div className="flex items-start gap-3">
-            <IoMusicalNotesOutline className="text-primary mt-1" size={18} />
-            <div>
-              <h3 className="font-medium">장르</h3>
-              <p className="text-text-secondary">
-                {/* 모바일에서는 첫 번째 장르만 표시 */}
-                <span className="md:hidden">{artist.genres[0]}</span>
-                {/* 데스크톱에서는 최대 3개 장르 표시 */}
-                <span className="hidden md:inline">
-                  {artist.genres.slice(0, 3).join(", ")}
-                </span>
-              </p>
+        {artist.attributes.genreNames &&
+          artist.attributes.genreNames.length > 0 && (
+            <div className="flex items-start gap-3">
+              <IoMusicalNotesOutline className="text-primary mt-1" size={18} />
+              <div>
+                <h3 className="font-medium">장르</h3>
+                <p className="text-text-secondary">
+                  {/* 모바일에서는 첫 번째 장르만 표시 */}
+                  <span className="md:hidden">
+                    {artist.attributes.genreNames[0]}
+                  </span>
+                  {/* 데스크톱에서는 최대 3개 장르 표시 */}
+                  <span className="hidden md:inline">
+                    {artist.attributes.genreNames.slice(0, 3).join(", ")}
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {artist.followers && (
-          <div className="flex items-start gap-3">
-            <IoHeartOutline className="text-primary mt-1" size={18} />
-            <div>
-              <h3 className="font-medium">팔로워</h3>
-              <p className="text-text-secondary">
-                {artist.followers.total.toLocaleString()}명
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Apple Music에는 follower 정보가 없으므로 제거 */}
 
-        {artist.popularity && (
-          <div className="flex items-start gap-3">
-            <IoTrendingUpOutline className="text-primary mt-1" size={18} />
-            <div>
-              <h3 className="font-medium">인기도</h3>
-              <p className="text-text-secondary">{artist.popularity}</p>
-            </div>
-          </div>
-        )}
+        {/* Apple Music에는 popularity 정보가 없으므로 제거 */}
       </div>
     </section>
   );

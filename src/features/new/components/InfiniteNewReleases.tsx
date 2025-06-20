@@ -1,12 +1,12 @@
 "use client";
 
-import { SpotifyAlbum } from "@/types/spotify";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import { useCallback, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { NewReleaseGrid } from "./NewReleaseGrid";
 
 interface InfiniteNewReleasesProps {
-  albums: SpotifyAlbum[];
+  albums: AppleMusicAlbum[];
   hasNextPage?: boolean;
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;

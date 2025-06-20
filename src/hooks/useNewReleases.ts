@@ -1,5 +1,5 @@
 import { getNewReleases } from "@/features/new/queries";
-import { SpotifyAlbum } from "@/types/spotify";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 /**
@@ -7,7 +7,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
  * @param limit 한 번에 가져올 앨범 수
  */
 export function useNewReleases(limit: number = 20) {
-  return useQuery<SpotifyAlbum[]>({
+  return useQuery<AppleMusicAlbum[]>({
     queryKey: ["newReleases", limit],
     queryFn: () => getNewReleases(limit),
     staleTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
@@ -19,7 +19,7 @@ export function useNewReleases(limit: number = 20) {
  * @param limit 한 번에 가져올 앨범 수
  */
 export function useInfiniteNewReleases(limit: number = 20) {
-  return useInfiniteQuery<SpotifyAlbum[]>({
+  return useInfiniteQuery<AppleMusicAlbum[]>({
     queryKey: ["infiniteNewReleases", limit],
     queryFn: async ({ pageParam = 0 }) => {
       return getNewReleases(limit, Number(pageParam));

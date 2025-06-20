@@ -1,12 +1,29 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyAlbum } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import Link from "next/link";
 
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-album.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
 interface AlbumListProps {
-  albums: SpotifyAlbum[];
+  albums: AppleMusicAlbum[];
 }
 
 export const AlbumList = ({ albums }: AlbumListProps) => {
@@ -19,16 +36,19 @@ export const AlbumList = ({ albums }: AlbumListProps) => {
             <Link href={`/album/${album.id}`} className="group">
               <div className="relative aspect-square bg-card-bg rounded-sm overflow-hidden">
                 <UnoptimizedImage
-                  src={getSafeImageUrl(album.images, "md")}
-                  alt={album.name}
+                  src={getAppleMusicImageUrl(album.attributes.artwork, "md")}
+                  alt={album.attributes.name}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                   className="object-cover"
                 />
               </div>
-              <h3 className="font-medium mt-2 truncate">{album.name}</h3>
+              <h3 className="font-medium mt-2 truncate">
+                {album.attributes.name}
+              </h3>
               <p className="text-sm text-text-secondary">
-                {album.release_date.split("-")[0]} • {album.total_tracks}곡
+                {album.attributes.releaseDate?.split("-")[0]} •{" "}
+                {album.attributes.trackCount}곡
               </p>
             </Link>
           </div>

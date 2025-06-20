@@ -1,8 +1,11 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+// import MusicPlayer from "@/components/MusicPlayer"; // 위젯 방식 - 현재 사용 안함
 import AuthProvider from "@/providers/AuthProvider";
+import { HeaderProvider } from "@/providers/HeaderProvider";
+import { MusicPlayerProvider } from "@/providers/MusicPlayerProvider";
 import QueryProvider from "@/providers/QueryProvider";
-import { ThemeProvider } from "@/providers/ThemeProvider";
+
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -19,13 +22,22 @@ export const metadata: Metadata = {
   description: "친구들과 음악을 공유하고 즐기는 앱",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "MUSIC X MUSIC",
   },
   formatDetection: {
     telephone: false,
   },
 };
+
+// 위젯 방식 MusicPlayer - 현재 사용 안함 (트랙 페이지로 대체)
+// function MusicPlayerWrapper() {
+//   return (
+//     <div>
+//       <MusicPlayer />
+//     </div>
+//   );
+// }
 
 export default function RootLayout({
   children,
@@ -35,22 +47,42 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        {/* 초기 테마 깜빡임 방지를 위한 인라인 스크립트 */}
+        {/* MusicKit JS */}
+        <script
+          src="https://js-cdn.music.apple.com/musickit/v3/musickit.js"
+          async
+        />
+        {/* MusicKit 초기화 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('musickitloaded', function() {
+                try {
+                  if (window.MusicKit) {
+                    window.MusicKit.configure({
+                      developerToken: '${
+                        process.env.NEXT_PUBLIC_APPLE_MUSIC_DEVELOPER_TOKEN ||
+                        ""
+                      }',
+                      app: {
+                        name: 'MUSIC X MUSIC',
+                        build: '1.0.0'
+                      }
+                    });
+                  }
+                } catch (error) {
+                  console.log('MusicKit 초기화 실패:', error);
+                }
+              });
+            `,
+          }}
+        />
+        {/* iOS 웹뷰 최적화 스크립트 */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  const savedTheme = localStorage.getItem('theme');
-                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  
-                  let initialTheme = 'light';
-                  if (savedTheme) {
-                    initialTheme = savedTheme;
-                  } else if (prefersDark) {
-                    initialTheme = 'dark';
-                  }
-
                   // iOS 웹뷰에서 뷰포트 높이 조정
                   function setViewportHeight() {
                     const vh = window.innerHeight * 0.01;
@@ -63,8 +95,8 @@ export default function RootLayout({
                     const mainElement = document.querySelector('main');
                     if (!mainElement) return;
                     
-                    // 검색 페이지나 설정 페이지는 내용물 높이에 맞추기
-                    if (path === '/search' || path === '/settings') {
+                    // 검색 페이지나 프로필 페이지는 내용물 높이에 맞추기
+                    if (path === '/search' || path === '/profile') {
                       mainElement.classList.add('min-h-fit');
                       mainElement.classList.remove('min-h-screen');
                     } else {
@@ -80,8 +112,6 @@ export default function RootLayout({
                   // 경로 변경 감지
                   const observer = new MutationObserver(adjustHeightByPage);
                   observer.observe(document.documentElement, { subtree: true, childList: true });
-                  
-                  document.documentElement.setAttribute('data-theme', initialTheme);
                 } catch (e) {}
               })();
             `,
@@ -89,26 +119,32 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider>
+        <HeaderProvider>
           <AuthProvider>
             <QueryProvider>
-              <Header />
-              <main
-                className="container mx-auto !pt-16 !pb-16 min-h-screen"
-                id="main-content"
-                style={
-                  {
-                    // paddingLeft: "var(--safe-area-inset-left)",
-                    // paddingRight: "var(--safe-area-inset-right)",
+              <MusicPlayerProvider>
+                {/* 데스크탑에서만 Header 표시 */}
+                <div className="hidden md:block">
+                  <Header />
+                </div>
+                <main
+                  className="container mx-auto !pb-16 min-h-screen md:pl-20"
+                  id="main-content"
+                  style={
+                    {
+                      // paddingLeft: "var(--safe-area-inset-left)",
+                      // paddingRight: "var(--safe-area-inset-right)",
+                    }
                   }
-                }
-              >
-                {children}
-              </main>
-              <Footer />
+                >
+                  {children}
+                </main>
+                <Footer />
+                {/* <MusicPlayerWrapper /> */}
+              </MusicPlayerProvider>
             </QueryProvider>
           </AuthProvider>
-        </ThemeProvider>
+        </HeaderProvider>
       </body>
     </html>
   );

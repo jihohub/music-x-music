@@ -1,6 +1,6 @@
 "use client";
 
-import { SpotifyAlbum } from "@/types/spotify";
+import { AppleMusicAlbum } from "@/types/apple-music";
 import {
   IoCalendarOutline,
   IoMusicalNotesOutline,
@@ -8,7 +8,7 @@ import {
 } from "react-icons/io5";
 
 interface AlbumInfoProps {
-  album: SpotifyAlbum;
+  album: AppleMusicAlbum;
 }
 
 export const AlbumInfo = ({ album }: AlbumInfoProps) => {
@@ -20,7 +20,9 @@ export const AlbumInfo = ({ album }: AlbumInfoProps) => {
           <IoCalendarOutline className="text-primary mt-1" size={18} />
           <div>
             <h3 className="font-medium">릴리즈</h3>
-            <p className="text-text-secondary">{album.release_date}</p>
+            <p className="text-text-secondary">
+              {album.attributes.releaseDate}
+            </p>
           </div>
         </div>
 
@@ -28,7 +30,9 @@ export const AlbumInfo = ({ album }: AlbumInfoProps) => {
           <IoMusicalNotesOutline className="text-primary mt-1" size={18} />
           <div>
             <h3 className="font-medium">트랙 수</h3>
-            <p className="text-text-secondary">{album.total_tracks}곡</p>
+            <p className="text-text-secondary">
+              {album.attributes.trackCount}곡
+            </p>
           </div>
         </div>
 
@@ -38,8 +42,8 @@ export const AlbumInfo = ({ album }: AlbumInfoProps) => {
             <h3 className="font-medium">총 재생 시간</h3>
             <p className="text-text-secondary">
               {Math.floor(
-                (album.tracks?.items?.reduce(
-                  (acc, track) => acc + track.duration_ms,
+                (album.relationships?.tracks?.data?.reduce(
+                  (acc, track) => acc + track.attributes.durationInMillis,
                   0
                 ) || 0) / 60000
               )}
