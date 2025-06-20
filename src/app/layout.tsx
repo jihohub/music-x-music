@@ -57,22 +57,40 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               document.addEventListener('musickitloaded', function() {
-                try {
-                  if (window.MusicKit) {
+                // 토큰을 동적으로 가져와서 MusicKit 설정
+                async function initializeMusicKit() {
+                  try {
+                    if (!window.MusicKit) return;
+                    
+                    // 서버에서 토큰 가져오기
+                    const response = await fetch('/api/apple-music-token');
+                    if (!response.ok) {
+                      console.log('MusicKit 토큰 가져오기 실패:', response.status);
+                      return;
+                    }
+                    
+                    const { token } = await response.json();
+                    if (!token) {
+                      console.log('MusicKit 토큰이 비어있습니다');
+                      return;
+                    }
+                    
+                    // MusicKit 설정
                     window.MusicKit.configure({
-                      developerToken: '${
-                        process.env.NEXT_PUBLIC_APPLE_MUSIC_DEVELOPER_TOKEN ||
-                        ""
-                      }',
+                      developerToken: token,
                       app: {
                         name: 'MUSIC X MUSIC',
                         build: '1.0.0'
                       }
                     });
+                    
+                    console.log('MusicKit 초기화 완료');
+                  } catch (error) {
+                    console.log('MusicKit 초기화 실패:', error);
                   }
-                } catch (error) {
-                  console.log('MusicKit 초기화 실패:', error);
                 }
+                
+                initializeMusicKit();
               });
             `,
           }}
