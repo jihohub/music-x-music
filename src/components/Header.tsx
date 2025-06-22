@@ -1,5 +1,7 @@
 "use client";
 
+import { useHeader } from "@/providers/HeaderProvider";
+import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { IoArrowBackOutline, IoHomeOutline } from "react-icons/io5";
 
@@ -7,6 +9,14 @@ export default function Header({ title }: { title?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const { title: contextTitle } = useHeader();
+  const { getPageTextColor } = useMusicPlayer();
+
+  // props로 받은 title이 있으면 우선, 없으면 context title 사용
+  const displayTitle = title || contextTitle;
+
+  // 헤더는 페이지 색상만 사용 (트랙 색상으로 변하지 않음)
+  const textColor = getPageTextColor();
 
   return (
     <header
@@ -26,14 +36,18 @@ export default function Header({ title }: { title?: string }) {
               onClick={() => router.back()}
               className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-colors"
               aria-label="뒤로 가기"
+              style={{ color: textColor }}
             >
               <IoArrowBackOutline size={20} />
             </button>
           ) : null}
         </div>
 
-        <h1 className="text-lg font-bold text-center flex-1 truncate">
-          {title || "MUSIC X MUSIC"}
+        <h1
+          className="text-lg font-bold text-center flex-1 truncate"
+          style={{ color: textColor }}
+        >
+          {displayTitle}
         </h1>
 
         <div className="w-12">
@@ -42,6 +56,7 @@ export default function Header({ title }: { title?: string }) {
               onClick={() => router.push("/")}
               className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-colors"
               aria-label="홈으로 가기"
+              style={{ color: textColor }}
             >
               <IoHomeOutline size={20} />
             </button>

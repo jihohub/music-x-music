@@ -25,32 +25,46 @@ export default function TrendHeader({ activeTab }: TrendHeaderProps) {
   };
 
   return (
-    <div className="mb-4">
-      <div className="flex justify-center">
-        <div className="inline-flex gap-4 px-1">
-          {tabItems.map((tab) => (
-            <Link
-              key={tab.id}
-              href={tab.href}
-              className={`relative py-2 px-4 font-medium text-sm transition-all duration-200 ${
-                activeTab === tab.id
-                  ? "text-primary font-semibold"
-                  : "text-gray-500 hover:text-gray-800"
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleTypeChange(tab.id as TrendTab);
-              }}
-            >
-              {tab.label}
-              {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full"></div>
-              )}
-            </Link>
-          ))}
+    <div
+      className="fixed left-6 right-6 z-40 flex justify-center
+          top-8 md:top-24"
+    >
+      <div className="relative">
+        {/* 리퀴드글래스 배경 */}
+        <div
+          className="absolute inset-0 backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-black/15 border border-white/10 shadow-2xl rounded-full"
+          style={{
+            boxShadow:
+              "0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-black/15 rounded-full"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-white/5 rounded-full"></div>
+        </div>
+
+        {/* 탭 컨텐츠 */}
+        <div className="relative px-2.5 py-1.5">
+          <div className="flex gap-1">
+            {tabItems.map((tab) => (
+              <Link
+                key={tab.id}
+                href={tab.href}
+                className={`relative py-1 px-2 font-medium text-xs transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? "text-white font-semibold"
+                    : "text-white/70 hover:text-white/90"
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTypeChange(tab.id as any);
+                }}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="w-full h-px bg-gray-200 mt-0.5"></div>
     </div>
   );
 }

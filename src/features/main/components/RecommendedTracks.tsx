@@ -1,76 +1,80 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { useRecommendedTracks } from "@/features/main/queries";
-import { getSafeImageUrl } from "@/utils/image";
-import Link from "next/link";
+import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
+import { AppleMusicTrack } from "@/types/apple-music";
 
-export const RecommendedTracks = () => {
-  const { data: tracks, isLoading, isError } = useRecommendedTracks();
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-track.jpg"; // 기본 이미지
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
+
+interface RecommendedTracksProps {
+  tracks: AppleMusicTrack[];
+  isLoading: boolean;
+}
+
+export const RecommendedTracks = ({
+  tracks,
+  isLoading,
+}: RecommendedTracksProps) => {
+  const { playTrack } = useMusicPlayer();
 
   return (
     <section>
-      <div className="flex-between mb-4">
-        <h2 className="text-xl font-bold">추천 트랙</h2>
-        {/* <Link href="/tracks" className="text-primary text-sm font-medium">
-          더보기
-        </Link> */}
-      </div>
+      {isLoading && <div className="h-[555.5px] md:h-[158.836px]"></div>}
 
-      {isLoading && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div
-                className="aspect-square rounded-sm w-full"
-                style={{ backgroundColor: "var(--skeleton-bg)" }}
-              />
-              <div
-                className="h-5 mt-2 rounded w-3/4"
-                style={{ backgroundColor: "var(--skeleton-bg)" }}
-              />
-              <div
-                className="h-4 mt-1 rounded w-1/2"
-                style={{ backgroundColor: "var(--skeleton-bg)" }}
-              />
-            </div>
-          ))}
+      {!isLoading && tracks.length === 0 && (
+        <div className="text-center text-white/60 py-8">
+          No tracks available
         </div>
       )}
 
-      {!isLoading && (tracks?.length === 0 || isError) && (
-        <div className="text-center py-6">
-          <p>추천 트랙을 불러올 수 없습니다.</p>
-          <p className="text-sm text-text-secondary mt-2">
-            {isError
-              ? "데이터를 가져오는 중 오류가 발생했습니다."
-              : "추천 트랙이 없습니다."}
-          </p>
-        </div>
-      )}
-
-      {!isLoading && tracks && tracks.length > 0 && (
+      {!isLoading && tracks.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {tracks.map((track, index) => (
-            <div key={track.id}>
-              <Link href={`/track/${track.id}`} className="group">
-                <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+          {tracks.map((track) => (
+            <div
+              key={`recommended-track-${track.id}`}
+              className="group relative"
+            >
+              <button
+                onClick={() => {
+                  playTrack(track);
+                }}
+                className="w-full text-left"
+              >
+                <div className="overflow-hidden rounded-2xl aspect-square relative bg-card-bg">
                   <UnoptimizedImage
-                    src={getSafeImageUrl(track.album?.images, "md")}
-                    alt={track.album?.name || "앨범 이미지"}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                    className="object-cover"
-                    priority={track === tracks[0]}
+                    src={getAppleMusicImageUrl(track.attributes.artwork, "md")}
+                    alt={track.attributes.name}
+                    className="aspect-square rounded-2xl w-full"
                   />
                 </div>
-                <h3 className="mt-2 font-semibold truncate text-sm">
-                  {track.name}
+              </button>
+
+              <button
+                onClick={() => {
+                  playTrack(track);
+                }}
+                className="w-full text-left mt-2"
+              >
+                <h3 className="font-semibold text-sm truncate leading-tight text-white group-hover:text-white/80 transition-colors">
+                  {track.attributes.name}
                 </h3>
-                <p className="text-sm text-text-secondary truncate">
-                  {track.artists.map((artist) => artist.name).join(", ")}
-                </p>
-              </Link>
+              </button>
             </div>
           ))}
         </div>

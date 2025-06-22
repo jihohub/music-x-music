@@ -1,15 +1,19 @@
 "use client";
 
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
+import {
+  AppleMusicAlbum,
+  AppleMusicArtist,
+  AppleMusicTrack,
+} from "@/types/apple-music";
 import AlbumResults from "./AlbumResults";
 import ArtistResults from "./ArtistResults";
 import TrackResults from "./TrackResults";
 
 interface BasicSearchResultsProps {
   searchTerm: string;
-  allArtists: SpotifyArtist[];
-  allTracks: SpotifyTrack[];
-  allAlbums: SpotifyAlbum[];
+  allArtists: AppleMusicArtist[];
+  allTracks: AppleMusicTrack[];
+  allAlbums: AppleMusicAlbum[];
   shouldShowArtists: boolean;
   shouldShowTracks: boolean;
   shouldShowAlbums: boolean;
@@ -29,41 +33,37 @@ export function BasicSearchResults({
   isLoading = false,
 }: BasicSearchResultsProps) {
   return (
-    <div className="space-y-16">
-      {/* 아티스트 결과 */}
+    <div className="space-y-8">
+      {/* 아티스트 결과 - 전체 탭에서는 첫 번째 1명만 크게 표시 */}
       {(shouldShowArtists || isLoading) && (
-        <div key={`artist-results-${searchTerm}`}>
-          <ArtistResults
-            artists={allArtists.slice(0, 4)}
-            showMoreLink
-            onShowMore={() => handleTypeChange("artist")}
-            isLoading={isLoading}
-          />
-        </div>
+        <ArtistResults
+          key={`artist-results-${searchTerm}`}
+          artists={allArtists.slice(0, 1)} // 첫 번째 1명만
+          isLoading={isLoading}
+          isFeatured={true} // 크게 표시하는 모드
+        />
       )}
 
       {/* 트랙 결과 */}
       {(shouldShowTracks || isLoading) && (
-        <div key={`track-results-${searchTerm}`}>
-          <TrackResults
-            tracks={allTracks.slice(0, 4)}
-            showMoreLink
-            onShowMore={() => handleTypeChange("track")}
-            isLoading={isLoading}
-          />
-        </div>
+        <TrackResults
+          key={`track-results-${searchTerm}`}
+          tracks={allTracks.slice(0, 4)}
+          isLoading={isLoading}
+          context="basic"
+          isFeatured={true}
+        />
       )}
 
       {/* 앨범 결과 */}
       {(shouldShowAlbums || isLoading) && (
-        <div key={`album-results-${searchTerm}`}>
-          <AlbumResults
-            albums={allAlbums.slice(0, 4)}
-            showMoreLink
-            onShowMore={() => handleTypeChange("album")}
-            isLoading={isLoading}
-          />
-        </div>
+        <AlbumResults
+          key={`album-results-${searchTerm}`}
+          albums={allAlbums.slice(0, 4)}
+          isLoading={isLoading}
+          context="basic"
+          isFeatured={true}
+        />
       )}
     </div>
   );
