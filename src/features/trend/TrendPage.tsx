@@ -8,6 +8,7 @@ import {
   useTrendArtists,
   useTrendTracks,
 } from "@/features/trend/queries";
+import { useHeader } from "@/providers/HeaderProvider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -101,6 +102,7 @@ const getInitialTabFromUrl = (params: URLSearchParams | null): TrendTab => {
 // useSearchParams를 사용하는 부분을 별도 컴포넌트로 분리
 const TrendPageContent = () => {
   const searchParams = useSearchParams();
+  const { setTitle } = useHeader();
 
   // 초기 상태를 URL에서 바로 가져옴
   const [activeTab, setActiveTab] = useState<TrendTab>(() =>
@@ -115,9 +117,15 @@ const TrendPageContent = () => {
     }
   }, [searchParams, activeTab]);
 
+  // 헤더 타이틀 설정
+  useEffect(() => {
+    setTitle("트렌드");
+    return () => setTitle("MUSIC X MUSIC");
+  }, [setTitle]);
+
   return (
     <>
-      <div className="py-6 space-y-6 px-4">
+      <div className="pt-20 md:pt-40 pb-24 md:pb-8 space-y-6 px-4 max-w-4xl mx-auto">
         {/* 트렌드 헤더 컴포넌트 */}
         <TrendHeader activeTab={activeTab} />
 
@@ -133,7 +141,7 @@ export function TrendPage() {
   return (
     <Suspense
       fallback={
-        <div className="py-6 space-y-6 px-4">
+        <div className="py-6 space-y-6 px-4 max-w-4xl mx-auto">
           <div className="text-center py-10">로딩 중...</div>
         </div>
       }

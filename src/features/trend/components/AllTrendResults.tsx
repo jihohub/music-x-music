@@ -30,9 +30,9 @@ export function AllTrendResults({
   onViewMore,
 }: AllTrendResultsProps) {
   return (
-    <div className="space-y-16">
+    <div className="space-y-8">
       {/* 아티스트 섹션 */}
-      <div className="section-artist">
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
         <ArtistGrid
           artists={artists}
           limit={4}
@@ -43,7 +43,7 @@ export function AllTrendResults({
       </div>
 
       {/* 트랙 섹션 */}
-      <div className="section-track">
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
         <TrackGrid
           tracks={tracks}
           limit={4}
@@ -54,7 +54,7 @@ export function AllTrendResults({
       </div>
 
       {/* 앨범 섹션 */}
-      <div className="section-album">
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
         <AlbumGrid
           albums={albums}
           limit={4}

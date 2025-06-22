@@ -1,6 +1,8 @@
 "use client";
 
+import { useHeader } from "@/providers/HeaderProvider";
 import Link from "next/link";
+import { useEffect } from "react";
 import BasicSearchResults from "./components/BasicSearchResults";
 import InfiniteScrollResults from "./components/InfiniteScrollResults";
 import NoResults from "./components/NoResults";
@@ -17,6 +19,7 @@ const searchTabItems = [
 ] as const;
 
 export function SearchPage() {
+  const { setTitle } = useHeader();
   const {
     // 상태
     searchTerm,
@@ -51,6 +54,20 @@ export function SearchPage() {
     // 유틸리티
     popularSearches,
   } = useSearchPageLogic();
+
+  // 검색어에 따라 헤더 타이틀 설정
+  useEffect(() => {
+    if (searchTerm && searchTerm.trim().length > 0) {
+      setTitle(`"${searchTerm}" 검색결과`);
+    } else {
+      setTitle("검색");
+    }
+
+    // 컴포넌트 언마운트 시 기본 title로 복원
+    return () => {
+      setTitle("MUSIC X MUSIC");
+    };
+  }, [searchTerm, setTitle]);
 
   // 탭 변경 시 즉시 결과를 표시하기 위한 최적화된 조건
   const showBasicResults = searchType === "all" && (hasResults || isFetching);
@@ -97,11 +114,11 @@ export function SearchPage() {
         />
       </div>
 
-      {/* 검색 탭 - 반응형 위치 조정 */}
+      {/* 검색 탭 - 검색바 바로 아래 */}
       {searchTerm.trim().length > 0 && (
         <div
           className="fixed left-6 right-6 z-40 flex justify-center
-          bottom-28 md:bottom-8"
+          top-24 md:top-44"
         >
           <div className="relative">
             {/* 리퀴드글래스 배경 */}
@@ -144,8 +161,8 @@ export function SearchPage() {
 
       {/* 메인 컨텐츠 영역 */}
       <div
-        className="space-y-6 px-4
-          pt-28 pb-32 md:pt-52 md:pb-8"
+        className="space-y-6 px-4 max-w-4xl mx-auto
+          pt-36 pb-20 md:pt-60 md:pb-8"
         ref={scrollContainerRef}
         id="search-page-container"
       >

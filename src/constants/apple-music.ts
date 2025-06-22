@@ -10,7 +10,7 @@ export const APPLE_MUSIC_API_BASE = "https://api.music.apple.com/v1";
 export const FEATURED_ARTIST_IDS = [
   "925734064", // James Hype
   "605800394", // SZA
-  "1594159996", // IVE
+  "1387587503", // John Summit
   "1455262408", // Fred again..
   "432942256", // Charli XCX
   "1446365464", // Tate McRae
@@ -22,10 +22,10 @@ export const FEATURED_ARTIST_IDS = [
 export const RECOMMENDED_TRACK_IDS = [
   "1791736475", // Don't Wake Me Up - James Hype
   "1657869492", // Snooze - SZA
-  "1741071167", // HEYA - IVE
-  "1672154709", // Leave Me Like This - Skrillex & Bobby Raps
-  "1760613455", // Shiver - John Summit & HAYLA
+  "1789854625", // Focus (feat. CLOVES) - John Summit
   "1640463909", // Kammy (like i do) - Fred again..
+  "1513162746", // party 4 u - Charli xcx
+  "1779319626", // Revolving door - Tate McRae
 ];
 
 /**

@@ -2,8 +2,8 @@
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { useAlbumTracks } from "@/features/album/queries";
+import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
 import { AppleMusicAlbum, AppleMusicTrack } from "@/types/apple-music";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 
 // Apple Music 이미지 URL 생성 함수
@@ -26,9 +26,15 @@ function getAppleMusicImageUrl(
 
 interface TrackListProps {
   album: AppleMusicAlbum;
+  textColor1?: string;
+  textColor2?: string;
 }
 
-export const TrackList = ({ album }: TrackListProps) => {
+export const TrackList = ({
+  album,
+  textColor1 = "#ffffff",
+  textColor2 = "#ffffff",
+}: TrackListProps) => {
   const albumImage = getAppleMusicImageUrl(album.attributes.artwork, "sm");
   const params = useParams();
   const albumId = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -43,47 +49,56 @@ export const TrackList = ({ album }: TrackListProps) => {
       ? album.relationships.tracks.data // 앨범 객체 내 트랙 데이터 사용
       : tracksData; // API로 가져온 트랙 데이터 사용
 
+  const { playTrack } = useMusicPlayer();
+
   if (isLoading && tracks.length === 0) {
     return (
-      <section className="bg-card-bg rounded-lg py-5">
-        <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
-        <div className="p-4 text-center text-text-secondary">
-          트랙 로딩 중...
-        </div>
-      </section>
+      <div className="p-4 text-center" style={{ color: textColor2 }}>
+        트랙 로딩 중...
+      </div>
     );
   }
 
   return (
-    <section className="bg-card-bg rounded-lg py-5">
-      <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
-      <div className="space-y-1">
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
+      <div className="space-y-4">
         {tracks.map((track: AppleMusicTrack, index: number) => (
-          <Link
-            key={track.id}
-            href={`/track/${track.id}`}
-            className="flex items-center gap-3 p-2 hover:bg-gray-700/10 transition-colors group cursor-pointer rounded-md"
+          <div
+            key={`album-track-${track.id}`}
+            className="group flex items-center gap-3 rounded-lg hover:bg-white/5 transition-colors"
           >
-            <div className="w-12 h-12 shrink-0">
-              <UnoptimizedImage
-                src={albumImage}
-                alt={album.attributes.name}
-                width={48}
-                height={48}
-                className="rounded-md"
-              />
-            </div>
-            <div className="flex-grow min-w-0">
-              <div className="font-medium hover:text-primary line-clamp-1 text-sm">
+            <button
+              onClick={() => {
+                playTrack(track);
+              }}
+              className="relative w-12 h-12 rounded-2xl overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0"
+            >
+              <div className="w-12 h-12 shrink-0">
+                <UnoptimizedImage
+                  src={albumImage}
+                  alt={album.attributes.name}
+                  width={48}
+                  height={48}
+                  className="rounded-2xl"
+                />
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                playTrack(track);
+              }}
+              className="flex-1 min-w-0 text-left"
+            >
+              <h3
+                className="font-medium text-sm truncate group-hover:opacity-80 transition-colors"
+                style={{ color: textColor1 }}
+              >
                 {track.attributes.name}
-              </div>
-              <div className="text-text-secondary text-sm line-clamp-1 mt-0.5">
-                {track.attributes.artistName}
-              </div>
-            </div>
-          </Link>
+              </h3>
+            </button>
+          </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 };

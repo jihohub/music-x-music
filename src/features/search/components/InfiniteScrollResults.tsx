@@ -73,21 +73,33 @@ export function InfiniteScrollResults({
       {/* 아티스트 타입 검색 결과 */}
       {searchType === "artist" && (
         <div key={`artist-infinite-${searchTerm}`}>
-          <ArtistResults artists={allArtists} isLoading={false} />
+          <ArtistResults
+            artists={allArtists}
+            isLoading={isLoading}
+            isHorizontal={true}
+          />
         </div>
       )}
 
       {/* 트랙 타입 검색 결과 */}
       {searchType === "track" && (
         <div key={`track-infinite-${searchTerm}`}>
-          <TrackResults tracks={allTracks} isLoading={false} />
+          <TrackResults
+            tracks={allTracks}
+            isLoading={isLoading}
+            context="infinite"
+          />
         </div>
       )}
 
       {/* 앨범 타입 검색 결과 */}
       {searchType === "album" && (
         <div key={`album-infinite-${searchTerm}`}>
-          <AlbumResults albums={allAlbums} isLoading={false} />
+          <AlbumResults
+            albums={allAlbums}
+            isLoading={isLoading}
+            context="infinite"
+          />
         </div>
       )}
     </div>

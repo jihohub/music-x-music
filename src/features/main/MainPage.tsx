@@ -33,12 +33,27 @@ export default function MainPage() {
   });
 
   return (
-    <main className="min-h-screen pt-16">
-      <div className="max-w-screen-xl mx-auto px-4 py-8 space-y-12">
-        <HeroSection />
-        <FeaturedArtists />
-        <RecommendedTracks tracks={tracks} isLoading={tracksLoading} />
-        <GenreSection />
+    <main className="min-h-screen pt-20 pb-24 md:pb-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* 히어로 섹션 */}
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-lg">
+          <HeroSection />
+        </div>
+
+        {/* 추천 트랙 */}
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg">
+          <RecommendedTracks tracks={tracks} isLoading={tracksLoading} />
+        </div>
+
+        {/* 인기 아티스트 */}
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg">
+          <FeaturedArtists />
+        </div>
+
+        {/* 장르 섹션 */}
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg">
+          <GenreSection />
+        </div>
       </div>
     </main>
   );

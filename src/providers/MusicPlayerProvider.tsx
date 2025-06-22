@@ -1,7 +1,6 @@
 "use client";
 
 import { AppleMusicTrack } from "@/types/apple-music";
-import { useSession } from "next-auth/react";
 import {
   createContext,
   ReactNode,
@@ -39,11 +38,18 @@ interface MusicPlayerContextType {
   currentTime: number;
   duration: number;
   isUsingMusicKit: boolean;
+  isFullScreen: boolean;
   audioRef: React.RefObject<HTMLAudioElement | null>;
   playTrack: (track: AppleMusicTrack) => void;
   togglePlayback: () => void;
   seekTo: (time: number) => void;
   hidePlayer: () => void;
+  expandPlayer: () => void;
+  collapsePlayer: () => void;
+  getCurrentTrackTextColor: () => string;
+  setPageTextColor: (color: string) => void;
+  getPageTextColor: () => string;
+  getWidgetTextColor: () => string; // 위젯용 텍스트 색상
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(
@@ -55,7 +61,6 @@ interface MusicPlayerProviderProps {
 }
 
 export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
-  const { data: session } = useSession();
   const [currentTrack, setCurrentTrack] = useState<AppleMusicTrack | null>(
     null
   );
@@ -64,12 +69,14 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isUsingMusicKit, setIsUsingMusicKit] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [pageTextColor, setPageTextColor] = useState("#ffffff");
   const audioRef = useRef<HTMLAudioElement>(null);
   const musicKitRef = useRef<any>(null);
 
   // MusicKit 권한 확인 (로그인이 되어있고 명시적으로 권한이 있을 때만)
   const checkMusicKitAuth = () => {
-    if (session && typeof window !== "undefined" && window.MusicKit) {
+    if (typeof window !== "undefined" && window.MusicKit) {
       try {
         const musicKit = window.MusicKit.getInstance();
         musicKitRef.current = musicKit;
@@ -85,6 +92,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   const playTrack = async (track: AppleMusicTrack) => {
     setCurrentTrack(track);
     setIsPlayerVisible(true);
+    setIsFullScreen(true);
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
@@ -100,6 +108,8 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         });
         setDuration(track.attributes.durationInMillis / 1000);
         setIsUsingMusicKit(true);
+        // MusicKit으로 자동 재생 시작
+        await musicKitRef.current.play();
         console.log("MusicKit으로 재생:", track.attributes.name);
         return;
       } catch (error) {
@@ -110,6 +120,15 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
     // 기본적으로 프리뷰 재생 사용
     setIsUsingMusicKit(false);
     console.log("프리뷰로 재생:", track.attributes.name);
+
+    // 프리뷰 자동 재생 (audioRef 업데이트는 useEffect에서 처리)
+    setTimeout(() => {
+      if (audioRef.current && !musicKitAuthorized) {
+        audioRef.current.play().catch((error) => {
+          console.error("프리뷰 자동 재생 실패:", error);
+        });
+      }
+    }, 100);
   };
 
   const togglePlayback = async () => {
@@ -118,6 +137,10 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         if (isPlaying) {
           musicKitRef.current.pause();
         } else {
+          // 노래가 끝났을 때 처음부터 재생
+          if (Math.abs(currentTime - duration) < 1) {
+            musicKitRef.current.currentPlaybackTime = 0;
+          }
           await musicKitRef.current.play();
         }
       } catch (error) {
@@ -131,6 +154,11 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         audioRef.current.pause();
       } else {
         try {
+          // 노래가 끝났을 때 처음부터 재생
+          if (Math.abs(currentTime - duration) < 1) {
+            audioRef.current.currentTime = 0;
+            setCurrentTime(0);
+          }
           await audioRef.current.play();
         } catch (error) {
           console.error("프리뷰 재생 실패:", error);
@@ -154,24 +182,16 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   };
 
   const hidePlayer = () => {
-    if (isUsingMusicKit && musicKitRef.current?.isAuthorized) {
-      try {
-        musicKitRef.current.pause();
-      } catch (error) {
-        console.error("MusicKit 일시정지 실패:", error);
-      }
-    } else {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    }
+    // 페이지 이동 시에는 음악을 중단하지 않고 미니 플레이어로만 전환
+    setIsFullScreen(false); // 풀스크린만 해제, 미니 플레이어는 유지
+  };
 
-    setIsPlayerVisible(false);
-    setCurrentTrack(null);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-    setIsUsingMusicKit(false);
+  const expandPlayer = () => {
+    setIsFullScreen(true);
+  };
+
+  const collapsePlayer = () => {
+    setIsFullScreen(false);
   };
 
   // MusicKit 이벤트 리스너 (권한이 있을 때만)
@@ -181,9 +201,23 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
     const musicKit = musicKitRef.current;
 
     const handlePlaybackStateChange = () => {
-      setIsPlaying(musicKit.playbackState === 2); // 2 = playing
-      setCurrentTime(musicKit.currentPlaybackTime);
-      setDuration(musicKit.currentPlaybackDuration);
+      const playbackState = musicKit.playbackState;
+      const currentPlaybackTime = musicKit.currentPlaybackTime;
+      const playbackDuration = musicKit.currentPlaybackDuration;
+
+      setIsPlaying(playbackState === 2); // 2 = playing
+      setCurrentTime(currentPlaybackTime);
+      setDuration(playbackDuration);
+
+      // 재생 완료 감지 (재생이 멈추고 시간이 끝에 도달했을 때)
+      if (
+        playbackState !== 2 &&
+        Math.abs(currentPlaybackTime - playbackDuration) < 1 &&
+        playbackDuration > 0
+      ) {
+        setIsPlaying(false);
+        setCurrentTime(playbackDuration);
+      }
     };
 
     musicKit.addEventListener(
@@ -207,6 +241,27 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
     };
   }, [isUsingMusicKit]);
 
+  // 현재 트랙의 텍스트 색상 가져오기
+  const getCurrentTrackTextColor = () => {
+    if (currentTrack?.attributes.artwork?.textColor1) {
+      return `#${currentTrack.attributes.artwork.textColor1}`;
+    }
+    return "#ffffff"; // 기본 흰색
+  };
+
+  // 위젯용 텍스트 색상 가져오기 (트랙 색상 우선)
+  const getWidgetTextColor = () => {
+    // 트랙이 재생 중이면 트랙 색상 사용
+    if (currentTrack?.attributes.artwork?.textColor1) {
+      return `#${currentTrack.attributes.artwork.textColor1}`;
+    }
+    // 트랙이 없으면 페이지 색상 사용
+    if (pageTextColor !== "#ffffff") {
+      return pageTextColor;
+    }
+    return "#ffffff"; // 기본 흰색
+  };
+
   return (
     <MusicPlayerContext.Provider
       value={{
@@ -216,11 +271,18 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         currentTime,
         duration,
         isUsingMusicKit,
+        isFullScreen,
         audioRef,
         playTrack,
         togglePlayback,
         seekTo,
         hidePlayer,
+        expandPlayer,
+        collapsePlayer,
+        getCurrentTrackTextColor,
+        setPageTextColor,
+        getPageTextColor: () => pageTextColor,
+        getWidgetTextColor,
       }}
     >
       {children}
@@ -229,10 +291,20 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         ref={audioRef}
         onPlay={() => !isUsingMusicKit && setIsPlaying(true)}
         onPause={() => !isUsingMusicKit && setIsPlaying(false)}
-        onTimeUpdate={(e) =>
-          !isUsingMusicKit &&
-          setCurrentTime((e.target as HTMLAudioElement).currentTime)
-        }
+        onTimeUpdate={(e) => {
+          if (!isUsingMusicKit) {
+            const audio = e.target as HTMLAudioElement;
+            const currentTime = audio.currentTime;
+            const duration = audio.duration;
+            setCurrentTime(currentTime);
+
+            // 재생 완료 감지 (시간이 끝에 도달했을 때)
+            if (Math.abs(currentTime - duration) < 0.1 && duration > 0) {
+              setIsPlaying(false);
+              setCurrentTime(duration);
+            }
+          }
+        }}
         onLoadedMetadata={(e) =>
           !isUsingMusicKit &&
           setDuration((e.target as HTMLAudioElement).duration)
@@ -240,7 +312,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         onEnded={() => {
           if (!isUsingMusicKit) {
             setIsPlaying(false);
-            setCurrentTime(0);
+            setCurrentTime(duration); // duration으로 설정해서 진행바가 끝까지 가도록
           }
         }}
         onError={(e) => {

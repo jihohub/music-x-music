@@ -37,22 +37,14 @@ const processInfiniteSearchResults = (pages: AppleMusicSearchResult[]) => {
 // 인기 검색어 목록
 const popularSearches = [
   "Taylor Swift",
-  "BTS",
-  "NewJeans",
-  "IVE",
-  "aespa",
-  "BLACKPINK",
+  "Bruno Mars",
   "Dua Lipa",
   "The Weeknd",
   "Billie Eilish",
   "Coldplay",
-  "르세라핌",
-  "Skrillex",
   "Ariana Grande",
   "Kendrick Lamar",
-  "Stray Kids",
   "The Weeknd",
-  "Justin Bieber",
 ];
 
 export function useSearchPageLogic() {

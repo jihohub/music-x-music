@@ -1,5 +1,6 @@
 "use client";
 
+import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -15,6 +16,7 @@ import {
   IoSearch,
   IoSearchOutline,
 } from "react-icons/io5";
+
 interface NavItem {
   name: string;
   path: string;
@@ -24,6 +26,13 @@ interface NavItem {
 
 export default function Footer() {
   const pathname = usePathname();
+  const { getPageTextColor } = useMusicPlayer();
+
+  // 푸터는 페이지 색상만 사용 (트랙 색상으로 변하지 않음)
+  const textColor = getPageTextColor();
+
+  // 비활성 상태 색상 (70% 투명도) - hex 끝에 B3 추가
+  const inactiveColor = `${textColor}B3`;
 
   const navItems: NavItem[] = [
     {
@@ -95,15 +104,20 @@ export default function Footer() {
                       <div
                         className={`w-12 h-12 flex items-center justify-center transition-all duration-300 ${
                           isActive
-                            ? "bg-white/20 text-white scale-105"
-                            : "text-white/70 hover:text-white/90 hover:scale-105 hover:bg-white/10"
+                            ? "bg-white/20 scale-105"
+                            : "hover:scale-105 hover:bg-white/10"
                         }`}
-                        style={{ borderRadius: "12px" }}
+                        style={{
+                          borderRadius: "12px",
+                        }}
                       >
                         <div
                           className={`transition-all duration-300 ${
                             isActive ? "drop-shadow-lg" : ""
                           }`}
+                          style={{
+                            color: isActive ? textColor : inactiveColor,
+                          }}
                         >
                           {isActive ? item.activeIcon : item.icon}
                         </div>
@@ -155,15 +169,20 @@ export default function Footer() {
                       <div
                         className={`w-12 h-12 flex items-center justify-center transition-all duration-300 ${
                           isActive
-                            ? "bg-white/20 text-white scale-105"
-                            : "text-white/70 hover:text-white/90 hover:scale-105 hover:bg-white/10"
+                            ? "bg-white/20 scale-105"
+                            : "hover:scale-105 hover:bg-white/10"
                         }`}
-                        style={{ borderRadius: "12px" }}
+                        style={{
+                          borderRadius: "12px",
+                        }}
                       >
                         <div
                           className={`transition-all duration-300 ${
                             isActive ? "drop-shadow-lg" : ""
                           }`}
+                          style={{
+                            color: isActive ? textColor : inactiveColor,
+                          }}
                         >
                           {isActive ? item.activeIcon : item.icon}
                         </div>

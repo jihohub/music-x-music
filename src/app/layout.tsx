@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-// import MusicPlayer from "@/components/MusicPlayer"; // 위젯 방식 - 현재 사용 안함
-import AuthProvider from "@/providers/AuthProvider";
+import MainContent from "@/components/MainContent";
+import MusicPlayer from "@/components/MusicPlayer";
 import { HeaderProvider } from "@/providers/HeaderProvider";
 import { MusicPlayerProvider } from "@/providers/MusicPlayerProvider";
 import QueryProvider from "@/providers/QueryProvider";
@@ -20,6 +20,15 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "MUSIC X MUSIC",
   description: "친구들과 음악을 공유하고 즐기는 앱",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -30,14 +39,10 @@ export const metadata: Metadata = {
   },
 };
 
-// 위젯 방식 MusicPlayer - 현재 사용 안함 (트랙 페이지로 대체)
-// function MusicPlayerWrapper() {
-//   return (
-//     <div>
-//       <MusicPlayer />
-//     </div>
-//   );
-// }
+// 위젯 방식 MusicPlayer 활성화
+function MusicPlayerWrapper() {
+  return <MusicPlayer />;
+}
 
 export default function RootLayout({
   children,
@@ -107,29 +112,11 @@ export default function RootLayout({
                     document.documentElement.style.setProperty('--vh', vh + 'px');
                   }
                   
-                  // 페이지 경로에 따른 높이 설정 함수
-                  function adjustHeightByPage() {
-                    const path = window.location.pathname;
-                    const mainElement = document.querySelector('main');
-                    if (!mainElement) return;
-                    
-                    // 검색 페이지나 프로필 페이지는 내용물 높이에 맞추기
-                    if (path === '/search' || path === '/profile') {
-                      mainElement.classList.add('min-h-fit');
-                      mainElement.classList.remove('min-h-screen');
-                    } else {
-                      mainElement.classList.add('min-h-screen');
-                      mainElement.classList.remove('min-h-fit');
-                    }
-                  }
-                  
                   // 초기 실행
                   setViewportHeight();
-                  document.addEventListener('DOMContentLoaded', adjustHeightByPage);
                   
-                  // 경로 변경 감지
-                  const observer = new MutationObserver(adjustHeightByPage);
-                  observer.observe(document.documentElement, { subtree: true, childList: true });
+                  // 리사이즈 이벤트 리스너
+                  window.addEventListener('resize', setViewportHeight);
                 } catch (e) {}
               })();
             `,
@@ -138,30 +125,17 @@ export default function RootLayout({
       </head>
       <body>
         <HeaderProvider>
-          <AuthProvider>
-            <QueryProvider>
-              <MusicPlayerProvider>
-                {/* 데스크탑에서만 Header 표시 */}
-                <div className="hidden md:block">
-                  <Header />
-                </div>
-                <main
-                  className="container mx-auto !pb-16 min-h-screen md:pl-20"
-                  id="main-content"
-                  style={
-                    {
-                      // paddingLeft: "var(--safe-area-inset-left)",
-                      // paddingRight: "var(--safe-area-inset-right)",
-                    }
-                  }
-                >
-                  {children}
-                </main>
-                <Footer />
-                {/* <MusicPlayerWrapper /> */}
-              </MusicPlayerProvider>
-            </QueryProvider>
-          </AuthProvider>
+          <QueryProvider>
+            <MusicPlayerProvider>
+              {/* 데스크탑에서만 Header 표시 */}
+              <div className="hidden md:block">
+                <Header />
+              </div>
+              <MainContent>{children}</MainContent>
+              <Footer />
+              <MusicPlayerWrapper />
+            </MusicPlayerProvider>
+          </QueryProvider>
         </HeaderProvider>
       </body>
     </html>

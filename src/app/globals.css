@@ -1,12 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* iOS 다크모드 전용 색상 */
-  --spotify-green: #1db954;
-  --background: #1c1c1e;
+  --background: #0f0f10;
   --foreground: #ffffff;
-  --card-bg: #2c2c2e;
-  --border-color: #3a3a3c;
+  --card: #1c1c1e;
+  --card-foreground: #ffffff;
+  --primary: #007aff; /* Apple 블루 색상으로 변경 */
+  --primary-foreground: #ffffff;
+  --secondary: #2c2c2e;
+  --secondary-foreground: #ffffff;
+  --muted: #1c1c1e;
+  --muted-foreground: #8e8e93;
+  --accent: #2c2c2e;
+  --accent-foreground: #ffffff;
+  --destructive: #ff3b30;
+  --destructive-foreground: #ffffff;
+  --border: #2c2c2e;
+  --input: #2c2c2e;
+  --ring: #007aff;
+  --radius: 0.5rem;
 
   /* 스켈레톤 로더 색상 */
   --skeleton-bg: #3a3a3c;
@@ -17,11 +29,10 @@
   --text-tertiary: #8e8e93;
 
   /* UI 요소 색상 */
-  --primary: var(--spotify-green);
-  --primary-hover: #1ed760;
-  --primary-active: #1aa34a;
+  --primary-hover: #0056cc;
+  --primary-active: #004499;
   --error: #ff5252;
-  --success: #1db954;
+  --success: #34c759; /* Apple 그린으로 변경 */
   --warning: #ffae00;
 }
 

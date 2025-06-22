@@ -72,7 +72,6 @@ export function InfiniteNewReleases({
         next={handleNext}
         hasMore={!!hasNextPage}
         loader={null}
-        endMessage={null}
         className="space-y-6"
         scrollThreshold={0.9}
         style={{ overflow: "visible" }}

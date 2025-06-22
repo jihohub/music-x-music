@@ -28,75 +28,67 @@ interface ArtistHeaderProps {
 export const ArtistHeader = ({ artist }: ArtistHeaderProps) => {
   // 이미지 URL 가져오기
   const artistImage = getAppleMusicImageUrl(artist.attributes.artwork, "md");
-  const bannerImage = getAppleMusicImageUrl(artist.attributes.artwork, "lg");
+
+  // 배경색 가져오기
+  const bgColor = artist.attributes.artwork?.bgColor
+    ? `#${artist.attributes.artwork.bgColor}`
+    : "#1c1c1e";
+
+  // 텍스트 색상 가져오기 (API에서 제공하는 색상 사용)
+  const textColor1 = artist.attributes.artwork?.textColor1
+    ? `#${artist.attributes.artwork.textColor1}`
+    : "#ffffff";
+
+  const textColor2 = artist.attributes.artwork?.textColor2
+    ? `#${artist.attributes.artwork.textColor2}`
+    : "#ffffff";
 
   return (
-    <section className="relative h-[40vh] min-h-[300px] max-h-[500px]">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background">
-        <UnoptimizedImage
-          src={bannerImage}
-          alt={artist.attributes.name}
-          fill
-          sizes="100vw"
-          className="object-cover -z-10 opacity-50"
-          priority
-        />
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 container px-4 pb-6">
-        <div className="flex items-end gap-6">
-          <div
-            className="relative overflow-hidden aspect-square rounded-sm"
-            style={{
-              width: "160px",
-              height: "160px",
-              minWidth: "160px",
-              minHeight: "160px",
-              maxWidth: "160px",
-              maxHeight: "160px",
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
-            <div className="absolute inset-0">
-              <UnoptimizedImage
-                src={artistImage}
-                alt={artist.attributes.name}
-                fill
-                sizes="(max-width: 768px) 160px, 256px"
-                className="object-cover object-center"
-              />
-            </div>
-            <div className="absolute inset-0 ring-1 ring-white/10" />
-          </div>
-          <div className="flex-grow">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-5xl font-bold drop-shadow-lg">
-                  {artist.attributes.name}
-                </h1>
-                {artist.attributes.genreNames &&
-                  artist.attributes.genreNames.length > 0 && (
-                    <div className="flex flex-wrap gap-4 mt-3">
-                      {/* 모바일: 첫 번째 장르만 표시 */}
-                      <span className="md:hidden text-sm bg-primary/20 text-primary rounded-full">
-                        {artist.attributes.genreNames[0]}
-                      </span>
-
-                      {/* 태블릿/데스크톱: 최대 3개 장르 표시 */}
-                      {artist.attributes.genreNames
-                        .slice(0, 3)
-                        .map((genre, idx) => (
-                          <span
-                            key={idx}
-                            className="hidden md:inline-block text-sm bg-primary/20 text-primary rounded-full"
-                          >
-                            {genre}
-                          </span>
-                        ))}
-                    </div>
-                  )}
+    <section className="px-4 pt-8" style={{ backgroundColor: bgColor }}>
+      {/* 가로로 긴 투명 컨테이너 */}
+      <div className="relative mx-auto">
+        <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl">
+          {/* 가로 배치 컨텐츠 */}
+          <div className="flex items-center gap-6 md:gap-8">
+            {/* 아티스트 이미지 */}
+            <div className="relative flex-shrink-0">
+              <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-xl">
+                <UnoptimizedImage
+                  src={artistImage}
+                  alt={artist.attributes.name}
+                  fill
+                  sizes="(max-width: 768px) 80px, 128px"
+                  className="object-cover"
+                />
               </div>
+            </div>
+
+            {/* 텍스트 정보 */}
+            <div className="flex-1 min-w-0">
+              <h1
+                className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight"
+                style={{ color: textColor1 }}
+              >
+                {artist.attributes.name}
+              </h1>
+
+              {/* 장르 태그들 */}
+              {artist.attributes.genreNames &&
+                artist.attributes.genreNames.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {artist.attributes.genreNames
+                      .slice(0, 3)
+                      .map((genre, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 text-sm font-medium bg-white/20 backdrop-blur-sm rounded-full border border-white/30"
+                          style={{ color: textColor2 }}
+                        >
+                          {genre}
+                        </span>
+                      ))}
+                  </div>
+                )}
             </div>
           </div>
         </div>
