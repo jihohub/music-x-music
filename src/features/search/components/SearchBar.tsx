@@ -39,38 +39,49 @@ export const SearchBar = ({
 
   return (
     <div className="relative max-w-xl mx-auto">
-      <form
-        onSubmit={handleSubmit}
-        className="relative bg-card-bg rounded-full border border-gray-200/10 px-4 py-2.5 shadow-sm"
-      >
-        <div className="flex items-center">
-          <IoSearchOutline
-            size={18}
-            className="text-text-secondary mr-2.5 flex-shrink-0"
-          />
-          <input
-            ref={inputRef}
-            type="text"
-            className="bg-transparent w-full py-1 text-text-primary focus:outline-none placeholder-text-secondary/70 font-medium tracking-wide text-base md:text-sm"
-            placeholder="곡, 아티스트, 앨범 검색..."
-            value={searchTerm}
-            onChange={onSearchChange}
-            autoComplete="off"
-            spellCheck="false"
-          />
-          {searchTerm && (
-            <button
-              type="button"
-              className="flex items-center justify-center ml-2 h-5 w-5 rounded-full bg-gray-400/30 text-white flex-shrink-0"
-              onClick={onClearSearch}
-              aria-label="검색어 지우기"
-            >
-              <IoCloseCircleOutline size={14} />
-            </button>
-          )}
+      <form onSubmit={handleSubmit} className="relative">
+        {/* 리퀴드글래스 배경 */}
+        <div
+          className="absolute inset-0 backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-black/15 border border-white/10 shadow-2xl rounded-full"
+          style={{
+            boxShadow:
+              "0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-black/15 rounded-full"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-white/5 rounded-full"></div>
+        </div>
+
+        {/* 검색 입력 컨텐츠 */}
+        <div className="relative px-4 py-2.5 md:px-6 md:py-4">
+          <div className="flex items-center">
+            <IoSearchOutline
+              size={18}
+              className="text-white/80 mr-2.5 md:mr-3 flex-shrink-0 md:size-5"
+            />
+            <input
+              ref={inputRef}
+              type="text"
+              className="bg-transparent w-full py-1.5 md:py-2 text-white focus:outline-none placeholder-white/60 font-medium tracking-wide text-sm md:text-base"
+              placeholder="곡, 아티스트, 앨범 검색..."
+              value={searchTerm}
+              onChange={onSearchChange}
+              autoComplete="off"
+              spellCheck="false"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                className="flex items-center justify-center ml-3 h-6 w-6 rounded-full bg-white/20 text-white/80 flex-shrink-0 hover:bg-white/30 transition-all duration-200"
+                onClick={onClearSearch}
+                aria-label="검색어 지우기"
+              >
+                <IoCloseCircleOutline size={16} />
+              </button>
+            )}
+          </div>
         </div>
       </form>
-      <div className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-[90%] h-1.5 bg-black/20 blur-md rounded-full" />
     </div>
   );
 };

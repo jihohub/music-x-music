@@ -1,14 +1,14 @@
-import Header from "@/components/Header";
 import { SearchPage } from "@/features/search/SearchPage";
 import { Suspense } from "react";
 
-export default function SearchPageRoute() {
+function SearchPageFallback() {
+  return <div className="flex items-center justify-center min-h-screen"></div>;
+}
+
+export default function Page() {
   return (
-    <>
-      <Header title="검색" />
-      <Suspense fallback={null}>
-        <SearchPage />
-      </Suspense>
-    </>
+    <Suspense fallback={<SearchPageFallback />}>
+      <SearchPage />
+    </Suspense>
   );
 }

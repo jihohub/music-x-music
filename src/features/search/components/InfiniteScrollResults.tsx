@@ -1,9 +1,13 @@
 "use client";
 
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
-import { useCallback, useEffect, useRef, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { SearchType } from "../queries/searchSpotify";
+import {
+  AppleMusicAlbum,
+  AppleMusicArtist,
+  AppleMusicTrack,
+} from "@/types/apple-music";
+import { FetchNextPageOptions } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { SearchType } from "../hooks/useSearchPageLogic";
 import AlbumResults from "./AlbumResults";
 import ArtistResults from "./ArtistResults";
 import TrackResults from "./TrackResults";
@@ -11,13 +15,13 @@ import TrackResults from "./TrackResults";
 interface InfiniteScrollResultsProps {
   searchType: SearchType;
   searchTerm: string;
-  allArtists: SpotifyArtist[];
-  allTracks: SpotifyTrack[];
-  allAlbums: SpotifyAlbum[];
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  fetchNextPage: () => void;
+  allArtists: AppleMusicArtist[];
+  allTracks: AppleMusicTrack[];
+  allAlbums: AppleMusicAlbum[];
   isLoading?: boolean;
+  fetchNextPage?: (options?: FetchNextPageOptions) => Promise<any>;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 export function InfiniteScrollResults({
@@ -26,125 +30,78 @@ export function InfiniteScrollResults({
   allArtists,
   allTracks,
   allAlbums,
+  isLoading = false,
+  fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
-  fetchNextPage,
-  isLoading = false,
 }: InfiniteScrollResultsProps) {
-  // 마지막 데이터 요청 시간 추적
-  const lastFetchTimeRef = useRef<number>(0);
-  // 스크롤 컨테이너 참조
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  // 최초 로딩 여부 추적
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-
-  // 현재 검색 유형에 맞는 데이터 선택
-  const currentItems =
-    searchType === "artist"
-      ? allArtists
-      : searchType === "track"
-      ? allTracks
-      : allAlbums;
-
-  // 데이터가 로드되면 isFirstLoad를 false로 설정
+  // 무한스크롤 구현
   useEffect(() => {
-    if (currentItems.length > 0 && isFirstLoad) {
-      setIsFirstLoad(false);
-    }
-  }, [currentItems.length, isFirstLoad]);
+    if (!fetchNextPage || !hasNextPage || isFetchingNextPage) return;
 
-  // 검색어나 검색 타입이 변경되면 isFirstLoad를 true로 재설정
-  useEffect(() => {
-    setIsFirstLoad(true);
-  }, [searchTerm, searchType]);
-
-  // 스크롤 복원 비활성화 및 브라우저의 스크롤 조정 방지
-  useEffect(() => {
-    // CSS 속성 추가
-    document.documentElement.style.setProperty("overflow-anchor", "none");
-
-    return () => {
-      // 컴포넌트 언마운트 시 원래대로 복원
-      document.documentElement.style.removeProperty("overflow-anchor");
-    };
-  }, []);
-
-  // 메모이제이션된 handleNext 함수
-  const handleNext = useCallback(() => {
-    // 연속 요청 방지 (시간 간격 줄임)
-    const now = Date.now();
-    if (now - lastFetchTimeRef.current < 500) return;
-
-    lastFetchTimeRef.current = now;
-    fetchNextPage();
-  }, [currentItems.length, fetchNextPage]);
-
-  // 수동 스크롤 감지 추가
-  useEffect(() => {
     const handleScroll = () => {
-      // 스크롤 위치 확인
-      if (!hasNextPage || isFetchingNextPage) return;
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
 
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-      const clientHeight = window.innerHeight;
-
-      // 페이지 하단에 근접했을 때 추가 데이터 로드
-      if (scrollHeight - scrollTop - clientHeight < 300) {
-        handleNext();
+      // 화면 최하단에서 100px 전에 도달하면 다음 페이지 로드
+      if (scrollTop + windowHeight >= documentHeight - 100) {
+        console.log("무한스크롤 트리거: fetchNextPage 호출");
+        fetchNextPage();
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, handleNext]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (searchType === "all") return null;
-
-  // 데이터가 없는 경우에도 로딩 중일 때는 스켈레톤 표시 (최초 로딩 시에만)
-  if (!currentItems.length && !isLoading) return null;
-
-  // 스켈레톤을 표시할지 결정하는 조건: 최초 로딩 시에만 표시
-  const shouldShowSkeleton = isLoading && isFirstLoad;
+  // 디버깅용 로그
+  console.log("InfiniteScrollResults Debug:", {
+    searchType,
+    searchTerm,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage: !!fetchNextPage,
+    artistsCount: allArtists.length,
+    tracksCount: allTracks.length,
+    albumsCount: allAlbums.length,
+  });
 
   return (
-    <div className="min-h-[300px]">
-      <InfiniteScroll
-        dataLength={currentItems.length}
-        next={handleNext}
-        hasMore={!!hasNextPage}
-        loader={null}
-        endMessage={null}
-        className="space-y-6"
-        scrollThreshold={0.5}
-        scrollableTarget="search-page-container"
-        style={{ overflow: "visible" }}
-      >
-        {/* 결과 컴포넌트 - 즉시 렌더링 */}
-        {searchType === "artist" && (
+    <div className="space-y-8">
+      {/* 아티스트 타입 검색 결과 */}
+      {searchType === "artist" && (
+        <div key={`artist-infinite-${searchTerm}`}>
           <ArtistResults
             artists={allArtists}
-            limit={4}
-            isLoading={shouldShowSkeleton}
+            isLoading={isLoading}
+            isHorizontal={true}
           />
-        )}
+        </div>
+      )}
 
-        {searchType === "track" && (
+      {/* 트랙 타입 검색 결과 */}
+      {searchType === "track" && (
+        <div key={`track-infinite-${searchTerm}`}>
           <TrackResults
             tracks={allTracks}
-            limit={4}
-            isLoading={shouldShowSkeleton}
+            isLoading={isLoading}
+            context="infinite"
           />
-        )}
+        </div>
+      )}
 
-        {searchType === "album" && (
+      {/* 앨범 타입 검색 결과 */}
+      {searchType === "album" && (
+        <div key={`album-infinite-${searchTerm}`}>
           <AlbumResults
             albums={allAlbums}
-            limit={4}
-            isLoading={shouldShowSkeleton}
+            isLoading={isLoading}
+            context="infinite"
           />
-        )}
-      </InfiniteScroll>
+        </div>
+      )}
     </div>
   );
 }

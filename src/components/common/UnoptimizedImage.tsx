@@ -16,6 +16,10 @@ export const UnoptimizedImage = ({
   alt,
   fallbackSrc,
   className,
+  width,
+  height,
+  fill,
+  sizes,
   ...props
 }: UnoptimizedImageProps) => {
   const [imgSrc, setImgSrc] = useState<string>(src as string);
@@ -39,6 +43,22 @@ export const UnoptimizedImage = ({
     );
   }
 
+  // fill이 true이면 width/height 불필요
+  if (fill) {
+    return (
+      <Image
+        src={imgSrc}
+        alt={alt || ""}
+        className={className}
+        unoptimized={true}
+        onError={handleError}
+        fill={fill}
+        sizes={sizes || "100vw"}
+        {...props}
+      />
+    );
+  }
+
   return (
     <Image
       src={imgSrc}
@@ -46,6 +66,11 @@ export const UnoptimizedImage = ({
       className={className}
       unoptimized={true}
       onError={handleError}
+      width={width || 200} // 더 적절한 기본 width
+      height={height || 200} // 더 적절한 기본 height
+      sizes={
+        sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      }
       {...props}
     />
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SearchType } from "../queries/searchSpotify";
+import { SearchType } from "../hooks/useSearchPageLogic";
 import SearchBar from "./SearchBar";
 
 interface SearchHeaderProps {

@@ -2,94 +2,103 @@
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { useAlbumTracks } from "@/features/album/queries";
-import { SpotifyAlbum, SpotifyTrack } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
-import Link from "next/link";
+import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
+import { AppleMusicAlbum, AppleMusicTrack } from "@/types/apple-music";
+import { useParams } from "next/navigation";
 
-interface TrackListProps {
-  album: SpotifyAlbum;
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-album.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
 }
 
-export const TrackList = ({ album }: TrackListProps) => {
-  const albumImage = getSafeImageUrl(album.images, "sm");
+interface TrackListProps {
+  album: AppleMusicAlbum;
+  textColor1?: string;
+  textColor2?: string;
+}
 
-  // 앨범 트랙을 React Query로 가져오기 - 앨범 내 트랙이 있으면 해당 데이터를 우선 사용
-  const { data: tracksData, isLoading } = useAlbumTracks(album.id, 50);
+export const TrackList = ({
+  album,
+  textColor1 = "#ffffff",
+  textColor2 = "#ffffff",
+}: TrackListProps) => {
+  const albumImage = getAppleMusicImageUrl(album.attributes.artwork, "sm");
+  const params = useParams();
+  const albumId = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  // 앨범 트랙을 React Query로 가져오기 - ID 기반
+  const { data: tracksData = [], isLoading } = useAlbumTracks(albumId || "");
 
   // 앨범 객체 내의, API 응답으로 가져온 트랙 데이터 합치기 (둘 중 더 많은 데이터 사용)
   const tracks =
-    album.tracks?.items && album.tracks.items.length > 0
-      ? album.tracks.items // 앨범 객체 내 트랙 데이터 사용
-      : tracksData?.items || []; // API로 가져온 트랙 데이터 사용
+    album.relationships?.tracks?.data &&
+    album.relationships.tracks.data.length > 0
+      ? album.relationships.tracks.data // 앨범 객체 내 트랙 데이터 사용
+      : tracksData; // API로 가져온 트랙 데이터 사용
+
+  const { playTrack } = useMusicPlayer();
 
   if (isLoading && tracks.length === 0) {
     return (
-      <section className="bg-card-bg rounded-lg py-5">
-        <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
-        <div className="p-4 text-center text-text-secondary">
-          트랙 로딩 중...
-        </div>
-      </section>
+      <div className="p-4 text-center" style={{ color: textColor2 }}>
+        트랙 로딩 중...
+      </div>
     );
   }
 
   return (
-    <section className="bg-card-bg rounded-lg py-5">
-      <h2 className="text-lg font-bold mb-4">트랙 목록</h2>
-      <div>
-        <div className="flex items-center gap-2 py-2 text-text-secondary text-sm">
-          <div className="w-8 text-center shrink-0">#</div>
-          <div className="flex-grow min-w-0">제목</div>
-          <div className="hidden md:block w-1/4 min-w-0">아티스트</div>
-          <div className="text-right w-10 shrink-0">시간</div>
-        </div>
-        {tracks.map((track: SpotifyTrack, index: number) => (
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
+      <div className="space-y-4">
+        {tracks.map((track: AppleMusicTrack, index: number) => (
           <div
-            key={track.id}
-            className="flex items-center gap-2 py-2 hover:bg-gray-700/10 transition-colors group"
+            key={`album-track-${track.id}`}
+            className="group flex items-center gap-3 rounded-lg hover:bg-white/5 transition-colors"
           >
-            <div className="w-8 text-center text-text-secondary shrink-0">
-              <span>{index + 1}</span>
-            </div>
-            <div className="w-10 h-10 shrink-0">
-              <UnoptimizedImage
-                src={albumImage}
-                alt={album.name}
-                width={40}
-                height={40}
-                className="rounded-md"
-              />
-            </div>
-            <div className="flex-grow min-w-0">
-              <Link
-                href={`/track/${track.id}`}
-                className="hover:text-primary line-clamp-2"
+            <button
+              onClick={() => {
+                playTrack(track);
+              }}
+              className="relative w-12 h-12 rounded-2xl overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0"
+            >
+              <div className="w-12 h-12 shrink-0">
+                <UnoptimizedImage
+                  src={albumImage}
+                  alt={album.attributes.name}
+                  width={48}
+                  height={48}
+                  className="rounded-2xl"
+                />
+              </div>
+            </button>
+            <button
+              onClick={() => {
+                playTrack(track);
+              }}
+              className="flex-1 min-w-0 text-left"
+            >
+              <h3
+                className="font-medium text-sm truncate group-hover:opacity-80 transition-colors"
+                style={{ color: textColor1 }}
               >
-                {track.name}
-              </Link>
-            </div>
-            <div className="hidden md:block w-1/4 text-text-secondary line-clamp-1 min-w-0">
-              {track.artists.map((artist, idx) => (
-                <span key={artist.id}>
-                  <Link
-                    href={`/artist/${artist.id}`}
-                    className="hover:text-primary"
-                  >
-                    {artist.name}
-                  </Link>
-                  {idx < track.artists.length - 1 && ", "}
-                </span>
-              ))}
-            </div>
-            <div className="text-right w-10 text-text-secondary shrink-0">
-              {Math.floor(track.duration_ms / 60000)}:
-              {(Math.floor(track.duration_ms / 1000) % 60)
-                .toString()
-                .padStart(2, "0")}
-            </div>
+                {track.attributes.name}
+              </h3>
+            </button>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 };

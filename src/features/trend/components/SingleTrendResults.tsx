@@ -1,16 +1,20 @@
 "use client";
 
 import { TrendTab } from "@/features/trend/TrendPage";
-import { SpotifyAlbum, SpotifyArtist, SpotifyTrack } from "@/types/spotify";
+import {
+  AppleMusicAlbum,
+  AppleMusicArtist,
+  AppleMusicTrack,
+} from "@/types/apple-music";
 import AlbumGrid from "./AlbumGrid";
 import ArtistGrid from "./ArtistGrid";
 import TrackGrid from "./TrackGrid";
 
 interface SingleTrendResultsProps {
   trendType: TrendTab;
-  artists: SpotifyArtist[];
-  tracks: SpotifyTrack[];
-  albums: SpotifyAlbum[];
+  artists: AppleMusicArtist[];
+  tracks: AppleMusicTrack[];
+  albums: AppleMusicAlbum[];
   isLoadingArtists: boolean;
   isLoadingTracks: boolean;
   isLoadingAlbums: boolean;
@@ -31,7 +35,7 @@ export function SingleTrendResults({
   }
 
   return (
-    <div>
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
       {trendType === "artist" && (
         <ArtistGrid artists={artists} isLoading={isLoadingArtists} />
       )}

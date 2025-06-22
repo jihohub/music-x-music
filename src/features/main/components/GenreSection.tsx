@@ -2,36 +2,44 @@
 
 import Link from "next/link";
 
-// 장르 데이터
+// 미니멀한 장르 데이터
 const genres = [
-  { id: "pop", name: "팝", color: "#E8115B" },
-  { id: "hiphop", name: "힙합", color: "#F230AA" },
-  { id: "kpop", name: "케이팝", color: "#1DB954" },
-  { id: "rnb", name: "R&B", color: "#BA5DE8" },
-  { id: "indie", name: "인디", color: "#148A08" },
-  { id: "rock", name: "록", color: "#BC5900" },
-  { id: "electronic", name: "일렉트로닉", color: "#509BF5" },
-  { id: "classical", name: "클래식", color: "#7D4B32" },
+  { id: "pop", name: "Pop", gradient: "from-slate-600/60 to-slate-700/60" },
+  {
+    id: "hiphop",
+    name: "Hip Hop",
+    gradient: "from-slate-600/60 to-slate-700/60",
+  },
+  { id: "kpop", name: "K-Pop", gradient: "from-slate-600/60 to-slate-700/60" },
+  { id: "rnb", name: "R&B", gradient: "from-slate-600/60 to-slate-700/60" },
+  { id: "indie", name: "Indie", gradient: "from-slate-600/60 to-slate-700/60" },
+  { id: "rock", name: "Rock", gradient: "from-slate-600/60 to-slate-700/60" },
+  {
+    id: "electronic",
+    name: "Electronic",
+    gradient: "from-slate-600/60 to-slate-700/60",
+  },
+  {
+    id: "classical",
+    name: "Classical",
+    gradient: "from-slate-600/60 to-slate-700/60",
+  },
 ];
 
 export const GenreSection = () => {
   return (
-    <section>
-      <div className="flex-between mb-4">
-        <h2 className="text-xl font-bold">장르</h2>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {genres.map((genre) => (
-          <Link
-            href={`/genre/${genre.id}`}
-            key={genre.id}
-            className="rounded-md p-4 h-24 flex items-center justify-center"
-            style={{ backgroundColor: genre.color }}
-          >
-            <span className="text-white font-bold text-lg">{genre.name}</span>
-          </Link>
-        ))}
-      </div>
-    </section>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {genres.map((genre) => (
+        <Link
+          href={`/search?q=${encodeURIComponent(genre.name)}`}
+          key={genre.id}
+          className={`backdrop-blur-sm bg-gradient-to-br ${genre.gradient} border border-white/10 rounded-xl p-4 h-20 flex items-center justify-center hover:bg-white/10 transition-all duration-200 group`}
+        >
+          <span className="text-white font-medium text-sm text-center">
+            {genre.name}
+          </span>
+        </Link>
+      ))}
+    </div>
   );
 };

@@ -1,98 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { SearchType } from "../queries/searchSpotify";
+import { SearchType } from "../hooks/useSearchPageLogic";
 
 interface NoResultsProps {
   searchTerm: string;
   searchType: SearchType;
   isLoading?: boolean;
-  delay?: number; // 표시 지연 시간 (ms)
 }
 
 export function NoResults({
   searchTerm,
   searchType,
   isLoading = false,
-  delay = 1000, //  1000ms(
 }: NoResultsProps) {
-  const [showNoResults, setShowNoResults] = useState(false);
+  if (isLoading) return null;
 
-  // 지연 시간 후에만 결과 없음 메시지 표시
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    // 조건이 충족되면 타이머 설정
-    if (!isLoading && searchTerm && searchTerm.trim().length >= 2) {
-      timer = setTimeout(() => {
-        setShowNoResults(true);
-      }, delay);
-    } else {
-      // 검색어가 변경되거나 로딩 상태가 변경되면 상태 초기화
-      setShowNoResults(false);
-    }
-
-    // 클린업 함수
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [searchTerm, isLoading, delay]);
-
-  // 지연 시간 이전이거나 필요한 조건이 충족되지 않으면 표시하지 않음
-  if (
-    isLoading ||
-    !searchTerm ||
-    searchTerm.trim().length < 2 ||
-    !showNoResults
-  ) {
-    return null;
-  }
+  const typeLabels = {
+    all: "전체",
+    artist: "아티스트",
+    track: "트랙",
+    album: "앨범",
+  };
 
   return (
-    <div className="text-center py-8">
-      {searchType === "artist" && (
-        <>
-          <p className="text-lg text-text-secondary">
-            "{searchTerm}"에 대한 아티스트 검색 결과가 없습니다.
-          </p>
-          <p className="text-sm text-text-secondary mt-2">
-            다른 키워드로 검색하거나 다른 카테고리를 선택해보세요.
-          </p>
-        </>
-      )}
-
-      {searchType === "track" && (
-        <>
-          <p className="text-lg text-text-secondary">
-            "{searchTerm}"에 대한 트랙 검색 결과가 없습니다.
-          </p>
-          <p className="text-sm text-text-secondary mt-2">
-            다른 키워드로 검색하거나 다른 카테고리를 선택해보세요.
-          </p>
-        </>
-      )}
-
-      {searchType === "album" && (
-        <>
-          <p className="text-lg text-text-secondary">
-            "{searchTerm}"에 대한 앨범 검색 결과가 없습니다.
-          </p>
-          <p className="text-sm text-text-secondary mt-2">
-            다른 키워드로 검색하거나 다른 카테고리를 선택해보세요.
-          </p>
-        </>
-      )}
-
-      {searchType === "all" && (
-        <>
-          <p className="text-lg text-text-secondary">
-            "{searchTerm}"에 대한 검색 결과가 없습니다.
-          </p>
-          <p className="text-sm text-text-secondary mt-2">
-            다른 키워드로 검색해보세요.
-          </p>
-        </>
-      )}
+    <div className="text-center py-12">
+      <div className="mb-4">
+        <svg
+          className="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        검색 결과가 없습니다
+      </h3>
+      <p className="text-gray-500 dark:text-gray-400">
+        "{searchTerm}" 에 대한 {typeLabels[searchType]} 검색 결과를 찾을 수
+        없습니다.
+      </p>
+      <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+        다른 검색어를 시도해보세요.
+      </p>
     </div>
   );
 }

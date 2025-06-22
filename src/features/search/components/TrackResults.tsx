@@ -1,105 +1,127 @@
 "use client";
 
 import UnoptimizedImage from "@/components/common/UnoptimizedImage";
-import { SpotifyTrack } from "@/types/spotify";
-import { getSafeImageUrl } from "@/utils/image";
-import Link from "next/link";
+import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
+import { AppleMusicTrack } from "@/types/apple-music";
+import React from "react";
+
+// Apple Music 이미지 URL 생성 함수
+function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "sm" | "md" | "lg" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder-track.jpg";
+  }
+
+  const sizeMap = {
+    sm: "300x300",
+    md: "640x640",
+    lg: "1200x1200",
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}
 
 interface TrackResultsProps {
-  tracks: SpotifyTrack[];
+  tracks: AppleMusicTrack[];
   limit?: number;
-  showMoreLink?: boolean;
-  onShowMore?: () => void;
   isLoading?: boolean;
+  context?: string; // 렌더링 컨텍스트를 구분하기 위한 props
+  isFeatured?: boolean;
 }
 
 export const TrackResults = ({
   tracks,
   limit,
-  showMoreLink = false,
-  onShowMore,
   isLoading = false,
+  context = "search", // 기본값 설정
+  isFeatured = false,
 }: TrackResultsProps) => {
-  if (tracks.length === 0 && !isLoading) return null;
-  // 전체 탭에서는 4개, 각 탭에서는 8개씩 표시
-  const itemLimit = showMoreLink ? 4 : 8;
+  const { playTrack } = useMusicPlayer();
 
-  // 스켈레톤 UI
-  if (isLoading) {
+  // 컴포넌트 마운트 시점의 고유 ID 생성
+  const componentId = React.useMemo(
+    () => Math.random().toString(36).substr(2, 9),
+    []
+  );
+
+  if (tracks.length === 0 && !isLoading) return null;
+
+  // Featured 모드 스켈레톤 UI
+  if (isLoading && isFeatured) {
     return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div
-            className="h-7 w-20 rounded"
-            style={{ backgroundColor: "var(--skeleton-bg)" }}
-          ></div>
-          {showMoreLink && (
-            <div
-              className="h-5 w-12 mr-2 rounded"
-              style={{ backgroundColor: "var(--skeleton-bg)" }}
-            ></div>
-          )}
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Array.from({ length: itemLimit }).map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div
-                className="aspect-square overflow-hidden rounded-sm bg-card-bg relative w-full"
-                style={{ backgroundColor: "var(--skeleton-bg)" }}
-              />
-              <div
-                className="mt-2 h-5 rounded w-[85%]"
-                style={{ backgroundColor: "var(--skeleton-bg)" }}
-              />
-              <div
-                className="h-4 mt-1 rounded w-[65%]"
-                style={{ backgroundColor: "var(--skeleton-bg)" }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+      <>
+        <style>
+          {`
+            .track-featured-skeleton {
+              min-height: 290px;
+            }
+            @media (min-width: 768px) {
+              .track-featured-skeleton {
+                min-height: 354px;
+              }
+            }
+          `}
+        </style>
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl animate-pulse track-featured-skeleton"></div>
+      </>
+    );
+  }
+
+  // 일반 스켈레톤 UI
+  if (isLoading) {
+    // 전체 탭(basic)에서는 4개 트랙에 맞는 높이, 개별 탭에서는 화면 높이
+    const skeletonHeight = context === "basic" ? "250px" : "70vh";
+
+    return (
+      <div
+        className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl animate-pulse"
+        style={{ minHeight: skeletonHeight }}
+      ></div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">트랙</h2>
-        {showMoreLink && (
-          <Link
-            href="/search?type=track"
-            className="text-primary hover:text-primary/80 hover:underline text-sm font-medium px-3 py-1 rounded transition-all duration-200"
-            onClick={(e) => {
-              if (onShowMore) {
-                e.preventDefault();
-                onShowMore();
-              }
-            }}
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
+      <div className="space-y-4">
+        {tracks.map((track, index) => (
+          <div
+            key={`${context}-${componentId}-track-${track.id}-${index}`}
+            className="group flex items-center gap-3 md:gap-4 rounded-lg hover:bg-white/5 transition-colors"
           >
-            더 보기
-          </Link>
-        )}
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {tracks.map((track) => (
-          <Link href={`/track/${track.id}`} key={track.id} className="group">
-            <div className="overflow-hidden rounded-sm aspect-square relative bg-card-bg">
+            <button
+              onClick={() => {
+                playTrack(track);
+              }}
+              className="relative w-12 h-12 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0"
+            >
               <UnoptimizedImage
-                src={getSafeImageUrl(track.album?.images, "md")}
-                alt={track.name}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                className="object-cover"
+                src={getAppleMusicImageUrl(track.attributes.artwork, "sm")}
+                alt={track.attributes.albumName || track.attributes.name}
+                width={64}
+                height={64}
+                className="rounded-2xl"
               />
-            </div>
-            <div className="mt-2">
-              <h3 className="text-sm font-semibold truncate">{track.name}</h3>
-            </div>
-            <p className="text-sm text-text-secondary truncate">
-              {track.artists.map((a) => a.name).join(", ")}
-            </p>
-          </Link>
+            </button>
+
+            <button
+              onClick={() => {
+                playTrack(track);
+              }}
+              className="flex-1 min-w-0 text-left"
+            >
+              <h3 className="font-medium text-sm md:text-base truncate group-hover:text-primary transition-colors text-white">
+                {track.attributes.name}
+              </h3>
+              <p className="text-xs md:text-sm text-white/70 truncate">
+                {track.attributes.albumName}
+                {track.attributes.releaseDate && (
+                  <span> • {track.attributes.releaseDate.split("-")[0]}</span>
+                )}
+              </p>
+            </button>
+          </div>
         ))}
       </div>
     </div>
