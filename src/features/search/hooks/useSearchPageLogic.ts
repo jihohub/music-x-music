@@ -38,13 +38,14 @@ const processInfiniteSearchResults = (pages: AppleMusicSearchResult[]) => {
 const popularSearches = [
   "Taylor Swift",
   "Bruno Mars",
-  "Dua Lipa",
+  "Kendrick Lamar",
   "The Weeknd",
   "Billie Eilish",
   "Coldplay",
   "Ariana Grande",
-  "Kendrick Lamar",
-  "The Weeknd",
+  "Dua Lipa",
+  "Lil Wayne",
+  "Addison Rae",
 ];
 
 export function useSearchPageLogic() {

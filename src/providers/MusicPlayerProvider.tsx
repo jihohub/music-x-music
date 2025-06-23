@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 // MusicKit 타입 정의
 declare global {
@@ -39,6 +40,7 @@ interface MusicPlayerContextType {
   duration: number;
   isUsingMusicKit: boolean;
   isFullScreen: boolean;
+  isExpanded: boolean; // 데스크탑 확장 상태
   audioRef: React.RefObject<HTMLAudioElement | null>;
   playTrack: (track: AppleMusicTrack) => void;
   togglePlayback: () => void;
@@ -47,6 +49,8 @@ interface MusicPlayerContextType {
   closePlayer: () => void;
   expandPlayer: () => void;
   collapsePlayer: () => void;
+  toggleExpanded: () => void; // 데스크탑 확장/축소 토글
+  maximizePlayer: () => void; // 전체화면으로 전환
   getCurrentTrackTextColor: () => string;
   setPageTextColor: (color: string) => void;
   getPageTextColor: () => string;
@@ -71,9 +75,17 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   const [duration, setDuration] = useState(0);
   const [isUsingMusicKit, setIsUsingMusicKit] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // 데스크탑 확장 상태
   const [pageTextColor, setPageTextColor] = useState("#ffffff");
   const audioRef = useRef<HTMLAudioElement>(null);
   const musicKitRef = useRef<any>(null);
+
+  // 모바일 재생 상태 보존을 위한 백업
+  const audioStateRef = useRef<{
+    src: string;
+    currentTime: number;
+    isPlaying: boolean;
+  }>({ src: "", currentTime: 0, isPlaying: false });
 
   // MusicKit 권한 확인 (로그인이 되어있고 명시적으로 권한이 있을 때만)
   const checkMusicKitAuth = () => {
@@ -156,6 +168,13 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
       // HTML5 Audio (프리뷰)
       if (!audioRef.current) return;
 
+      // 상태 백업
+      audioStateRef.current = {
+        src: audioRef.current.src,
+        currentTime: audioRef.current.currentTime,
+        isPlaying: !isPlaying,
+      };
+
       if (isPlaying) {
         audioRef.current.pause();
       } else {
@@ -222,7 +241,45 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
 
   const collapsePlayer = () => {
     setIsFullScreen(false);
+    setIsExpanded(false); // 전체화면 해제 시 확장도 해제
   };
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+    setIsFullScreen(false); // 확장 토글 시 전체화면 해제
+  };
+
+  const maximizePlayer = () => {
+    setIsFullScreen(true);
+    setIsExpanded(false); // 전체화면 전환 시 확장 해제
+  };
+
+  // Audio 요소 상태 복원 (모바일 대응)
+  useEffect(() => {
+    if (!audioRef.current || isUsingMusicKit) return;
+
+    const audio = audioRef.current;
+    const backup = audioStateRef.current;
+
+    // 백업된 상태가 있고 현재 트랙과 일치하면 복원
+    if (backup.src && audio.src !== backup.src && currentTrack) {
+      const previewUrl = currentTrack.attributes.previews?.[0]?.url;
+      if (
+        previewUrl &&
+        backup.src.includes(previewUrl.split("/").pop() || "")
+      ) {
+        console.log("모바일: Audio 상태 복원 중...");
+        audio.src = backup.src;
+        audio.currentTime = backup.currentTime;
+
+        if (backup.isPlaying) {
+          audio.play().catch((error) => {
+            console.error("상태 복원 중 재생 실패:", error);
+          });
+        }
+      }
+    }
+  }, [audioRef.current, currentTrack, isUsingMusicKit]);
 
   // MusicKit 이벤트 리스너 (권한이 있을 때만)
   useEffect(() => {
@@ -302,6 +359,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         duration,
         isUsingMusicKit,
         isFullScreen,
+        isExpanded,
         audioRef,
         playTrack,
         togglePlayback,
@@ -310,6 +368,8 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         closePlayer,
         expandPlayer,
         collapsePlayer,
+        toggleExpanded,
+        maximizePlayer,
         getCurrentTrackTextColor,
         setPageTextColor,
         getPageTextColor: () => pageTextColor,
@@ -317,66 +377,81 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
       }}
     >
       {children}
-      {/* HTML5 Audio for preview playback */}
-      <audio
-        ref={audioRef}
-        onPlay={() => {
-          if (!isUsingMusicKit) {
-            setIsPlaying(true);
-            console.log("HTML5 Audio: 재생 시작");
-          }
-        }}
-        onPause={() => {
-          if (!isUsingMusicKit) {
-            setIsPlaying(false);
-            console.log("HTML5 Audio: 재생 일시정지");
-          }
-        }}
-        onTimeUpdate={(e) => {
-          if (!isUsingMusicKit) {
-            const audio = e.target as HTMLAudioElement;
-            const currentTime = audio.currentTime;
-            const duration = audio.duration;
-            setCurrentTime(currentTime);
+      {/* HTML5 Audio를 Portal로 body에 마운트 (페이지 변경에 영향받지 않음) */}
+      {typeof window !== "undefined" &&
+        createPortal(
+          <audio
+            ref={audioRef}
+            onPlay={() => {
+              if (!isUsingMusicKit) {
+                setIsPlaying(true);
+                console.log("HTML5 Audio: 재생 시작");
+              }
+            }}
+            onPause={() => {
+              if (!isUsingMusicKit) {
+                setIsPlaying(false);
+                console.log("HTML5 Audio: 재생 일시정지");
+              }
+            }}
+            onTimeUpdate={(e) => {
+              if (!isUsingMusicKit) {
+                const audio = e.target as HTMLAudioElement;
+                const currentTime = audio.currentTime;
+                const duration = audio.duration;
+                setCurrentTime(currentTime);
 
-            // 재생 완료 감지 (시간이 끝에 도달했을 때)
-            if (Math.abs(currentTime - duration) < 0.1 && duration > 0) {
-              setIsPlaying(false);
-              setCurrentTime(duration);
-            }
-          }
-        }}
-        onLoadedMetadata={(e) => {
-          if (!isUsingMusicKit) {
-            const audio = e.target as HTMLAudioElement;
-            setDuration(audio.duration);
-            console.log(
-              "HTML5 Audio: 메타데이터 로드됨, 길이:",
-              audio.duration
-            );
-          }
-        }}
-        onCanPlay={() => {
-          if (!isUsingMusicKit && audioRef.current) {
-            console.log("HTML5 Audio: 재생 준비됨");
-          }
-        }}
-        onEnded={() => {
-          if (!isUsingMusicKit) {
-            setIsPlaying(false);
-            setCurrentTime(duration);
-            console.log("HTML5 Audio: 재생 완료");
-          }
-        }}
-        onError={(e) => {
-          console.error("HTML5 Audio 재생 오류:", e);
-          if (!isUsingMusicKit) {
-            setIsPlaying(false);
-          }
-        }}
-        preload="metadata"
-        crossOrigin="anonymous"
-      />
+                // 재생 완료 감지 (시간이 끝에 도달했을 때)
+                if (Math.abs(currentTime - duration) < 0.1 && duration > 0) {
+                  setIsPlaying(false);
+                  setCurrentTime(duration);
+                }
+              }
+            }}
+            onLoadedMetadata={(e) => {
+              if (!isUsingMusicKit) {
+                const audio = e.target as HTMLAudioElement;
+                setDuration(audio.duration);
+                console.log(
+                  "HTML5 Audio: 메타데이터 로드됨, 길이:",
+                  audio.duration
+                );
+              }
+            }}
+            onCanPlay={() => {
+              if (!isUsingMusicKit && audioRef.current) {
+                console.log("HTML5 Audio: 재생 준비됨");
+              }
+            }}
+            onEnded={() => {
+              if (!isUsingMusicKit) {
+                setIsPlaying(false);
+                setCurrentTime(duration);
+                console.log("HTML5 Audio: 재생 완료");
+              }
+            }}
+            onError={(e) => {
+              console.error("HTML5 Audio 재생 오류:", e);
+              if (!isUsingMusicKit) {
+                setIsPlaying(false);
+              }
+            }}
+            onSuspend={() => {
+              // 모바일에서 Suspense 경계로 인한 중단 방지
+              console.log("HTML5 Audio: 일시 중단됨 (모바일 대응)");
+            }}
+            onStalled={() => {
+              // 네트워크 지연으로 인한 중단 방지
+              console.log("HTML5 Audio: 네트워크 지연");
+            }}
+            preload="metadata"
+            crossOrigin="anonymous"
+            playsInline // iOS에서 인라인 재생 허용
+            muted={false} // 음소거 해제
+            style={{ display: "none" }} // 화면에 보이지 않게
+          />,
+          document.body
+        )}
     </MusicPlayerContext.Provider>
   );
 }
