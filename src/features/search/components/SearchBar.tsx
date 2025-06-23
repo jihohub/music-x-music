@@ -32,7 +32,14 @@ export const SearchBar = ({
   // 폼 제출 핸들러
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSubmit) {
+    if (onSubmit && searchTerm.trim().length >= 2) {
+      onSubmit();
+    }
+  };
+
+  // 검색 버튼 클릭 핸들러
+  const handleSearchButtonClick = () => {
+    if (onSubmit && searchTerm.trim().length >= 2) {
       onSubmit();
     }
   };
@@ -55,10 +62,19 @@ export const SearchBar = ({
         {/* 검색 입력 컨텐츠 */}
         <div className="relative px-4 py-2.5 md:px-6 md:py-4">
           <div className="flex items-center">
-            <IoSearchOutline
-              size={18}
-              className="text-white/80 mr-2.5 md:mr-3 flex-shrink-0 md:size-5"
-            />
+            <button
+              type="button"
+              className={`mr-2.5 md:mr-3 flex-shrink-0 p-1 rounded-full transition-all duration-200 ${
+                searchTerm.trim().length >= 2
+                  ? "text-white hover:bg-white/20 cursor-pointer"
+                  : "text-white/50 cursor-not-allowed"
+              }`}
+              onClick={handleSearchButtonClick}
+              disabled={searchTerm.trim().length < 2}
+              aria-label="검색"
+            >
+              <IoSearchOutline size={18} className="md:size-5" />
+            </button>
             <input
               ref={inputRef}
               type="text"

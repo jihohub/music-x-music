@@ -27,75 +27,61 @@ interface AlbumHeaderProps {
 }
 
 export const AlbumHeader = ({ album }: AlbumHeaderProps) => {
-  // 이미지 URL 가져오기
-  const albumImage = getAppleMusicImageUrl(album.attributes.artwork, "md");
-
-  // 배경색 가져오기
-  const bgColor = album.attributes.artwork?.bgColor
-    ? `#${album.attributes.artwork.bgColor}`
-    : "#1c1c1e";
-
-  // 텍스트 색상 가져오기 (API에서 제공하는 색상 사용)
-  const textColor1 = album.attributes.artwork?.textColor1
-    ? `#${album.attributes.artwork.textColor1}`
-    : "#ffffff";
-
-  const textColor2 = album.attributes.artwork?.textColor2
-    ? `#${album.attributes.artwork.textColor2}`
-    : "#ffffff";
+  const albumImage = getAppleMusicImageUrl(album.attributes.artwork, "lg");
 
   return (
-    <section className="px-4 pt-8" style={{ backgroundColor: bgColor }}>
-      {/* 가로로 긴 투명 컨테이너 */}
-      <div className="relative mx-auto">
-        <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl">
-          {/* 가로 배치 컨텐츠 */}
-          <div className="flex items-center gap-6 md:gap-8">
-            {/* 앨범 이미지 */}
-            <div className="relative flex-shrink-0">
-              <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-xl">
-                <UnoptimizedImage
-                  src={albumImage}
-                  alt={album.attributes.name}
-                  fill
-                  sizes="(max-width: 768px) 80px, 128px"
-                  className="object-cover"
-                />
-              </div>
-            </div>
+    <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
+      {/* 확대된 앨범 이미지 (블러된 배경) */}
+      <div className="absolute inset-0 scale-150">
+        <UnoptimizedImage
+          src={albumImage}
+          alt={album.attributes.name}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+      </div>
 
-            {/* 텍스트 정보 */}
-            <div className="flex-1 min-w-0">
-              <h1
-                className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight"
-                style={{ color: textColor1 }}
+      {/* 매우 강한 블러 효과 (더 밝게) */}
+      <div className="absolute inset-0 backdrop-blur-3xl bg-white/5"></div>
+
+      {/* 원본 이미지 (상단 80px 떨어짐, 아이폰 곡률 border-top) */}
+      <div
+        className="absolute left-0 right-0 top-20 bottom-0 rounded-t-3xl overflow-hidden"
+        style={{ borderTopLeftRadius: "24px", borderTopRightRadius: "24px" }}
+      >
+        <UnoptimizedImage
+          src={albumImage}
+          alt={album.attributes.name}
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+
+        {/* 텍스트 오버레이 */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight drop-shadow-lg">
+            {album.attributes.name}
+          </h1>
+
+          {/* 아티스트명 태그 */}
+          <div className="flex flex-wrap gap-2">
+            {album.relationships?.artists?.data?.[0] ? (
+              <Link
+                href={`/artist/${album.relationships.artists.data[0].id}`}
+                className="px-3 py-1 text-sm font-medium text-white bg-white/25 backdrop-blur-sm rounded-full border border-white/40 hover:bg-white/35 transition-colors"
               >
-                {album.attributes.name}
-              </h1>
-
-              {/* 아티스트명 태그 */}
-              <div className="flex flex-wrap gap-2">
-                {album.relationships?.artists?.data?.[0] ? (
-                  <Link
-                    href={`/artist/${album.relationships.artists.data[0].id}`}
-                    className="px-3 py-1 text-sm font-medium bg-white/20 backdrop-blur-sm rounded-full border border-white/30 hover:bg-white/30 transition-colors"
-                    style={{ color: textColor2 }}
-                  >
-                    {album.attributes.artistName}
-                  </Link>
-                ) : (
-                  <span
-                    className="px-3 py-1 text-sm font-medium bg-white/20 backdrop-blur-sm rounded-full border border-white/30"
-                    style={{ color: textColor2 }}
-                  >
-                    {album.attributes.artistName}
-                  </span>
-                )}
-              </div>
-            </div>
+                {album.attributes.artistName}
+              </Link>
+            ) : (
+              <span className="px-3 py-1 text-sm font-medium text-white bg-white/25 backdrop-blur-sm rounded-full border border-white/40">
+                {album.attributes.artistName}
+              </span>
+            )}
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
