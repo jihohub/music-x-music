@@ -70,8 +70,8 @@ export default function Footer() {
   return (
     <>
       {/* 모바일: 하단 플로팅 네비게이션 */}
-      <footer className="fixed bottom-[4vh] left-[4vw] right-[4vw] z-50 flex justify-center md:hidden">
-        <div className="relative w-[84vw] max-w-md mx-auto">
+      <footer className="fixed bottom-4 left-4 right-4 z-50 flex justify-center md:hidden">
+        <div className="relative w-full max-w-md mx-auto">
           {/* 리퀴드글래스 배경 - 둥근 사각형 형태 */}
           <div
             className="absolute inset-0 backdrop-blur-2xl bg-gradient-to-br from-white/10 via-white/5 to-black/15 border border-white/10 shadow-2xl"

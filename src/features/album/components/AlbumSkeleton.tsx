@@ -16,32 +16,34 @@ export const AlbumSkeleton = ({
     >
       <div className="max-w-4xl mx-auto">
         <div className="md:pt-16">
-          {/* 헤더 영역 - 실제와 동일한 구조 */}
-          <section className="px-4 pt-8" style={{ backgroundColor: bgColor }}>
-            <div className="relative mx-auto">
-              <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl animate-pulse">
-                {/* 실제와 동일한 내부 구조 - 높이 확보용 */}
-                <div className="flex items-center gap-6 md:gap-8">
-                  {/* 이미지 영역 */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl"></div>
-                  </div>
+          {/* 새로운 헤더 스켈레톤 */}
+          <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden animate-pulse">
+            {/* 블러된 배경 스켈레톤 */}
+            <div className="absolute inset-0 bg-gray-300 opacity-30"></div>
 
-                  {/* 텍스트 정보 영역 */}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-2xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 leading-tight">
-                      &nbsp;
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1 text-sm font-medium rounded-full">
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      </span>
-                    </div>
-                  </div>
+            {/* 블러 효과 */}
+            <div className="absolute inset-0 backdrop-blur-3xl bg-white/5"></div>
+
+            {/* 본 이미지 영역 스켈레톤 */}
+            <div
+              className="absolute left-0 right-0 top-20 bottom-0 rounded-t-3xl overflow-hidden bg-gray-400 opacity-40"
+              style={{
+                borderTopLeftRadius: "24px",
+                borderTopRightRadius: "24px",
+              }}
+            >
+              {/* 텍스트 오버레이 영역 */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
+                {/* 앨범명 스켈레톤 */}
+                <div className="h-8 md:h-10 bg-gray-300 rounded opacity-60 mb-2 w-56"></div>
+
+                {/* 아티스트명 태그 스켈레톤 */}
+                <div className="flex gap-2">
+                  <div className="h-6 bg-gray-300 rounded-full opacity-50 w-24"></div>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         </div>
 
         {/* 컨텐츠 영역 */}
