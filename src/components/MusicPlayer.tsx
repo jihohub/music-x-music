@@ -634,7 +634,7 @@ export default memo(function MusicPlayer() {
   return (
     <>
       {/* 모바일용 미니 플레이어 */}
-      <div className="md:hidden fixed bottom-[calc(4vh+5rem)] left-0 right-0 z-50 transition-all duration-500 ease-out">
+      <div className="md:hidden fixed bottom-24 left-0 right-0 z-50 transition-all duration-500 ease-out">
         <div className="w-[75vw] max-w-md mx-auto">
           <div
             key={`mini-player-mobile-${currentTrack?.id || "no-track"}`}
