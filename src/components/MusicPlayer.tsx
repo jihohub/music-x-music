@@ -3,6 +3,7 @@
 import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
 import { memo, useEffect, useState } from "react";
 import {
+  IoExpand,
   IoPauseSharp,
   IoPlayBackSharp,
   IoPlayForwardSharp,
@@ -66,6 +67,7 @@ export default memo(function MusicPlayer() {
     duration,
     isUsingMusicKit,
     isFullScreen,
+    isExpanded,
     audioRef,
     togglePlayback,
     seekTo,
@@ -73,24 +75,45 @@ export default memo(function MusicPlayer() {
     closePlayer,
     expandPlayer,
     collapsePlayer,
+    toggleExpanded,
+    maximizePlayer,
     getWidgetTextColor,
   } = useMusicPlayer();
 
   const [isLiked, setIsLiked] = useState(false);
-  const [dominantColor, setDominantColor] = useState("#1c1c1e"); // hex 코드 그대로 사용
+  const [dominantColor, setDominantColor] = useState("#1c1c1e");
 
-  // 드래그 상태 관리
+  // 드래그 상태 관리 (모바일용)
   const [isDragging, setIsDragging] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
+
+  // 애니메이션 전환 상태 관리
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [animationState, setAnimationState] = useState<
+    "mini" | "expanded" | "full" | "hidden"
+  >("hidden");
 
   // 드래그 임계값
   const closeThreshold =
     typeof window !== "undefined" ? window.innerHeight * 0.33 : 200;
   const maxDrag = typeof window !== "undefined" ? window.innerHeight : 600;
 
-  // 터치 이벤트 핸들러
+  // 배경 스크롤 차단
+  useEffect(() => {
+    if (isFullScreen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isFullScreen]);
+
+  // 터치 이벤트 핸들러 (드래그 핸들 영역에서만 작동)
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isClosing || !isFullScreen) return;
     setIsDragging(true);
@@ -125,22 +148,17 @@ export default memo(function MusicPlayer() {
     }
   };
 
-  // 트랙이 변경될 때 audio src 업데이트 및 색상 설정
+  // 트랙이 변경될 때 색상 설정
   useEffect(() => {
-    // currentTrack이 있을 때마다 배경색 강제 설정
     if (currentTrack) {
-      // 배경색 설정 - hex 코드 그대로 사용
       if (currentTrack.attributes.artwork?.bgColor) {
         const hexColor = `#${currentTrack.attributes.artwork.bgColor}`;
         setDominantColor(hexColor);
-        console.log("배경색 적용:", hexColor);
       } else {
-        // 배경색 정보가 없으면 기본 어두운 색상 사용
         setDominantColor("#1c1c1e");
-        console.log("기본 배경색 사용: #1c1c1e");
       }
 
-      // 오디오 소스 설정 (프리뷰 모드용)
+      // 오디오 소스 설정
       if (audioRef.current && !isUsingMusicKit) {
         const previewUrl = currentTrack.attributes.previews?.[0]?.url;
         if (previewUrl) {
@@ -155,312 +173,96 @@ export default memo(function MusicPlayer() {
         img.src = getAppleMusicImageUrl(currentTrack.attributes.artwork, "xl");
       }
     } else {
-      // currentTrack이 없을 때도 기본 배경색으로 리셋
       setDominantColor("#1c1c1e");
-      console.log("트랙 없음 - 기본 배경색으로 리셋: #1c1c1e");
     }
   }, [currentTrack, isUsingMusicKit, audioRef]);
 
-  // 전체화면 상태 변경 시 배경색 강제 재적용
+  // 애니메이션 상태 관리
   useEffect(() => {
-    if (isFullScreen && currentTrack) {
-      // 즉시 실행하도록 수정
-      if (currentTrack.attributes.artwork?.bgColor) {
-        const hexColor = `#${currentTrack.attributes.artwork.bgColor}`;
-        setDominantColor(hexColor);
-        console.log("전체화면 전환 - 배경색 즉시 적용:", hexColor);
-      } else {
-        setDominantColor("#1c1c1e");
-        console.log("전체화면 전환 - 기본 배경색 즉시 적용: #1c1c1e");
-      }
+    if (!isPlayerVisible) {
+      setAnimationState("hidden");
+      return;
     }
-  }, [isFullScreen, currentTrack]);
+
+    const currentState: "mini" | "expanded" | "full" | "hidden" = isFullScreen
+      ? "full"
+      : isExpanded
+      ? "expanded"
+      : "mini";
+
+    if (currentState !== animationState) {
+      setIsTransitioning(true);
+      setAnimationState(currentState);
+      setTimeout(() => setIsTransitioning(false), 500);
+    }
+  }, [isPlayerVisible, isFullScreen, isExpanded, animationState]);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const hasPreview = currentTrack?.attributes.previews?.[0]?.url;
   const canPlay = isUsingMusicKit || hasPreview;
-
-  // 위젯용 텍스트 색상 (트랙 색상 우선)
   const widgetTextColor = getWidgetTextColor();
 
-  if (!isPlayerVisible || !currentTrack) return null;
+  if (!isPlayerVisible || !currentTrack || animationState === "hidden")
+    return null;
 
-  // 전체 화면 플레이어
-  if (isFullScreen) {
-    return (
-      <>
-        {/* 모바일: 전체 화면 */}
+  return (
+    <>
+      {/* 전체 화면 플레이어 - 모바일 */}
+      <div
+        className={`md:hidden fixed inset-0 z-50 flex flex-col transition-all duration-500 ease-out ${
+          animationState === "full"
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
+        style={{
+          transform: `translateY(${
+            animationState === "full" ? dragY : "100vh"
+          })`,
+          transition: isDragging
+            ? "none"
+            : "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        {/* 배경 레이어 */}
         <div
-          key={`fullscreen-player-${currentTrack?.id || "no-track"}`}
-          className="md:hidden fixed inset-0 z-50 flex flex-col"
+          className="absolute inset-0"
           style={{
-            transform: `translateY(${dragY}px)`,
-            transition: isDragging
-              ? "none"
-              : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            touchAction: "none",
+            background: `linear-gradient(180deg, 
+              ${dominantColor} 0%, 
+              ${dominantColor} 40%, 
+              #000000 100%)`,
           }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* 배경 레이어 - API 응답 색상 */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, 
-                ${dominantColor} 0%, 
-                ${dominantColor} 40%, 
-                #000000 100%)`,
-            }}
-          />
+        />
 
-          {/* 리퀴드글래스 플레이어 레이어 */}
-          <div className="relative z-10 w-full h-full flex flex-col backdrop-blur-md bg-white/5">
-            {/* 상단 네비게이션 */}
-            <div className="flex items-center justify-center p-4">
-              {/* 드래그 핸들만 중앙에 표시 */}
-              <button
-                onClick={collapsePlayer}
-                className="flex flex-col items-center justify-center py-2 px-4 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <div
-                  className={`w-10 h-1 bg-white/40 rounded-full transition-all duration-200 ${
-                    isDragging ? "bg-white/60 w-12" : ""
-                  }`}
-                ></div>
-              </button>
+        {/* 리퀴드글래스 플레이어 레이어 */}
+        <div className="relative z-10 w-full h-full flex flex-col backdrop-blur-md bg-white/5">
+          {/* 상단 네비게이션 - 드래그 핸들 */}
+          <div className="flex items-center justify-center p-4">
+            <div
+              className="flex flex-col items-center justify-center py-4 px-8 cursor-grab active:cursor-grabbing touch-manipulation"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onClick={collapsePlayer}
+            >
+              <div
+                className={`w-10 h-1 bg-white/40 rounded-full transition-all duration-200 ${
+                  isDragging ? "bg-white/60 w-12" : ""
+                }`}
+              />
             </div>
-
-            {/* 메인 컨텐츠 */}
-            <div className="flex-1 flex flex-col items-center justify-between px-6 pb-16">
-              {/* 앨범 아트 */}
-              <div className="relative mb-12">
-                <div className="w-80 h-80 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
-                  {currentTrack.attributes.artwork?.url ? (
-                    <img
-                      src={getAppleMusicImageUrl(
-                        currentTrack.attributes.artwork,
-                        "xl"
-                      )}
-                      alt={currentTrack.attributes.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const parent = e.currentTarget.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, ${addAlpha(
-                              dominantColor,
-                              0.8
-                            )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)">
-                              <div class="text-white/60">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                                </svg>
-                              </div>
-                            </div>
-                          `;
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{
-                        background: `linear-gradient(135deg, ${addAlpha(
-                          dominantColor,
-                          0.8
-                        )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)`,
-                      }}
-                    >
-                      <div className="text-white/60">
-                        <svg
-                          width="80"
-                          height="80"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 재생 중 펄스 효과 */}
-                {isPlaying && (
-                  <div
-                    className="absolute inset-0 rounded-2xl animate-pulse"
-                    style={{
-                      background: `linear-gradient(135deg, 
-                        ${addAlpha(dominantColor, 0.3)} 0%, 
-                        transparent 100%)`,
-                    }}
-                  />
-                )}
-              </div>
-
-              {/* 트랙 정보 */}
-              <div className="text-center mb-12 max-w-md">
-                <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
-                  {currentTrack.attributes.name}
-                </h1>
-                <p className="text-lg md:text-xl text-white/80">
-                  {currentTrack.attributes.artistName}
-                </p>
-              </div>
-
-              {/* 진행 바 */}
-              {canPlay && (
-                <div className="w-full max-w-md mb-8">
-                  <div className="relative">
-                    <input
-                      type="range"
-                      min="0"
-                      max={duration}
-                      value={currentTime}
-                      onChange={(e) => seekTo(Number(e.target.value))}
-                      className="w-full h-1 bg-white/30 rounded-lg appearance-none cursor-pointer slider"
-                      style={{
-                        background: `linear-gradient(to right, 
-                          ${addAlpha(dominantColor, 1)} 0%, 
-                          ${addAlpha(dominantColor, 1)} ${progress}%, 
-                          rgba(255, 255, 255, 0.3) ${progress}%, 
-                          rgba(255, 255, 255, 0.3) 100%)`,
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-white/60 mt-2">
-                    <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(duration)}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 컨트롤 버튼 */}
-              <div className="flex items-center justify-center gap-8 mb-6">
-                {/* 이전 버튼 */}
-                <button
-                  className="w-16 h-16 flex items-center justify-center text-white hover:text-white/80 transition-all duration-200 active:scale-90 hover:scale-110"
-                  onClick={() => {
-                    // 햅틱 피드백
-                    if (navigator.vibrate) {
-                      navigator.vibrate(50);
-                    }
-                  }}
-                >
-                  <IoPlayBackSharp size={32} />
-                </button>
-
-                {/* 재생/일시정지 버튼 */}
-                <button
-                  onClick={() => {
-                    // 햅틱 피드백
-                    if (navigator.vibrate) {
-                      navigator.vibrate(75);
-                    }
-                    togglePlayback();
-                  }}
-                  disabled={!canPlay}
-                  className={`w-16 h-16 flex items-center justify-center transition-all duration-200 active:scale-90 hover:scale-110 ${
-                    canPlay
-                      ? "text-white hover:text-white/80"
-                      : "text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  <div className="flex items-center justify-center w-8 h-8">
-                    {isPlaying ? (
-                      <IoPauseSharp
-                        size={32}
-                        className="transition-all duration-200"
-                      />
-                    ) : (
-                      <IoPlaySharp
-                        size={32}
-                        className="transition-all duration-200 translate-x-0.5"
-                      />
-                    )}
-                  </div>
-                </button>
-
-                {/* 다음 버튼 */}
-                <button
-                  className="w-16 h-16 flex items-center justify-center text-white hover:text-white/80 transition-all duration-200 active:scale-90 hover:scale-110"
-                  onClick={() => {
-                    // 햅틱 피드백
-                    if (navigator.vibrate) {
-                      navigator.vibrate(50);
-                    }
-                  }}
-                >
-                  <IoPlayForwardSharp size={32} />
-                </button>
-              </div>
-
-              {/* 재생 불가능 메시지 */}
-              {!canPlay && (
-                <div className="mt-4 p-4 bg-white/10 backdrop-blur-md rounded-lg">
-                  <p className="text-white/80 text-center text-sm">
-                    이 곡은 프리뷰를 제공하지 않습니다
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* CSS 스타일 */}
-            <style jsx>{`
-              .slider::-webkit-slider-thumb {
-                appearance: none;
-                height: 0;
-                width: 0;
-                background: transparent;
-                cursor: pointer;
-                border: none;
-              }
-
-              .slider::-moz-range-thumb {
-                height: 0;
-                width: 0;
-                background: transparent;
-                cursor: pointer;
-                border: none;
-              }
-            `}</style>
           </div>
-        </div>
 
-        {/* 데스크탑: 확장된 플레이어 */}
-        <div
-          key={`desktop-expanded-player-${currentTrack?.id || "no-track"}`}
-          className="hidden md:block fixed bottom-8 right-6 z-50 w-80 h-96 transition-all duration-500 ease-out"
-        >
-          <div
-            className="h-full rounded-2xl border border-white/20 shadow-2xl overflow-hidden backdrop-blur-md flex flex-col"
-            style={{
-              background: `linear-gradient(135deg, 
-                ${addAlpha(dominantColor, 0.3)} 0%, 
-                ${addAlpha(dominantColor, 0.2)} 50%, 
-                ${addAlpha(dominantColor, 0.9)} 100%)`,
-            }}
-          >
-            {/* 상단 축소 버튼 */}
-            <div className="flex items-center justify-center pt-2 pb-1">
-              <button
-                onClick={collapsePlayer}
-                className="w-12 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg transition-all duration-200 active:scale-95"
-              >
-                <div className="w-8 h-1 bg-white/50 rounded-full hover:bg-white/70 transition-colors duration-200"></div>
-              </button>
-            </div>
-
+          {/* 메인 컨텐츠 */}
+          <div className="flex-1 flex flex-col items-center justify-between px-6 pb-16">
             {/* 앨범 아트 */}
-            <div className="flex justify-center mb-4">
-              <div className="w-32 h-32 rounded-2xl overflow-hidden shadow-lg">
+            <div className="relative mb-12">
+              <div className="w-80 h-80 rounded-2xl overflow-hidden shadow-2xl">
                 {currentTrack.attributes.artwork?.url ? (
                   <img
                     src={getAppleMusicImageUrl(
                       currentTrack.attributes.artwork,
-                      "lg"
+                      "xl"
                     )}
                     alt={currentTrack.attributes.name}
                     className="w-full h-full object-cover"
@@ -477,8 +279,8 @@ export default memo(function MusicPlayer() {
                   >
                     <div className="text-white/60">
                       <svg
-                        width="40"
-                        height="40"
+                        width="80"
+                        height="80"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                       >
@@ -491,24 +293,18 @@ export default memo(function MusicPlayer() {
             </div>
 
             {/* 트랙 정보 */}
-            <div className="text-center mb-4 px-3">
-              <h3
-                className="text-sm font-bold mb-1 leading-tight truncate"
-                style={{ color: widgetTextColor }}
-              >
+            <div className="text-center mb-12 max-w-md">
+              <h1 className="text-2xl font-bold text-white mb-2 leading-tight">
                 {currentTrack.attributes.name}
-              </h3>
-              <p
-                className="text-xs truncate"
-                style={{ color: `${widgetTextColor}B3` }}
-              >
+              </h1>
+              <p className="text-lg text-white/80">
                 {currentTrack.attributes.artistName}
               </p>
             </div>
 
             {/* 진행 바 */}
             {canPlay && (
-              <div className="px-3 mb-4">
+              <div className="w-full max-w-md mb-8">
                 <div className="relative">
                   <input
                     type="range"
@@ -516,7 +312,7 @@ export default memo(function MusicPlayer() {
                     max={duration}
                     value={currentTime}
                     onChange={(e) => seekTo(Number(e.target.value))}
-                    className="w-full h-1 bg-white/30 rounded-lg appearance-none cursor-pointer slider"
+                    className="w-full h-1 bg-white/30 rounded-lg appearance-none cursor-pointer range-slider"
                     style={{
                       background: `linear-gradient(to right, 
                         ${addAlpha(dominantColor, 1)} 0%, 
@@ -526,10 +322,7 @@ export default memo(function MusicPlayer() {
                     }}
                   />
                 </div>
-                <div
-                  className="flex justify-between text-xs mt-1"
-                  style={{ color: `${widgetTextColor}99` }}
-                >
+                <div className="flex justify-between text-sm text-white/60 mt-2">
                   <span>{formatTime(currentTime)}</span>
                   <span>{formatTime(duration)}</span>
                 </div>
@@ -537,108 +330,194 @@ export default memo(function MusicPlayer() {
             )}
 
             {/* 컨트롤 버튼 */}
-            <div className="flex items-center justify-center gap-4 px-3 flex-1">
-              {/* 이전 버튼 */}
-              <button
-                className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-all duration-200 active:scale-90 hover:scale-110"
-                style={{ color: widgetTextColor }}
-                onClick={() => {
-                  if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                  }
-                }}
-              >
-                <IoPlayBackSharp size={20} />
+            <div className="flex items-center justify-center gap-8">
+              <button className="w-16 h-16 flex items-center justify-center text-white hover:text-white/80 transition-all duration-200 active:scale-90">
+                <IoPlayBackSharp size={32} />
               </button>
 
-              {/* 재생/일시정지 버튼 */}
               <button
-                onClick={() => {
-                  if (navigator.vibrate) {
-                    navigator.vibrate(75);
-                  }
-                  togglePlayback();
-                }}
+                onClick={togglePlayback}
                 disabled={!canPlay}
-                className={`w-12 h-12 flex items-center justify-center transition-all duration-200 active:scale-90 hover:scale-110 ${
-                  canPlay ? "hover:opacity-80" : "cursor-not-allowed opacity-50"
+                className={`w-16 h-16 flex items-center justify-center transition-all duration-200 active:scale-90 ${
+                  canPlay
+                    ? "text-white hover:text-white/80"
+                    : "text-gray-400 cursor-not-allowed"
                 }`}
-                style={{
-                  color: canPlay ? widgetTextColor : `${widgetTextColor}66`,
-                }}
               >
-                <div className="flex items-center justify-center">
-                  {isPlaying ? (
-                    <IoPauseSharp
-                      size={24}
-                      className="transition-all duration-200"
-                    />
-                  ) : (
-                    <IoPlaySharp
-                      size={24}
-                      className="transition-all duration-200 translate-x-0.5"
-                    />
-                  )}
-                </div>
+                {isPlaying ? (
+                  <IoPauseSharp size={32} />
+                ) : (
+                  <IoPlaySharp size={32} />
+                )}
               </button>
 
-              {/* 다음 버튼 */}
-              <button
-                className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-all duration-200 active:scale-90 hover:scale-110"
-                style={{ color: widgetTextColor }}
-                onClick={() => {
-                  if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                  }
-                }}
-              >
-                <IoPlayForwardSharp size={20} />
+              <button className="w-16 h-16 flex items-center justify-center text-white hover:text-white/80 transition-all duration-200 active:scale-90">
+                <IoPlayForwardSharp size={32} />
               </button>
             </div>
-
-            {/* 재생 불가능 메시지 */}
-            {!canPlay && (
-              <div className="p-3">
-                <p className="text-white/80 text-center text-xs">
-                  이 곡은 프리뷰를 제공하지 않습니다
-                </p>
-              </div>
-            )}
-
-            {/* 데스크탑 위젯용 CSS 스타일 */}
-            <style jsx>{`
-              .slider::-webkit-slider-thumb {
-                appearance: none;
-                height: 0;
-                width: 0;
-                background: transparent;
-                cursor: pointer;
-                border: none;
-              }
-
-              .slider::-moz-range-thumb {
-                height: 0;
-                width: 0;
-                background: transparent;
-                cursor: pointer;
-                border: none;
-              }
-            `}</style>
           </div>
         </div>
-      </>
-    );
-  }
+      </div>
 
-  // 미니 플레이어 위젯
-  return (
-    <>
-      {/* 모바일용 미니 플레이어 */}
-      <div className="md:hidden fixed bottom-24 left-0 right-0 z-50 transition-all duration-500 ease-out">
+      {/* 전체 화면 플레이어 - 데스크탑 */}
+      <div
+        className={`hidden md:block fixed inset-0 z-50 transition-all duration-500 ease-out ${
+          animationState === "full"
+            ? "opacity-100 backdrop-blur-xl"
+            : "opacity-0 backdrop-blur-0 pointer-events-none"
+        }`}
+        style={{
+          background:
+            animationState === "full"
+              ? `linear-gradient(135deg, ${addAlpha(
+                  dominantColor,
+                  0.8
+                )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)`
+              : "transparent",
+        }}
+      >
+        <div className="w-full h-full flex items-center justify-center p-8">
+          <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* 앨범 아트 */}
+            <div className="flex justify-center">
+              <div className="w-96 h-96 rounded-3xl overflow-hidden shadow-2xl">
+                {currentTrack.attributes.artwork?.url ? (
+                  <img
+                    src={getAppleMusicImageUrl(
+                      currentTrack.attributes.artwork,
+                      "xl"
+                    )}
+                    alt={currentTrack.attributes.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    style={{
+                      background: `linear-gradient(135deg, ${addAlpha(
+                        dominantColor,
+                        0.8
+                      )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)`,
+                    }}
+                  >
+                    <div className="text-white/60">
+                      <svg
+                        width="120"
+                        height="120"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 컨트롤 패널 */}
+            <div className="space-y-8">
+              {/* 닫기 버튼 */}
+              <div className="flex justify-end">
+                <button
+                  onClick={collapsePlayer}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* 트랙 정보 */}
+              <div>
+                <h1 className="text-4xl font-bold text-white mb-3 leading-tight">
+                  {currentTrack.attributes.name}
+                </h1>
+                <p className="text-2xl text-white/80">
+                  {currentTrack.attributes.artistName}
+                </p>
+              </div>
+
+              {/* 진행 바 */}
+              {canPlay && (
+                <div className="space-y-3">
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max={duration}
+                      value={currentTime}
+                      onChange={(e) => seekTo(Number(e.target.value))}
+                      className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer range-slider"
+                      style={{
+                        background: `linear-gradient(to right, 
+                          ${addAlpha(dominantColor, 1)} 0%, 
+                          ${addAlpha(dominantColor, 1)} ${progress}%, 
+                          rgba(255, 255, 255, 0.3) ${progress}%, 
+                          rgba(255, 255, 255, 0.3) 100%)`,
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-white/60">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* 컨트롤 버튼 */}
+              <div className="flex items-center justify-center gap-8">
+                <button className="w-16 h-16 flex items-center justify-center text-white hover:text-white/80 transition-all duration-200 active:scale-90">
+                  <IoPlayBackSharp size={36} />
+                </button>
+
+                <button
+                  onClick={togglePlayback}
+                  disabled={!canPlay}
+                  className={`w-20 h-20 flex items-center justify-center transition-all duration-200 active:scale-90 ${
+                    canPlay
+                      ? "hover:opacity-80"
+                      : "cursor-not-allowed opacity-50"
+                  }`}
+                >
+                  {isPlaying ? (
+                    <IoPauseSharp size={40} />
+                  ) : (
+                    <IoPlaySharp size={40} />
+                  )}
+                </button>
+
+                <button className="w-16 h-16 flex items-center justify-center text-white hover:text-white/80 transition-all duration-200 active:scale-90">
+                  <IoPlayForwardSharp size={36} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 미니 플레이어 - 모바일 */}
+      <div
+        className={`md:hidden fixed bottom-24 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+          animationState === "mini"
+            ? "translate-y-0 opacity-100"
+            : animationState === "full"
+            ? "-translate-y-full opacity-0"
+            : "translate-y-full opacity-0"
+        }`}
+      >
         <div className="w-[75vw] max-w-md mx-auto">
           <div
-            key={`mini-player-mobile-${currentTrack?.id || "no-track"}`}
-            className="backdrop-blur-md bg-white/10 dark:bg-black/40 rounded-2xl border border-white/20 shadow-2xl cursor-pointer"
+            className="backdrop-blur-md bg-white/10 dark:bg-black/40 rounded-2xl border border-white/20 shadow-2xl cursor-pointer transition-all duration-300 hover:scale-105"
             style={{
               background: `linear-gradient(135deg, 
                 ${addAlpha(dominantColor, 0.3)} 0%, 
@@ -669,16 +548,15 @@ export default memo(function MusicPlayer() {
                       )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)`,
                     }}
                   >
-                    <div className="text-white/60">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                      </svg>
-                    </div>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="text-white/60"
+                    >
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                    </svg>
                   </div>
                 )}
               </div>
@@ -716,13 +594,11 @@ export default memo(function MusicPlayer() {
                     color: canPlay ? widgetTextColor : `${widgetTextColor}66`,
                   }}
                 >
-                  <div className="w-4 h-4 flex items-center justify-center">
-                    {isPlaying ? (
-                      <IoPauseSharp size={16} />
-                    ) : (
-                      <IoPlaySharp size={16} className="translate-x-0.5" />
-                    )}
-                  </div>
+                  {isPlaying ? (
+                    <IoPauseSharp size={16} />
+                  ) : (
+                    <IoPlaySharp size={16} className="translate-x-0.5" />
+                  )}
                 </button>
 
                 <button
@@ -748,18 +624,13 @@ export default memo(function MusicPlayer() {
               </div>
             </div>
 
-            {/* 진행 바 (아래쪽 별도 줄) */}
+            {/* 진행 바 */}
             {canPlay && (
-              <div
-                className="px-3 pb-1"
-                onClick={(e) => {
-                  e.stopPropagation(); // 진행바 영역 전체에서 확장 방지
-                }}
-              >
+              <div className="px-3 pb-1" onClick={(e) => e.stopPropagation()}>
                 <div
                   className="relative cursor-pointer"
                   onClick={(e) => {
-                    e.stopPropagation(); // 위젯 확장 방지
+                    e.stopPropagation();
                     const rect = e.currentTarget.getBoundingClientRect();
                     const clickX = e.clientX - rect.left;
                     const width = rect.width;
@@ -780,31 +651,29 @@ export default memo(function MusicPlayer() {
                 </div>
               </div>
             )}
-
-            {/* 재생 불가능 메시지 */}
-            {!canPlay && (
-              <div className="px-3 pb-1">
-                <p className="text-[10px] text-white/60 text-center">
-                  프리뷰 없음
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* 데스크탑용 미니 플레이어 */}
-      <div className="hidden md:block fixed bottom-8 right-6 z-50 w-80 transition-all duration-500 ease-out">
+      {/* 미니 플레이어 - 데스크탑 */}
+      <div
+        className={`hidden md:block fixed bottom-8 right-6 z-50 w-80 transition-all duration-500 ease-out cursor-pointer ${
+          animationState === "mini"
+            ? "translate-y-0 opacity-100 scale-100"
+            : animationState === "expanded" || animationState === "full"
+            ? "translate-y-8 opacity-0 scale-95"
+            : "translate-y-8 opacity-0 scale-95"
+        }`}
+        onClick={toggleExpanded}
+      >
         <div
-          key={`desktop-mini-player-${currentTrack?.id || "no-track"}`}
-          className="backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl overflow-hidden cursor-pointer"
+          className="backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl overflow-hidden transition-all duration-300 hover:scale-105"
           style={{
             background: `linear-gradient(135deg, 
               ${addAlpha(dominantColor, 0.3)} 0%, 
               ${addAlpha(dominantColor, 0.2)} 50%, 
               ${addAlpha(dominantColor, 0.9)} 100%)`,
           }}
-          onClick={expandPlayer}
         >
           <div className="flex items-center gap-3 p-2">
             {/* 앨범 아트 */}
@@ -828,16 +697,15 @@ export default memo(function MusicPlayer() {
                     )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)`,
                   }}
                 >
-                  <div className="text-white/60">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                    </svg>
-                  </div>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="text-white/60"
+                  >
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
                 </div>
               )}
             </div>
@@ -873,13 +741,11 @@ export default memo(function MusicPlayer() {
                   color: canPlay ? widgetTextColor : `${widgetTextColor}66`,
                 }}
               >
-                <div className="w-5 h-5 flex items-center justify-center">
-                  {isPlaying ? (
-                    <IoPauseSharp size={18} />
-                  ) : (
-                    <IoPlaySharp size={18} className="translate-x-0.5" />
-                  )}
-                </div>
+                {isPlaying ? (
+                  <IoPauseSharp size={18} />
+                ) : (
+                  <IoPlaySharp size={18} className="translate-x-0.5" />
+                )}
               </button>
 
               <button
@@ -907,16 +773,11 @@ export default memo(function MusicPlayer() {
 
           {/* 진행 바 */}
           {canPlay && (
-            <div
-              className="px-2 pb-2"
-              onClick={(e) => {
-                e.stopPropagation(); // 진행바 영역 전체에서 확장 방지
-              }}
-            >
+            <div className="px-2 pb-2" onClick={(e) => e.stopPropagation()}>
               <div
                 className="relative cursor-pointer py-1.5"
                 onClick={(e) => {
-                  e.stopPropagation(); // 위젯 확장 방지
+                  e.stopPropagation();
                   const rect = e.currentTarget.getBoundingClientRect();
                   const clickX = e.clientX - rect.left;
                   const width = rect.width;
@@ -937,17 +798,196 @@ export default memo(function MusicPlayer() {
               </div>
             </div>
           )}
+        </div>
+      </div>
 
-          {/* 재생 불가능 메시지 */}
-          {!canPlay && (
-            <div className="px-2 pb-2">
-              <p className="text-xs text-white/60 text-center">
-                이 곡은 프리뷰를 제공하지 않습니다
-              </p>
+      {/* 확장 플레이어 - 데스크탑 */}
+      <div
+        className={`hidden md:block fixed bottom-8 right-6 z-50 w-96 h-[520px] transition-all duration-500 ease-out ${
+          animationState === "expanded"
+            ? "translate-y-0 opacity-100 scale-100"
+            : animationState === "mini"
+            ? "translate-y-8 opacity-0 scale-95"
+            : "translate-y-8 opacity-0 scale-95 pointer-events-none"
+        }`}
+      >
+        <div
+          className="h-full rounded-2xl border border-white/20 shadow-2xl overflow-hidden backdrop-blur-md"
+          style={{
+            background: `linear-gradient(135deg, 
+              ${addAlpha(dominantColor, 0.3)} 0%, 
+              ${addAlpha(dominantColor, 0.2)} 50%, 
+              ${addAlpha(dominantColor, 0.9)} 100%)`,
+          }}
+        >
+          {/* 상단 버튼 */}
+          <div className="flex items-center justify-between p-3">
+            <button
+              onClick={toggleExpanded}
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            >
+              <div className="w-4 h-0.5 bg-white/50 rounded-full" />
+            </button>
+            <button
+              onClick={maximizePlayer}
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            >
+              <IoExpand size={16} />
+            </button>
+          </div>
+
+          {/* 앨범 아트 */}
+          <div className="flex justify-center mb-6">
+            <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-lg">
+              {currentTrack.attributes.artwork?.url ? (
+                <img
+                  src={getAppleMusicImageUrl(
+                    currentTrack.attributes.artwork,
+                    "lg"
+                  )}
+                  alt={currentTrack.attributes.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{
+                    background: `linear-gradient(135deg, ${addAlpha(
+                      dominantColor,
+                      0.8
+                    )} 0%, ${addAlpha(dominantColor, 0.4)} 100%)`,
+                  }}
+                >
+                  <div className="text-white/60">
+                    <svg
+                      width="64"
+                      height="64"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 트랙 정보 */}
+          <div className="text-center mb-6 px-4">
+            <h3
+              className="text-lg font-bold mb-1 leading-tight"
+              style={{ color: widgetTextColor }}
+            >
+              {currentTrack.attributes.name}
+            </h3>
+            <p className="text-sm" style={{ color: `${widgetTextColor}B3` }}>
+              {currentTrack.attributes.artistName}
+            </p>
+          </div>
+
+          {/* 진행 바 */}
+          {canPlay && (
+            <div className="px-4 mb-6">
+              <div className="relative">
+                <input
+                  type="range"
+                  min="0"
+                  max={duration}
+                  value={currentTime}
+                  onChange={(e) => seekTo(Number(e.target.value))}
+                  className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer range-slider"
+                  style={{
+                    background: `linear-gradient(to right, 
+                      ${addAlpha(dominantColor, 1)} 0%, 
+                      ${addAlpha(dominantColor, 1)} ${progress}%, 
+                      rgba(255, 255, 255, 0.3) ${progress}%, 
+                      rgba(255, 255, 255, 0.3) 100%)`,
+                  }}
+                />
+              </div>
+              <div
+                className="flex justify-between text-xs mt-2"
+                style={{ color: `${widgetTextColor}99` }}
+              >
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
             </div>
           )}
+
+          {/* 컨트롤 버튼 */}
+          <div className="flex items-center justify-center gap-6 px-4">
+            <button
+              className="w-12 h-12 flex items-center justify-center hover:opacity-80 transition-all duration-200 active:scale-90"
+              style={{ color: widgetTextColor }}
+            >
+              <IoPlayBackSharp size={24} />
+            </button>
+
+            <button
+              onClick={togglePlayback}
+              disabled={!canPlay}
+              className={`w-16 h-16 flex items-center justify-center transition-all duration-200 active:scale-90 ${
+                canPlay ? "hover:opacity-80" : "cursor-not-allowed opacity-50"
+              }`}
+              style={{
+                color: canPlay ? widgetTextColor : `${widgetTextColor}66`,
+              }}
+            >
+              {isPlaying ? (
+                <IoPauseSharp size={32} />
+              ) : (
+                <IoPlaySharp size={32} className="translate-x-0.5" />
+              )}
+            </button>
+
+            <button
+              className="w-12 h-12 flex items-center justify-center hover:opacity-80 transition-all duration-200 active:scale-90"
+              style={{ color: widgetTextColor }}
+            >
+              <IoPlayForwardSharp size={24} />
+            </button>
+          </div>
         </div>
       </div>
     </>
   );
 });
+
+// CSS 스타일 추가
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = `
+    .range-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 0;
+      height: 0;
+      background: transparent;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .range-slider::-moz-range-thumb {
+      width: 0;
+      height: 0;
+      background: transparent;
+      cursor: pointer;
+      border: none;
+      border-radius: 0;
+    }
+    
+    .range-slider::-ms-thumb {
+      width: 0;
+      height: 0;
+      background: transparent;
+      cursor: pointer;
+      border: none;
+    }
+  `;
+
+  if (!document.head.querySelector("style[data-range-slider]")) {
+    style.setAttribute("data-range-slider", "true");
+    document.head.appendChild(style);
+  }
+}
