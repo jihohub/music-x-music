@@ -183,6 +183,7 @@ export function useSearchPageLogic() {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
+    // 실시간 검색 제거: URL 업데이트를 하지 않음
   };
 
   // 검색어 초기화
@@ -238,17 +239,6 @@ export function useSearchPageLogic() {
       setSearchTerm("");
     }
   }, [queryParam]);
-
-  // 검색어 변경 시 URL 업데이트 (디바운스 적용)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== queryParam) {
-        updateSearchParams(searchTerm);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, queryParam, updateSearchParams]);
 
   return {
     // 상태
