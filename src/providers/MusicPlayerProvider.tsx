@@ -93,7 +93,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   const playTrack = async (track: AppleMusicTrack) => {
     setCurrentTrack(track);
     setIsPlayerVisible(true);
-    setIsFullScreen(true);
+    setIsFullScreen(false); // 미니 플레이어로 시작
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
@@ -125,9 +125,14 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
     // 프리뷰 자동 재생 (audioRef 업데이트는 useEffect에서 처리)
     setTimeout(() => {
       if (audioRef.current && !musicKitAuthorized) {
-        audioRef.current.play().catch((error) => {
-          console.error("프리뷰 자동 재생 실패:", error);
-        });
+        const previewUrl = track.attributes.previews?.[0]?.url;
+        if (previewUrl) {
+          audioRef.current.src = previewUrl;
+          audioRef.current.load();
+          audioRef.current.play().catch((error) => {
+            console.error("프리뷰 자동 재생 실패:", error);
+          });
+        }
       }
     }, 100);
   };
@@ -315,8 +320,18 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
       {/* HTML5 Audio for preview playback */}
       <audio
         ref={audioRef}
-        onPlay={() => !isUsingMusicKit && setIsPlaying(true)}
-        onPause={() => !isUsingMusicKit && setIsPlaying(false)}
+        onPlay={() => {
+          if (!isUsingMusicKit) {
+            setIsPlaying(true);
+            console.log("HTML5 Audio: 재생 시작");
+          }
+        }}
+        onPause={() => {
+          if (!isUsingMusicKit) {
+            setIsPlaying(false);
+            console.log("HTML5 Audio: 재생 일시정지");
+          }
+        }}
         onTimeUpdate={(e) => {
           if (!isUsingMusicKit) {
             const audio = e.target as HTMLAudioElement;
@@ -331,23 +346,36 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
             }
           }
         }}
-        onLoadedMetadata={(e) =>
-          !isUsingMusicKit &&
-          setDuration((e.target as HTMLAudioElement).duration)
-        }
+        onLoadedMetadata={(e) => {
+          if (!isUsingMusicKit) {
+            const audio = e.target as HTMLAudioElement;
+            setDuration(audio.duration);
+            console.log(
+              "HTML5 Audio: 메타데이터 로드됨, 길이:",
+              audio.duration
+            );
+          }
+        }}
+        onCanPlay={() => {
+          if (!isUsingMusicKit && audioRef.current) {
+            console.log("HTML5 Audio: 재생 준비됨");
+          }
+        }}
         onEnded={() => {
           if (!isUsingMusicKit) {
             setIsPlaying(false);
-            setCurrentTime(duration); // duration으로 설정해서 진행바가 끝까지 가도록
+            setCurrentTime(duration);
+            console.log("HTML5 Audio: 재생 완료");
           }
         }}
         onError={(e) => {
-          console.error("오디오 재생 오류:", e);
+          console.error("HTML5 Audio 재생 오류:", e);
           if (!isUsingMusicKit) {
             setIsPlaying(false);
           }
         }}
         preload="metadata"
+        crossOrigin="anonymous"
       />
     </MusicPlayerContext.Provider>
   );
