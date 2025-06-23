@@ -44,6 +44,7 @@ interface MusicPlayerContextType {
   togglePlayback: () => void;
   seekTo: (time: number) => void;
   hidePlayer: () => void;
+  closePlayer: () => void;
   expandPlayer: () => void;
   collapsePlayer: () => void;
   getCurrentTrackTextColor: () => string;
@@ -184,6 +185,30 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   const hidePlayer = () => {
     // 페이지 이동 시에는 음악을 중단하지 않고 미니 플레이어로만 전환
     setIsFullScreen(false); // 풀스크린만 해제, 미니 플레이어는 유지
+    // setIsPlayerVisible(false); // 이 줄을 주석처리하여 음악이 계속 재생되도록 함
+  };
+
+  const closePlayer = () => {
+    // 완전히 플레이어를 닫고 음악 중단
+    setIsPlayerVisible(false);
+    setIsFullScreen(false);
+    setIsPlaying(false);
+
+    if (isUsingMusicKit && musicKitRef.current?.isAuthorized) {
+      try {
+        musicKitRef.current.pause();
+      } catch (error) {
+        console.error("MusicKit 정지 실패:", error);
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
+
+    setCurrentTime(0);
+    setCurrentTrack(null);
   };
 
   const expandPlayer = () => {
@@ -277,6 +302,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         togglePlayback,
         seekTo,
         hidePlayer,
+        closePlayer,
         expandPlayer,
         collapsePlayer,
         getCurrentTrackTextColor,

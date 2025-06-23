@@ -70,6 +70,7 @@ export default memo(function MusicPlayer() {
     togglePlayback,
     seekTo,
     hidePlayer,
+    closePlayer,
     expandPlayer,
     collapsePlayer,
     getWidgetTextColor,
@@ -86,7 +87,7 @@ export default memo(function MusicPlayer() {
 
   // 드래그 임계값
   const closeThreshold =
-    typeof window !== "undefined" ? window.innerHeight * 0.66 : 400;
+    typeof window !== "undefined" ? window.innerHeight * 0.33 : 200;
   const maxDrag = typeof window !== "undefined" ? window.innerHeight : 600;
 
   // 터치 이벤트 핸들러
@@ -163,18 +164,15 @@ export default memo(function MusicPlayer() {
   // 전체화면 상태 변경 시 배경색 강제 재적용
   useEffect(() => {
     if (isFullScreen && currentTrack) {
-      // 타이밍을 더 빠르게 하고 즉시 실행
-      const timer = setTimeout(() => {
-        if (currentTrack.attributes.artwork?.bgColor) {
-          const hexColor = `#${currentTrack.attributes.artwork.bgColor}`;
-          setDominantColor(hexColor);
-          console.log("전체화면 전환 - 배경색 재적용:", hexColor);
-        } else {
-          setDominantColor("#1c1c1e");
-          console.log("전체화면 전환 - 기본 배경색 재적용: #1c1c1e");
-        }
-      }, 10);
-      return () => clearTimeout(timer);
+      // 즉시 실행하도록 수정
+      if (currentTrack.attributes.artwork?.bgColor) {
+        const hexColor = `#${currentTrack.attributes.artwork.bgColor}`;
+        setDominantColor(hexColor);
+        console.log("전체화면 전환 - 배경색 즉시 적용:", hexColor);
+      } else {
+        setDominantColor("#1c1c1e");
+        console.log("전체화면 전환 - 기본 배경색 즉시 적용: #1c1c1e");
+      }
     }
   }, [isFullScreen, currentTrack]);
 
@@ -730,7 +728,7 @@ export default memo(function MusicPlayer() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    hidePlayer();
+                    closePlayer();
                   }}
                   className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
                   style={{ color: `${widgetTextColor}B3` }}
@@ -887,7 +885,7 @@ export default memo(function MusicPlayer() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  hidePlayer();
+                  closePlayer();
                 }}
                 className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
                 style={{ color: `${widgetTextColor}B3` }}
