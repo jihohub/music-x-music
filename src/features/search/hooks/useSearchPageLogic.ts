@@ -61,10 +61,13 @@ export function useSearchPageLogic() {
   const [searchTerm, setSearchTerm] = useState(queryParam);
   const [searchType, setSearchType] = useState<SearchType>(typeParam);
 
+  // 검색어가 유효한지 확인 (성능 최적화)
+  const hasValidSearchTerm = queryParam.trim().length >= 2;
+
   // 검색 타입에 따라 다른 쿼리 실행
   const isSpecificTypeSearch = searchType !== "all";
 
-  // 기본 검색 (타입이 'all'인 경우)
+  // 기본 검색 (타입이 'all'인 경우) - 검색어가 있을 때만 실행
   const {
     data: basicSearchData,
     isFetching: isBasicFetching,
@@ -72,21 +75,22 @@ export function useSearchPageLogic() {
     error: basicError,
   } = useBasicSearchQuery(
     queryParam,
-    !isSpecificTypeSearch && queryParam.trim().length >= 2
+    !isSpecificTypeSearch && hasValidSearchTerm
   );
 
-  // 특정 타입 검색 (무한스크롤)
-  const searchTypes = isSpecificTypeSearch
-    ? typeParam === "artist"
-      ? "artists"
-      : typeParam === "track"
-      ? "songs"
-      : typeParam === "album"
-      ? "albums"
-      : "songs,albums,artists"
-    : "songs,albums,artists";
+  // 특정 타입 검색용 타입 설정 - 검색어가 있을 때만 계산
+  const searchTypes =
+    hasValidSearchTerm && isSpecificTypeSearch
+      ? typeParam === "artist"
+        ? "artists"
+        : typeParam === "track"
+        ? "songs"
+        : typeParam === "album"
+        ? "albums"
+        : "songs,albums,artists"
+      : "songs,albums,artists";
 
-  // 개별 탭에서는 무한스크롤 사용
+  // 개별 탭에서는 무한스크롤 사용 - 검색어가 있을 때만 실행
   const {
     data: infiniteSearchData,
     isFetching: isInfiniteFetching,
@@ -98,7 +102,7 @@ export function useSearchPageLogic() {
   } = useInfiniteSearchQuery(
     queryParam,
     searchTypes,
-    isSpecificTypeSearch && queryParam.trim().length >= 2
+    isSpecificTypeSearch && hasValidSearchTerm
   );
 
   // 검색 결과 및 상태 통합
@@ -111,43 +115,48 @@ export function useSearchPageLogic() {
   const isError = isSpecificTypeSearch ? isInfiniteError : isBasicError;
   const error = isSpecificTypeSearch ? infiniteError : basicError;
 
-  // 결과 처리
-  const { allTracks, allArtists, allAlbums } = isSpecificTypeSearch
-    ? processInfiniteSearchResults(infiniteSearchData?.pages || [])
-    : processSearchResults(searchResults);
+  // 결과 처리 - 검색어가 있을 때만 계산
+  const { allTracks, allArtists, allAlbums } = hasValidSearchTerm
+    ? isSpecificTypeSearch
+      ? processInfiniteSearchResults(infiniteSearchData?.pages || [])
+      : processSearchResults(searchResults)
+    : { allTracks: [], allArtists: [], allAlbums: [] };
 
-  // 전체 탭 디버깅용 로그
-  if (!isSpecificTypeSearch && searchResults) {
-    console.log("전체 탭 검색 결과:", {
-      queryParam,
-      rawResults: {
-        artists: searchResults.artists?.data?.length || 0,
-        albums: searchResults.albums?.data?.length || 0,
-        songs: searchResults.songs?.data?.length || 0,
-      },
-      processedResults: {
-        allArtists: allArtists.length,
-        allAlbums: allAlbums.length,
-        allTracks: allTracks.length,
-      },
-    });
-  }
+  // 디버깅용 로그 - 개발 모드에서만 실행
+  if (process.env.NODE_ENV === "development") {
+    // 전체 탭 디버깅용 로그
+    if (!isSpecificTypeSearch && searchResults && hasValidSearchTerm) {
+      console.log("전체 탭 검색 결과:", {
+        queryParam,
+        rawResults: {
+          artists: searchResults.artists?.data?.length || 0,
+          albums: searchResults.albums?.data?.length || 0,
+          songs: searchResults.songs?.data?.length || 0,
+        },
+        processedResults: {
+          allArtists: allArtists.length,
+          allAlbums: allAlbums.length,
+          allTracks: allTracks.length,
+        },
+      });
+    }
 
-  // 디버깅용 로그 (무한스크롤 상태)
-  if (isSpecificTypeSearch) {
-    console.log("Infinite Search Debug:", {
-      queryParam,
-      searchTypes,
-      isSpecificTypeSearch,
-      pagesCount: infiniteSearchData?.pages?.length || 0,
-      hasNextPage,
-      isFetchingNextPage,
-      totalResults: {
-        allTracks: allTracks.length,
-        allArtists: allArtists.length,
-        allAlbums: allAlbums.length,
-      },
-    });
+    // 무한스크롤 상태 로그
+    if (isSpecificTypeSearch && hasValidSearchTerm) {
+      console.log("Infinite Search Debug:", {
+        queryParam,
+        searchTypes,
+        isSpecificTypeSearch,
+        pagesCount: infiniteSearchData?.pages?.length || 0,
+        hasNextPage,
+        isFetchingNextPage,
+        totalResults: {
+          allTracks: allTracks.length,
+          allArtists: allArtists.length,
+          allAlbums: allAlbums.length,
+        },
+      });
+    }
   }
 
   // 검색 결과가 있는지 확인

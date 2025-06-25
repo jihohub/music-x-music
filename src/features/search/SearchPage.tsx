@@ -22,7 +22,6 @@ const searchTabItems = [
 export function SearchPage() {
   const { setTitle } = useHeader();
   const { getDisplayColors } = useThemeStore();
-  const { textColor } = getDisplayColors();
 
   const {
     // 상태
@@ -58,6 +57,11 @@ export function SearchPage() {
     // 유틸리티
     popularSearches,
   } = useSearchPageLogic();
+
+  // 테마 색상은 검색어가 있을 때만 계산
+  const { textColor } = searchTerm.trim()
+    ? getDisplayColors()
+    : { textColor: "#ffffff" };
 
   // 검색어에 따라 헤더 타이틀 설정
   useEffect(() => {
