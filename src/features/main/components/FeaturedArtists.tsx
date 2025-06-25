@@ -28,7 +28,7 @@ export const FeaturedArtists = () => {
 
   return (
     <section>
-      {isLoading && <div className="h-[590px] md:h-[170.336px]"></div>}
+      {isLoading && <div className="h-[590px] md:h-[170.34px]"></div>}
 
       {error && (
         <div className="text-center text-white/60 py-8">

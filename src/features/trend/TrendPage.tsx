@@ -9,6 +9,7 @@ import {
   useTrendTracks,
 } from "@/features/trend/queries";
 import { useHeader } from "@/providers/HeaderProvider";
+import { useThemeStore } from "@/stores/themeStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -18,6 +19,8 @@ export type TrendTab = "all" | "track" | "artist" | "album";
 // 실제 트렌드 데이터와 UI를 처리하는 컴포넌트
 const TrendContent = ({ activeTab }: { activeTab: TrendTab }) => {
   const router = useRouter();
+  const { getDisplayColors } = useThemeStore();
+  const { textColor } = getDisplayColors();
 
   // API 데이터 가져오기
   const {
@@ -52,9 +55,13 @@ const TrendContent = ({ activeTab }: { activeTab: TrendTab }) => {
 
   if (error) {
     return (
-      <div className="text-center py-20 text-error">
-        <p>데이터를 불러오는 중 오류가 발생했습니다.</p>
-        <p className="text-sm mt-2">{error.toString()}</p>
+      <div className="text-center py-20">
+        <p style={{ color: textColor }}>
+          데이터를 불러오는 중 오류가 발생했습니다.
+        </p>
+        <p className="text-sm mt-2 opacity-70" style={{ color: textColor }}>
+          {error.toString()}
+        </p>
       </div>
     );
   }
@@ -103,6 +110,8 @@ const getInitialTabFromUrl = (params: URLSearchParams | null): TrendTab => {
 const TrendPageContent = () => {
   const searchParams = useSearchParams();
   const { setTitle } = useHeader();
+  const { getDisplayColors } = useThemeStore();
+  const { textColor } = getDisplayColors();
 
   // 초기 상태를 URL에서 바로 가져옴
   const [activeTab, setActiveTab] = useState<TrendTab>(() =>
@@ -138,11 +147,16 @@ const TrendPageContent = () => {
 
 // 메인 컴포넌트에서는 Suspense로 감싸기
 export function TrendPage() {
+  const { getDisplayColors } = useThemeStore();
+  const { textColor } = getDisplayColors();
+
   return (
     <Suspense
       fallback={
         <div className="py-6 space-y-6 px-4 max-w-4xl mx-auto">
-          <div className="text-center py-10">로딩 중...</div>
+          <div className="text-center py-10" style={{ color: textColor }}>
+            로딩 중...
+          </div>
         </div>
       }
     >

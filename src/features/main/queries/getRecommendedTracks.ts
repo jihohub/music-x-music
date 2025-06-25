@@ -1,4 +1,5 @@
 import { RECOMMENDED_TRACK_IDS } from "@/constants/apple-music";
+import { saveTrackColorsToStore } from "@/lib/apple-music-api-client";
 import { AppleMusicTrack } from "@/types/apple-music";
 import { useQuery } from "@tanstack/react-query";
 
@@ -23,8 +24,15 @@ export async function getRecommendedTracks(): Promise<AppleMusicTrack[]> {
       return [];
     }
 
+    const tracks = data.data;
+
+    // 추천 트랙에서 색상 정보를 스토어에 저장
+    if (typeof window !== "undefined" && tracks.length > 0) {
+      saveTrackColorsToStore(tracks);
+    }
+
     // Apple Music 데이터를 그대로 반환
-    return data.data;
+    return tracks;
   } catch (error) {
     console.error("추천 트랙 가져오기 오류:", error);
     return [];

@@ -1,4 +1,5 @@
 import { TREND_ALBUM_IDS } from "@/constants/apple-music";
+import { saveAlbumColorsToStore } from "@/lib/apple-music-api-client";
 import { AppleMusicAlbum } from "@/types/apple-music";
 import { useQuery } from "@tanstack/react-query";
 
@@ -24,8 +25,15 @@ export async function getTrendAlbums(): Promise<AppleMusicAlbum[]> {
       return [];
     }
 
+    const albums = data.data;
+
+    // 트렌드 앨범에서 색상 정보를 스토어에 저장
+    if (typeof window !== "undefined" && albums.length > 0) {
+      saveAlbumColorsToStore(albums);
+    }
+
     // Apple Music 데이터를 직접 반환
-    return data.data;
+    return albums;
   } catch (error) {
     console.error("Error fetching trend albums:", error);
     return [];
