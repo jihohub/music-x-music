@@ -1,7 +1,6 @@
 "use client";
 
 import { useHeader } from "@/providers/HeaderProvider";
-import { useThemeStore } from "@/stores/themeStore";
 import Link from "next/link";
 import { useEffect } from "react";
 import BasicSearchResults from "./components/BasicSearchResults";
@@ -21,7 +20,6 @@ const searchTabItems = [
 
 export function SearchPage() {
   const { setTitle } = useHeader();
-  const { getDisplayColors } = useThemeStore();
 
   const {
     // 상태
@@ -35,6 +33,10 @@ export function SearchPage() {
     isError,
     error,
     hasResults,
+
+    // URL 기반 검색 상태
+    queryParam,
+    hasValidSearchTerm,
 
     // 선택 상태
     shouldShowArtists,
@@ -58,15 +60,13 @@ export function SearchPage() {
     popularSearches,
   } = useSearchPageLogic();
 
-  // 테마 색상은 검색어가 있을 때만 계산
-  const { textColor } = searchTerm.trim()
-    ? getDisplayColors()
-    : { textColor: "#ffffff" };
+  // 검색페이지는 항상 하얀색 텍스트 사용
+  const textColor = "#ffffff";
 
-  // 검색어에 따라 헤더 타이틀 설정
+  // 검색어에 따라 헤더 타이틀 설정 - URL 기반 쿼리 사용
   useEffect(() => {
-    if (searchTerm && searchTerm.trim().length > 0) {
-      setTitle(`"${searchTerm}" 검색결과`);
+    if (queryParam && queryParam.trim().length > 0) {
+      setTitle(`"${queryParam}" 검색결과`);
     } else {
       setTitle("검색");
     }
@@ -75,28 +75,29 @@ export function SearchPage() {
     return () => {
       setTitle("MUSIC X MUSIC");
     };
-  }, [searchTerm, setTitle]);
+  }, [queryParam, setTitle]);
 
-  // 탭 변경 시 즉시 결과를 표시하기 위한 최적화된 조건
-  const showBasicResults = searchType === "all" && (hasResults || isFetching);
+  // 탭 변경 시 즉시 결과를 표시하기 위한 최적화된 조건 - URL 기반
+  const showBasicResults =
+    searchType === "all" && hasValidSearchTerm && (hasResults || isFetching);
   const showInfiniteResults =
     searchType !== "all" &&
+    hasValidSearchTerm &&
     (isFetching ||
       (searchType === "artist" && allArtists.length > 0) ||
       (searchType === "track" && allTracks.length > 0) ||
       (searchType === "album" && allAlbums.length > 0));
   const showNoResults =
     !isFetching && // 로딩 중이 아닐 때만 "결과 없음" 표시
-    searchTerm &&
+    hasValidSearchTerm && // 실제로 검색이 실행된 경우에만
     !isError &&
-    !hasResults &&
-    searchTerm.trim().length >= 2;
+    !hasResults;
   const showPopularSearches =
-    (!searchTerm || searchTerm.trim() === "") && !isFetching;
+    (!queryParam || queryParam.trim() === "") && !isFetching;
 
-  // 검색어에 따른 URL 생성 함수
+  // 검색어에 따른 URL 생성 함수 - URL 기반 쿼리 사용
   const getSearchUrl = (type: any) => {
-    const baseUrl = `/search?q=${encodeURIComponent(searchTerm)}`;
+    const baseUrl = `/search?q=${encodeURIComponent(queryParam || searchTerm)}`;
     return type === "all" ? baseUrl : `${baseUrl}&type=${type}`;
   };
 
@@ -123,7 +124,7 @@ export function SearchPage() {
       </div>
 
       {/* 검색 탭 - 검색바 바로 아래 */}
-      {searchTerm.trim().length > 0 && (
+      {hasValidSearchTerm && (
         <div
           className="fixed left-6 right-6 z-40 flex justify-center
           top-24 md:top-44"

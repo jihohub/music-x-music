@@ -263,6 +263,10 @@ export function useSearchPageLogic() {
     error,
     hasResults,
 
+    // URL 기반 검색 상태
+    queryParam, // 실제 검색이 실행된 쿼리
+    hasValidSearchTerm, // 유효한 검색어인지 확인
+
     // 선택 상태
     shouldShowArtists,
     shouldShowTracks,
