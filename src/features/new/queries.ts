@@ -1,3 +1,4 @@
+import { saveAlbumColorsToStore } from "@/lib/apple-music-api-client";
 import { AppleMusicAlbum } from "@/types/apple-music";
 
 /**
@@ -24,10 +25,18 @@ export async function getNewReleases(
 
     // 차트 응답 구조에서 앨범 데이터 추출
     if (result.results?.albums?.[0]?.data) {
+      const albums = result.results.albums[0].data;
+
       console.log(
-        `차트에서 앨범 ${result.results.albums[0].data.length}개를 성공적으로 가져왔습니다.`
+        `차트에서 앨범 ${albums.length}개를 성공적으로 가져왔습니다.`
       );
-      return result.results.albums[0].data;
+
+      // 새 앨범에서 색상 정보를 스토어에 저장 (첫 번째 페이지만)
+      if (typeof window !== "undefined" && offset === 0 && albums.length > 0) {
+        saveAlbumColorsToStore(albums);
+      }
+
+      return albums;
     }
 
     return [];

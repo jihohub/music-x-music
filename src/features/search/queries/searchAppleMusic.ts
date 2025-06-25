@@ -1,3 +1,8 @@
+import {
+  saveAlbumColorsToStore,
+  saveArtistColorsToStore,
+  saveTrackColorsToStore,
+} from "@/lib/apple-music-api-client";
 import { AppleMusicSearchResult } from "@/types/apple-music";
 
 /**
@@ -29,14 +34,25 @@ export async function searchAppleMusic(
 
     const data = await response.json();
 
-    // Apple Music 검색 결과를 그대로 반환
-    return (
-      data.results || {
-        artists: { data: [] },
-        albums: { data: [] },
-        songs: { data: [] },
+    const result = data.results || {
+      artists: { data: [] },
+      albums: { data: [] },
+      songs: { data: [] },
+    };
+
+    // 검색 결과에서 색상 정보를 스토어에 저장
+    if (typeof window !== "undefined") {
+      // 클라이언트 사이드에서만 실행
+      if (result.songs?.data?.length > 0) {
+        saveTrackColorsToStore(result.songs.data);
+      } else if (result.artists?.data?.length > 0) {
+        saveArtistColorsToStore(result.artists.data);
+      } else if (result.albums?.data?.length > 0) {
+        saveAlbumColorsToStore(result.albums.data);
       }
-    );
+    }
+
+    return result;
   } catch (error) {
     console.error("Apple Music 검색 오류:", error);
     return {
@@ -77,14 +93,15 @@ export async function searchAppleMusicWithOffset(
 
     const data = await response.json();
 
-    // Apple Music 검색 결과를 그대로 반환
-    return (
-      data.results || {
-        artists: { data: [] },
-        albums: { data: [] },
-        songs: { data: [] },
-      }
-    );
+    const result = data.results || {
+      artists: { data: [] },
+      albums: { data: [] },
+      songs: { data: [] },
+    };
+
+    // 검색 결과에서 색상 정보를 스토어에 저장 (오프셋 결과는 저장하지 않음 - 스크롤 시마다 색상이 바뀌는 것을 방지)
+
+    return result;
   } catch (error) {
     console.error("Apple Music 검색 오류:", error);
     return {

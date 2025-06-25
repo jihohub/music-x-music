@@ -58,18 +58,20 @@ export function useInfiniteSearchQuery(
       if (lastPage.songs?.data)
         currentPageResults += lastPage.songs.data.length;
 
-      // 디버깅용 로그
-      console.log("getNextPageParam Debug:", {
-        currentOffset,
-        nextOffset,
-        currentPageResults,
-        hasNextPage: currentPageResults === 12,
-        lastPageData: {
-          artists: lastPage.artists?.data?.length || 0,
-          albums: lastPage.albums?.data?.length || 0,
-          songs: lastPage.songs?.data?.length || 0,
-        },
-      });
+      // 디버깅용 로그 - 개발 모드에서만
+      if (process.env.NODE_ENV === "development") {
+        console.log("getNextPageParam Debug:", {
+          currentOffset,
+          nextOffset,
+          currentPageResults,
+          hasNextPage: currentPageResults === 12,
+          lastPageData: {
+            artists: lastPage.artists?.data?.length || 0,
+            albums: lastPage.albums?.data?.length || 0,
+            songs: lastPage.songs?.data?.length || 0,
+          },
+        });
+      }
 
       // 현재 페이지에서 12개 미만이면 더 이상 페이지가 없음
       return currentPageResults === 12 ? nextOffset : undefined;

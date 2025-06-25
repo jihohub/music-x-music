@@ -1,4 +1,5 @@
 import { TREND_ARTIST_IDS } from "@/constants/apple-music";
+import { saveArtistColorsToStore } from "@/lib/apple-music-api-client";
 import { AppleMusicArtist } from "@/types/apple-music";
 import { useQuery } from "@tanstack/react-query";
 
@@ -24,8 +25,15 @@ export async function getTrendArtists(): Promise<AppleMusicArtist[]> {
       return [];
     }
 
+    const artists = data.data;
+
+    // 트렌드 아티스트에서 색상 정보를 스토어에 저장
+    if (typeof window !== "undefined" && artists.length > 0) {
+      saveArtistColorsToStore(artists);
+    }
+
     // Apple Music 데이터를 직접 반환
-    return data.data;
+    return artists;
   } catch (error) {
     console.error("Error fetching trend artists:", error);
     return [];

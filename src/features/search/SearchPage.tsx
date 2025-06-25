@@ -1,6 +1,7 @@
 "use client";
 
 import { useHeader } from "@/providers/HeaderProvider";
+import { useThemeStore } from "@/stores/themeStore";
 import Link from "next/link";
 import { useEffect } from "react";
 import BasicSearchResults from "./components/BasicSearchResults";
@@ -20,6 +21,8 @@ const searchTabItems = [
 
 export function SearchPage() {
   const { setTitle } = useHeader();
+  const { getDisplayColors } = useThemeStore();
+
   const {
     // 상태
     searchTerm,
@@ -54,6 +57,11 @@ export function SearchPage() {
     // 유틸리티
     popularSearches,
   } = useSearchPageLogic();
+
+  // 테마 색상은 검색어가 있을 때만 계산
+  const { textColor } = searchTerm.trim()
+    ? getDisplayColors()
+    : { textColor: "#ffffff" };
 
   // 검색어에 따라 헤더 타이틀 설정
   useEffect(() => {
@@ -142,9 +150,12 @@ export function SearchPage() {
                     href={getSearchUrl(tab.id)}
                     className={`relative py-1 px-2 font-medium text-xs transition-all duration-200 ${
                       searchType === tab.id
-                        ? "text-white font-semibold"
-                        : "text-white/70 hover:text-white/90"
+                        ? "font-semibold"
+                        : "opacity-70 hover:opacity-90"
                     }`}
+                    style={{
+                      color: textColor,
+                    }}
                     onClick={(e) => {
                       e.preventDefault();
                       handleTypeChange(tab.id as any);
@@ -201,28 +212,33 @@ export function SearchPage() {
               />
             </div>
           )}
-        </div>
 
-        {/* 결과 없음 메시지 */}
-        {showNoResults && (
-          <div key="no-results">
-            <NoResults
-              searchTerm={searchTerm}
-              searchType={searchType}
-              isLoading={isFetching}
-            />
-          </div>
-        )}
+          {/* 결과 없음 */}
+          {showNoResults && (
+            <NoResults searchTerm={searchTerm} searchType={searchType} />
+          )}
 
-        {/* 인기 검색어 (검색어가 없을 때) */}
-        {showPopularSearches && (
-          <div key="popular-searches" className="space-y-6 mt-4">
+          {/* 인기 검색어 */}
+          {showPopularSearches && (
             <PopularSearches
               popularSearches={popularSearches}
               onSearchClick={handlePopularSearchClick}
             />
-          </div>
-        )}
+          )}
+
+          {/* 에러 상태 */}
+          {isError && error && (
+            <div className="text-center py-20">
+              <p style={{ color: textColor }}>검색 중 오류가 발생했습니다.</p>
+              <p
+                className="text-sm mt-2 opacity-70"
+                style={{ color: textColor }}
+              >
+                {typeof error === "string" ? error : "알 수 없는 오류"}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
