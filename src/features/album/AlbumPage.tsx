@@ -2,6 +2,7 @@
 
 import { useHeader } from "@/providers/HeaderProvider";
 import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
+import { setAlbumTheme, useThemeStore } from "@/stores/themeStore";
 import { AppleMusicAlbum } from "@/types/apple-music";
 import { useEffect, useState } from "react";
 import { AlbumHeader } from "./components/AlbumHeader";
@@ -26,31 +27,27 @@ export function AlbumPage({
 }: AlbumPageProps) {
   const { setTitle } = useHeader();
   const { setPageTextColor } = useMusicPlayer();
+  const { getDisplayColors } = useThemeStore();
   const [activeTab, setActiveTab] = useState<AlbumTabType>("tracks");
 
-  // 배경색 가져오기
-  const bgColor = album?.attributes.artwork?.bgColor
-    ? `#${album.attributes.artwork.bgColor}`
-    : "#1c1c1e";
+  // 테마 스토어에서 색상 가져오기
+  const { backgroundColor, textColor, secondaryTextColor } = getDisplayColors();
 
-  // 텍스트 색상 가져오기
-  const textColor1 = album?.attributes.artwork?.textColor1
-    ? `#${album.attributes.artwork.textColor1}`
-    : "#ffffff";
-
-  const textColor2 = album?.attributes.artwork?.textColor2
-    ? `#${album.attributes.artwork.textColor2}`
-    : "#ffffff";
-
-  // 앨범 정보가 로드되면 Header title 설정 및 페이지 색상 설정
+  // 앨범 정보가 로드되면 Header title 설정 및 테마 적용
   useEffect(() => {
     if (album?.attributes?.name) {
       setTitle(album.attributes.name);
     }
 
-    // 앨범 데이터가 있으면 로딩 중이어도 페이지 색상 설정
+    // 앨범 데이터가 있으면 테마 스토어에 색상 저장
+    if (album) {
+      setAlbumTheme(album);
+    }
+
+    // 페이지 색상 설정 (Footer에서 사용)
     if (album?.attributes?.artwork?.textColor1) {
-      setPageTextColor(textColor1);
+      const pageTextColor = `#${album.attributes.artwork.textColor1}`;
+      setPageTextColor(pageTextColor);
     }
 
     // 컴포넌트 언마운트 시 기본 title과 색상으로 복원
@@ -58,21 +55,11 @@ export function AlbumPage({
       setTitle("MUSIC X MUSIC");
       setPageTextColor("#ffffff");
     };
-  }, [album, setTitle, setPageTextColor, textColor1]);
+  }, [album, setTitle, setPageTextColor]);
 
   if (isLoading) {
-    // 로딩 중이지만 album 데이터가 있으면 그 색상을 사용
-    const skeletonBgColor = album?.attributes.artwork?.bgColor
-      ? `#${album.attributes.artwork.bgColor}`
-      : "#0f0f10"; // 거의 검은색에 가까운 중성적 색상
-
-    const skeletonTextColor = album?.attributes.artwork?.textColor1
-      ? `#${album.attributes.artwork.textColor1}`
-      : "#ffffff";
-
-    return (
-      <AlbumSkeleton bgColor={skeletonBgColor} textColor={skeletonTextColor} />
-    );
+    // 로딩 중일 때도 스토어의 색상 사용
+    return <AlbumSkeleton bgColor={backgroundColor} textColor={textColor} />;
   }
 
   if (error || !album) {
@@ -82,7 +69,7 @@ export function AlbumPage({
   return (
     <div
       className="min-h-screen pb-32 md:pb-8 transition-colors duration-500"
-      style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor }}
     >
       <div className="max-w-4xl mx-auto">
         <div className="md:pt-16">
@@ -116,7 +103,7 @@ export function AlbumPage({
                         ? "font-semibold"
                         : "opacity-70 hover:opacity-90"
                     }`}
-                    style={{ color: textColor1 }}
+                    style={{ color: textColor }}
                   >
                     트랙
                   </a>
@@ -127,7 +114,7 @@ export function AlbumPage({
                         ? "font-semibold"
                         : "opacity-70 hover:opacity-90"
                     }`}
-                    style={{ color: textColor1 }}
+                    style={{ color: textColor }}
                   >
                     정보
                   </a>
@@ -142,8 +129,8 @@ export function AlbumPage({
               <div className="space-y-6">
                 <TrackList
                   album={album}
-                  textColor1={textColor1}
-                  textColor2={textColor2}
+                  textColor1={textColor}
+                  textColor2={secondaryTextColor}
                 />
               </div>
             )}
@@ -151,8 +138,8 @@ export function AlbumPage({
               <div className="space-y-6">
                 <AlbumInfo
                   album={album}
-                  textColor1={textColor1}
-                  textColor2={textColor2}
+                  textColor1={textColor}
+                  textColor2={secondaryTextColor}
                 />
               </div>
             )}

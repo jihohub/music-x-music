@@ -2,6 +2,7 @@
 
 import { useInfiniteNewReleases, useNewReleases } from "@/hooks/useNewReleases";
 import { useHeader } from "@/providers/HeaderProvider";
+import { useThemeStore } from "@/stores/themeStore";
 import { AppleMusicAlbum } from "@/types/apple-music";
 import { useEffect, useState } from "react";
 import { InfiniteNewReleases } from "./components/InfiniteNewReleases";
@@ -10,6 +11,8 @@ import { NewReleaseGrid } from "./components/NewReleaseGrid";
 export function NewPage() {
   const [displayedAlbums, setDisplayedAlbums] = useState<AppleMusicAlbum[]>([]);
   const { setTitle } = useHeader();
+  const { getDisplayColors } = useThemeStore();
+  const { textColor } = getDisplayColors();
 
   // 기본 신규 릴리스 (첫 페이지)
   const { data: newReleases, isLoading, error } = useNewReleases();
@@ -47,10 +50,13 @@ export function NewPage() {
   if (error) {
     return (
       <div className="pt-8 md:pt-24 pb-24 md:pb-8 px-4 max-w-6xl mx-auto">
-        <NewReleaseGrid
-          albums={[]}
-          error="새 앨범 정보를 가져오는데 실패했습니다."
-        />
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
+          <div className="text-center py-20">
+            <p style={{ color: textColor }}>
+              새 앨범 정보를 가져오는데 실패했습니다.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }

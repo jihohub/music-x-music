@@ -2,6 +2,7 @@
 
 import { useHeader } from "@/providers/HeaderProvider";
 import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
+import { setArtistTheme, useThemeStore } from "@/stores/themeStore";
 import {
   AppleMusicAlbum,
   AppleMusicArtist,
@@ -34,31 +35,27 @@ export function ArtistPage({
 }: ArtistPageProps) {
   const { setTitle } = useHeader();
   const { setPageTextColor } = useMusicPlayer();
+  const { getDisplayColors } = useThemeStore();
   const [activeTab, setActiveTab] = useState<ArtistTabType>("tracks");
 
-  // 배경색 가져오기
-  const bgColor = artist?.attributes.artwork?.bgColor
-    ? `#${artist.attributes.artwork.bgColor}`
-    : "#1c1c1e";
+  // 테마 스토어에서 색상 가져오기
+  const { backgroundColor, textColor, secondaryTextColor } = getDisplayColors();
 
-  // 텍스트 색상 가져오기
-  const textColor1 = artist?.attributes.artwork?.textColor1
-    ? `#${artist.attributes.artwork.textColor1}`
-    : "#ffffff";
-
-  const textColor2 = artist?.attributes.artwork?.textColor2
-    ? `#${artist.attributes.artwork.textColor2}`
-    : "#ffffff";
-
-  // 아티스트 정보가 로드되면 Header title 설정 및 페이지 색상 설정
+  // 아티스트 정보가 로드되면 Header title 설정 및 테마 적용
   useEffect(() => {
     if (artist?.attributes?.name) {
       setTitle(artist.attributes.name);
     }
 
-    // 아티스트 데이터가 있으면 로딩 중이어도 페이지 색상 설정
+    // 아티스트 데이터가 있으면 테마 스토어에 색상 저장
+    if (artist) {
+      setArtistTheme(artist);
+    }
+
+    // 페이지 색상 설정 (Footer에서 사용)
     if (artist?.attributes?.artwork?.textColor1) {
-      setPageTextColor(textColor1);
+      const pageTextColor = `#${artist.attributes.artwork.textColor1}`;
+      setPageTextColor(pageTextColor);
     }
 
     // 컴포넌트 언마운트 시 기본 title로 복원
@@ -66,21 +63,11 @@ export function ArtistPage({
       setTitle("MUSIC X MUSIC");
       setPageTextColor("#ffffff"); // 기본 색상으로 복원
     };
-  }, [artist, setTitle, setPageTextColor, textColor1]);
+  }, [artist, setTitle, setPageTextColor]);
 
   if (isLoading) {
-    // 로딩 중이지만 artist 데이터가 있으면 그 색상을 사용
-    const skeletonBgColor = artist?.attributes.artwork?.bgColor
-      ? `#${artist.attributes.artwork.bgColor}`
-      : "#0f0f10"; // 거의 검은색에 가까운 중성적 색상
-
-    const skeletonTextColor = artist?.attributes.artwork?.textColor1
-      ? `#${artist.attributes.artwork.textColor1}`
-      : "#ffffff";
-
-    return (
-      <ArtistSkeleton bgColor={skeletonBgColor} textColor={skeletonTextColor} />
-    );
+    // 로딩 중일 때도 스토어의 색상 사용
+    return <ArtistSkeleton bgColor={backgroundColor} textColor={textColor} />;
   }
 
   if (error || !artist) {
@@ -90,7 +77,7 @@ export function ArtistPage({
   return (
     <div
       className="min-h-screen pb-32 md:pb-8 transition-colors duration-500"
-      style={{ backgroundColor: bgColor }}
+      style={{ backgroundColor }}
     >
       <div className="max-w-4xl mx-auto">
         <div className="md:pt-16">
@@ -124,7 +111,7 @@ export function ArtistPage({
                         ? "font-semibold"
                         : "opacity-70 hover:opacity-90"
                     }`}
-                    style={{ color: textColor1 }}
+                    style={{ color: textColor }}
                   >
                     트랙
                   </a>
@@ -135,7 +122,7 @@ export function ArtistPage({
                         ? "font-semibold"
                         : "opacity-70 hover:opacity-90"
                     }`}
-                    style={{ color: textColor1 }}
+                    style={{ color: textColor }}
                   >
                     앨범
                   </a>
@@ -149,15 +136,15 @@ export function ArtistPage({
             {activeTab === "tracks" && (
               <TopTracks
                 tracks={topTracks}
-                textColor1={textColor1}
-                textColor2={textColor2}
+                textColor1={textColor}
+                textColor2={secondaryTextColor}
               />
             )}
             {activeTab === "albums" && (
               <AlbumList
                 albums={albums}
-                textColor1={textColor1}
-                textColor2={textColor2}
+                textColor1={textColor}
+                textColor2={secondaryTextColor}
               />
             )}
           </div>

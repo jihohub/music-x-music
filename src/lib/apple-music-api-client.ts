@@ -2,8 +2,51 @@ import {
   APPLE_MUSIC_API_BASE,
   DEFAULT_STOREFRONT,
 } from "@/constants/apple-music";
+import {
+  setAlbumTheme,
+  setArtistTheme,
+  setTrackTheme,
+} from "@/stores/themeStore";
+import {
+  AppleMusicAlbum,
+  AppleMusicArtist,
+  AppleMusicTrack,
+} from "@/types/apple-music";
 import axios from "axios";
 import jwt from "jsonwebtoken";
+
+/**
+ * Apple Music 데이터에서 색상 정보를 스토어에 저장하는 유틸리티 함수들
+ */
+export function saveTrackColorsToStore(tracks: AppleMusicTrack[]) {
+  if (tracks && tracks.length > 0) {
+    // 첫 번째 트랙의 색상을 테마로 설정
+    const firstTrack = tracks[0];
+    if (firstTrack?.attributes?.artwork) {
+      setTrackTheme(firstTrack);
+    }
+  }
+}
+
+export function saveArtistColorsToStore(artists: AppleMusicArtist[]) {
+  if (artists && artists.length > 0) {
+    // 첫 번째 아티스트의 색상을 테마로 설정
+    const firstArtist = artists[0];
+    if (firstArtist?.attributes?.artwork) {
+      setArtistTheme(firstArtist);
+    }
+  }
+}
+
+export function saveAlbumColorsToStore(albums: AppleMusicAlbum[]) {
+  if (albums && albums.length > 0) {
+    // 첫 번째 앨범의 색상을 테마로 설정
+    const firstAlbum = albums[0];
+    if (firstAlbum?.attributes?.artwork) {
+      setAlbumTheme(firstAlbum);
+    }
+  }
+}
 
 /**
  * Apple Music 개발자 토큰 생성

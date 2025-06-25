@@ -77,6 +77,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false); // 데스크탑 확장 상태
   const [pageTextColor, setPageTextColor] = useState("#ffffff");
+  const [mounted, setMounted] = useState(false); // SSR 대응
   const audioRef = useRef<HTMLAudioElement>(null);
   const musicKitRef = useRef<any>(null);
 
@@ -86,6 +87,11 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
     currentTime: number;
     isPlaying: boolean;
   }>({ src: "", currentTime: 0, isPlaying: false });
+
+  // 클라이언트 사이드 마운트 체크
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // MusicKit 권한 확인 (로그인이 되어있고 명시적으로 권한이 있을 때만)
   const checkMusicKitAuth = () => {
@@ -103,6 +109,8 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
   };
 
   const playTrack = async (track: AppleMusicTrack) => {
+    console.log("🎵 playTrack 호출됨:", track.attributes.name);
+
     setCurrentTrack(track);
     setIsPlayerVisible(true);
     setIsFullScreen(false); // 미니 플레이어로 시작
@@ -112,6 +120,7 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
 
     // MusicKit 권한이 명시적으로 있는 경우에만 사용
     const musicKitAuthorized = checkMusicKitAuth();
+    console.log("🔐 MusicKit 권한:", musicKitAuthorized);
 
     if (musicKitAuthorized) {
       try {
@@ -123,30 +132,49 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
         setIsUsingMusicKit(true);
         // MusicKit으로 자동 재생 시작
         await musicKitRef.current.play();
-        console.log("MusicKit으로 재생:", track.attributes.name);
+        console.log("✅ MusicKit으로 재생:", track.attributes.name);
         return;
       } catch (error) {
-        console.error("MusicKit 재생 실패, 프리뷰로 전환:", error);
+        console.error("❌ MusicKit 재생 실패, 프리뷰로 전환:", error);
       }
     }
 
     // 기본적으로 프리뷰 재생 사용
     setIsUsingMusicKit(false);
-    console.log("프리뷰로 재생:", track.attributes.name);
+    console.log("🎧 프리뷰로 재생:", track.attributes.name);
 
-    // 프리뷰 자동 재생 (audioRef 업데이트는 useEffect에서 처리)
-    setTimeout(() => {
-      if (audioRef.current && !musicKitAuthorized) {
-        const previewUrl = track.attributes.previews?.[0]?.url;
-        if (previewUrl) {
-          audioRef.current.src = previewUrl;
-          audioRef.current.load();
-          audioRef.current.play().catch((error) => {
-            console.error("프리뷰 자동 재생 실패:", error);
-          });
-        }
+    // 프리뷰 자동재생 시도 (사용자 상호작용으로 인한 호출이므로 허용될 가능성 높음)
+    if (audioRef.current) {
+      const previewUrl = track.attributes.previews?.[0]?.url;
+      console.log("🔗 프리뷰 URL:", previewUrl);
+
+      if (previewUrl) {
+        audioRef.current.src = previewUrl;
+        audioRef.current.load();
+        console.log("📁 오디오 로드 완료");
+
+        // 약간의 지연 후 자동재생 시도
+        setTimeout(async () => {
+          try {
+            if (audioRef.current) {
+              console.log("▶️ 자동재생 시도...");
+              await audioRef.current.play();
+              console.log("✅ 프리뷰 자동재생 성공!");
+            }
+          } catch (error) {
+            console.log(
+              "⚠️ 프리뷰 자동재생 실패 (사용자가 재생 버튼을 눌러야 함):",
+              (error as Error).message
+            );
+            // 자동재생이 실패해도 오디오는 준비되어 있어서 사용자가 재생 버튼을 누르면 재생됨
+          }
+        }, 100);
+      } else {
+        console.log("❌ 프리뷰 URL이 없습니다");
       }
-    }, 100);
+    } else {
+      console.log("❌ audioRef가 없습니다");
+    }
   };
 
   const togglePlayback = async () => {
@@ -377,8 +405,8 @@ export function MusicPlayerProvider({ children }: MusicPlayerProviderProps) {
       }}
     >
       {children}
-      {/* HTML5 Audio를 Portal로 body에 마운트 (페이지 변경에 영향받지 않음) */}
-      {typeof window !== "undefined" &&
+      {/* HTML5 Audio를 클라이언트 사이드에서만 렌더링 */}
+      {mounted &&
         createPortal(
           <audio
             ref={audioRef}

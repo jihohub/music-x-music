@@ -1,7 +1,6 @@
 "use client";
 
 import { useHeader } from "@/providers/HeaderProvider";
-import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { IoArrowBackOutline, IoHomeOutline } from "react-icons/io5";
 
@@ -10,13 +9,12 @@ export default function Header({ title }: { title?: string }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const { title: contextTitle } = useHeader();
-  const { getPageTextColor } = useMusicPlayer();
 
   // props로 받은 title이 있으면 우선, 없으면 context title 사용
   const displayTitle = title || contextTitle;
 
   // 헤더는 페이지 색상만 사용 (트랙 색상으로 변하지 않음)
-  const textColor = getPageTextColor();
+  const textColor = "#ffffff";
 
   return (
     <header

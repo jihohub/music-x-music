@@ -35,7 +35,7 @@ export const RecommendedTracks = ({
 
   return (
     <section>
-      {isLoading && <div className="h-[555.5px] md:h-[158.836px]"></div>}
+      {isLoading && <div className="h-[555.5px] md:h-[159.84px]"></div>}
 
       {!isLoading && tracks.length === 0 && (
         <div className="text-center text-white/60 py-8">
