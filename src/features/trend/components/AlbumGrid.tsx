@@ -45,7 +45,7 @@ export const AlbumGrid = ({
   if (isLoading) {
     // 전체 탭에서는 4개 아이템(2x2), 개별 탭에서는 8개 아이템(2x4 또는 4x2)
     const skeletonHeight = showPreview
-      ? "h-[388px] md:h-[240px]"
+      ? "h-[388px] md:h-[239.5px]"
       : "h-[1080px] md:h-[480px]";
     return <div className={`${skeletonHeight} animate-pulse`}></div>;
   }

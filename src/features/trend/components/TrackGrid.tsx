@@ -47,7 +47,7 @@ export const TrackGrid = ({
   if (isLoading) {
     // 전체 탭에서는 4개 아이템(2x2), 개별 탭에서는 8개 아이템(2x4 또는 4x2)
     const skeletonHeight = showPreview
-      ? "h-[399px] md:h-[220px]"
+      ? "h-[399px] md:h-[245.5px]"
       : "h-[1000px] md:h-[440px]";
     return <div className={`${skeletonHeight} animate-pulse`}></div>;
   }
