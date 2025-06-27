@@ -1,26 +1,11 @@
 "use client";
 
-import UnoptimizedImage from "@/components/common/UnoptimizedImage";
 import { useMusicPlayer } from "@/providers/MusicPlayerProvider";
 import { AppleMusicTrack } from "@/types/apple-music";
-
-// Apple Music 이미지 URL 생성 함수
-function getAppleMusicImageUrl(
-  artwork?: any,
-  size: "sm" | "md" | "lg" = "md"
-): string {
-  if (!artwork?.url) {
-    return "/images/placeholder-track.jpg"; // 기본 이미지
-  }
-
-  const sizeMap = {
-    sm: "300x300",
-    md: "640x640",
-    lg: "1200x1200",
-  };
-
-  return artwork.url.replace("{w}x{h}", sizeMap[size]);
-}
+import {
+  getAppleMusicImageSrcSet,
+  getOptimizedAppleMusicImageUrl,
+} from "@/utils/image";
 
 interface RecommendedTracksProps {
   tracks: AppleMusicTrack[];
@@ -35,17 +20,28 @@ export const RecommendedTracks = ({
 
   return (
     <section>
-      {isLoading && <div className="h-[555.5px] md:h-[159.84px]"></div>}
+      <h2 className="text-xl font-bold mb-4 text-white">추천 트랙</h2>
+
+      {isLoading && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="aspect-square bg-white/5 rounded-2xl animate-pulse" />
+              <div className="h-4 bg-white/5 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      )}
 
       {!isLoading && tracks.length === 0 && (
         <div className="text-center text-white/60 py-8">
-          No tracks available
+          추천 트랙을 불러올 수 없습니다
         </div>
       )}
 
       {!isLoading && tracks.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {tracks.map((track) => (
+          {tracks.map((track, index) => (
             <div
               key={`recommended-track-${track.id}`}
               className="group relative"
@@ -57,10 +53,24 @@ export const RecommendedTracks = ({
                 className="w-full text-left"
               >
                 <div className="overflow-hidden rounded-2xl aspect-square relative bg-card-bg">
-                  <UnoptimizedImage
-                    src={getAppleMusicImageUrl(track.attributes.artwork, "md")}
+                  <img
+                    src={getOptimizedAppleMusicImageUrl(
+                      track.attributes.artwork,
+                      {
+                        containerWidth: 200, // 실제 렌더링 크기에 맞춤
+                        useDevicePixelRatio: true,
+                        maxSize: 640,
+                      }
+                    )}
+                    srcSet={getAppleMusicImageSrcSet(track.attributes.artwork)}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16.66vw"
                     alt={track.attributes.name}
-                    className="aspect-square rounded-2xl w-full"
+                    className="aspect-square rounded-2xl w-full h-full object-cover transition-opacity duration-300"
+                    loading={index < 6 ? "eager" : "lazy"} // 첫 6개는 즉시 로드
+                    style={{
+                      contentVisibility: "auto",
+                      containIntrinsicSize: "200px 200px",
+                    }}
                   />
                 </div>
               </button>
