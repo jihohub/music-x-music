@@ -62,3 +62,92 @@ export function getSafeImageUrl(
     return sortedImages[middleIndex].url;
   }
 }
+
+// Apple Music 이미지 최적화 유틸리티
+
+interface ImageSizeOptions {
+  /** 컨테이너 너비 (px) */
+  containerWidth?: number;
+  /** 디바이스 픽셀 비율 고려 여부 */
+  useDevicePixelRatio?: boolean;
+  /** 최대 이미지 크기 제한 */
+  maxSize?: number;
+}
+
+/**
+ * Apple Music API 이미지 URL을 최적화된 사이즈로 생성
+ * 컨테이너 크기와 디바이스 픽셀 비율을 고려하여 적절한 이미지 사이즈 결정
+ */
+export function getOptimizedAppleMusicImageUrl(
+  artwork?: any,
+  options: ImageSizeOptions = {}
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder.jpg";
+  }
+
+  const {
+    containerWidth = 300,
+    useDevicePixelRatio = true,
+    maxSize = 1200,
+  } = options;
+
+  // 디바이스 픽셀 비율 고려
+  const devicePixelRatio = useDevicePixelRatio
+    ? typeof window !== "undefined"
+      ? window.devicePixelRatio || 1
+      : 1
+    : 1;
+
+  // 필요한 실제 이미지 크기 계산
+  let targetSize = Math.ceil(containerWidth * devicePixelRatio);
+
+  // 최대 크기 제한
+  targetSize = Math.min(targetSize, maxSize);
+
+  // Apple Music API는 특정 사이즈들을 지원하므로 가장 가까운 크기로 반올림
+  const supportedSizes = [
+    100, 200, 300, 400, 500, 600, 640, 800, 1000, 1200, 1400, 1600,
+  ];
+  const optimalSize =
+    supportedSizes.find((size) => size >= targetSize) ||
+    supportedSizes[supportedSizes.length - 1];
+
+  return artwork.url.replace("{w}x{h}", `${optimalSize}x${optimalSize}`);
+}
+
+/**
+ * 반응형 srcSet 생성 (여러 해상도 지원)
+ */
+export function getAppleMusicImageSrcSet(artwork?: any): string {
+  if (!artwork?.url) return "";
+
+  const sizes = [300, 640, 1200];
+  return sizes
+    .map(
+      (size) => `${artwork.url.replace("{w}x{h}", `${size}x${size}`)} ${size}w`
+    )
+    .join(", ");
+}
+
+/**
+ * 레거시 사이즈 매핑 (기존 코드 호환성)
+ */
+export function getAppleMusicImageUrl(
+  artwork?: any,
+  size: "xs" | "sm" | "md" | "lg" | "xl" = "md"
+): string {
+  if (!artwork?.url) {
+    return "/images/placeholder.jpg";
+  }
+
+  const sizeMap = {
+    xs: "100x100", // 아주 작은 썸네일
+    sm: "300x300", // 작은 썸네일
+    md: "640x640", // 일반 표시용
+    lg: "1200x1200", // 고해상도
+    xl: "1600x1600", // 최고해상도
+  };
+
+  return artwork.url.replace("{w}x{h}", sizeMap[size]);
+}

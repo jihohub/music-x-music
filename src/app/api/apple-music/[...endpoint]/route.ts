@@ -147,7 +147,14 @@ export async function GET(
       console.log("Apple Music API 성공 응답:", {
         responseSize: JSON.stringify(data).length,
       });
-      return NextResponse.json(data);
+
+      // 캐시 헤더 추가로 성능 개선
+      return NextResponse.json(data, {
+        headers: {
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600", // 30분 캐시, 1시간 stale-while-revalidate
+          "CDN-Cache-Control": "public, s-maxage=1800",
+        },
+      });
     } catch (tokenError) {
       console.error("Apple Music 토큰 생성 오류:", tokenError);
       return NextResponse.json(
