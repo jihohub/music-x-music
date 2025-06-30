@@ -26,6 +26,7 @@ export default function MainPageStory() {
 
   // 메인페이지 전용 음악 스토어
   const {
+    currentTrack,
     currentTrackIndex,
     isPlaying,
     isMuted,
@@ -306,6 +307,17 @@ export default function MainPageStory() {
     syncTrack();
   }, [currentIndex, currentTrackIndex, tracks, playTrack]);
 
+  // 첫 번째 트랙 자동 로딩 (처음 접속 시)
+  useEffect(() => {
+    if (tracks.length > 0 && !currentTrack && currentIndex === 0) {
+      console.log("📀 첫 번째 트랙 자동 설정:", tracks[0].attributes.name);
+      // 재생은 하지 않고 메타데이터만 로드
+      playTrack(tracks[0], 0).catch((error) => {
+        console.log("⚠️ 첫 번째 트랙 로드 실패:", error);
+      });
+    }
+  }, [tracks, currentTrack, currentIndex, playTrack]);
+
   // 모바일용 스크롤 이벤트 (개선된 감도 조정)
   useEffect(() => {
     if (!isMobile || !tracks.length) return;
@@ -470,13 +482,23 @@ export default function MainPageStory() {
           <>
             {/* 음소거 토글 버튼 - 우측 상단 */}
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (isProcessing) {
                   console.log("⚠️ 처리 중... 음소거 버튼 무시됨");
                   return;
                 }
+
+                // 명시적으로 사용자 상호작용 기록
                 console.log("🔇 음소거 버튼 클릭됨", { 현재상태: isMuted });
-                toggleMute();
+                setUserHasInteracted(true);
+
+                // 첫 번째 트랙이 로드되지 않았다면 로드
+                if (!currentTrack && tracks.length > 0) {
+                  console.log("📀 첫 번째 트랙 로딩...");
+                  await playTrack(tracks[0], 0);
+                }
+
+                await toggleMute();
               }}
               className="fixed top-4 right-4 z-[9999] bg-black/50 backdrop-blur-sm rounded-full p-3 text-white hover:bg-black/70 transition-all duration-300 shadow-lg"
               title={isMuted ? "음소거 해제" : "음소거"}
@@ -559,15 +581,23 @@ export default function MainPageStory() {
         <>
           {/* 음소거 토글 버튼 - 우측 상단 */}
           <button
-            onClick={() => {
+            onClick={async () => {
               if (isProcessing) {
                 console.log("⚠️ 처리 중... 음소거 버튼 무시됨");
                 return;
               }
-              console.log("🖥️ 데스크탑 음소거 버튼 클릭됨", {
-                현재상태: isMuted,
-              });
-              toggleMute();
+
+              // 명시적으로 사용자 상호작용 기록
+              console.log("🔇 음소거 버튼 클릭됨", { 현재상태: isMuted });
+              setUserHasInteracted(true);
+
+              // 첫 번째 트랙이 로드되지 않았다면 로드
+              if (!currentTrack && tracks.length > 0) {
+                console.log("📀 첫 번째 트랙 로딩...");
+                await playTrack(tracks[0], 0);
+              }
+
+              await toggleMute();
             }}
             className="fixed top-24 right-8 z-[9999] bg-black/50 backdrop-blur-sm rounded-full p-4 text-white hover:bg-black/70 transition-all duration-300 shadow-lg"
             title={isMuted ? "음소거 해제" : "음소거"}
