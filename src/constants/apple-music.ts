@@ -17,15 +17,23 @@ export const FEATURED_ARTIST_IDS = [
 ];
 
 /**
- * 메인 페이지에 표시될 추천 트랙 ID 목록 (Apple Music ID)
+ * 메인 페이지에 표시될 추천 트랙 ID 목록 (Apple Music ID) - 사용자 요청 순서
  */
 export const RECOMMENDED_TRACK_IDS = [
-  "1791736475", // Don't Wake Me Up - James Hype
-  "1657869492", // Snooze - SZA
-  "1789854625", // Focus (feat. CLOVES) - John Summit
-  "1640463909", // Kammy (like i do) - Fred again..
-  "1513162746", // party 4 u - Charli xcx
-  "1779319626", // Revolving door - Tate McRae
+  "1657869492", // Snooze - SZA ✅
+  "1513162746", // party 4 u - Charli XCX ✅
+  "1762656732", // Die With A Smile - Lady Gaga & Bruno Mars ⭐ NEW
+  "1789854625", // Focus - John Summit ✅
+  "1725877965", // supernatural - Ariana Grande ⭐ NEW
+  "1496383400", // LOVE ME HARD - Elley Duhe ⭐ NEW
+  "1603171533", // Sacrifice - The Weeknd ⭐ NEW
+  "1724935211", // Neverender - Justice & Tame Impala ⭐ NEW
+  "1779319626", // Revolving door - Tate McRae ✅
+  "1640463909", // Kammy - Fred Again ✅
+  "1578326277", // SO DONE - The Kid LAROI ⭐ NEW
+  "1791736475", // Don't Wake Me Up - James Hype ✅
+  "1531015422", // Let Me - ZAYN ⭐ NEW
+  "1809015879", // Fame is a Gun - Addison Rae ⭐ NEW
 ];
 
 /**

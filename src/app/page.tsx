@@ -1,4 +1,4 @@
-import MainPage from "@/features/main/MainPage";
+import MainPageStory from "@/features/main/MainPageStory";
 import { getMainPageDataServer } from "@/features/main/queries/getMainPageDataServer";
 import {
   HydrationBoundary,
@@ -18,7 +18,7 @@ export default async function Home() {
       staleTime: Infinity, // SSG이므로 무한대로 설정
     });
 
-    console.log("SSG 빌드 완료: 메인페이지 데이터 생성됨");
+    console.log("SSG 빌드 완료: 스토리 메인페이지 데이터 생성됨");
   } catch (error) {
     console.error("SSG 데이터 prefetch 실패 (CSR로 폴백):", error);
     // 에러가 발생해도 빈 페이지는 제공하되, 클라이언트에서 다시 로딩
@@ -26,7 +26,7 @@ export default async function Home() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <MainPage />
+      <MainPageStory />
     </HydrationBoundary>
   );
 }

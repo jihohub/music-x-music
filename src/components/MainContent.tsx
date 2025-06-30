@@ -14,9 +14,11 @@ export default function MainContent({ children }: MainContentProps) {
   const isContentBasedHeight =
     pathname === "/search" || pathname === "/profile";
 
-  // 아티스트나 앨범 페이지는 전체 배경색을 위해 container 제약 제거
+  // 메인페이지, 아티스트, 앨범 페이지는 전체 배경색을 위해 container 제약 제거
   const isFullWidthPage =
-    pathname.startsWith("/artist/") || pathname.startsWith("/album/");
+    pathname === "/" ||
+    pathname.startsWith("/artist/") ||
+    pathname.startsWith("/album/");
 
   return (
     <main
