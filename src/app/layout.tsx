@@ -1,7 +1,4 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import MainContent from "@/components/MainContent";
-import MusicPlayer from "@/components/MusicPlayer";
+import ConditionalLayout from "@/components/ConditionalLayout";
 import ServiceWorkerProvider from "@/components/ServiceWorkerProvider";
 import { HeaderProvider } from "@/providers/HeaderProvider";
 import { MusicPlayerProvider } from "@/providers/MusicPlayerProvider";
@@ -25,15 +22,6 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "MUSIC X MUSIC",
   description: "친구들과 음악을 공유하고 즐기는 앱",
-  icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "32x32" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -43,10 +31,6 @@ export const metadata: Metadata = {
     telephone: false,
   },
 };
-
-function MusicPlayerWrapper() {
-  return <MusicPlayer />;
-}
 
 export default function RootLayout({
   children,
@@ -68,13 +52,7 @@ export default function RootLayout({
             <ThemeProvider>
               <MusicPlayerProvider>
                 <ServiceWorkerProvider />
-                {/* 데스크탑에서만 Header 표시 */}
-                <div className="hidden md:block">
-                  <Header />
-                </div>
-                <MainContent>{children}</MainContent>
-                <Footer />
-                <MusicPlayerWrapper />
+                <ConditionalLayout>{children}</ConditionalLayout>
               </MusicPlayerProvider>
             </ThemeProvider>
           </QueryProvider>

@@ -4,6 +4,7 @@ import { create } from "zustand";
 interface MainPageMusicState {
   // 현재 재생 중인 트랙
   currentTrack: AppleMusicTrack | null;
+  currentTrackIndex: number;
 
   // 오디오 상태
   isPlaying: boolean;
@@ -17,6 +18,7 @@ interface MainPageMusicState {
 
   // 액션들
   setCurrentTrack: (track: AppleMusicTrack | null) => void;
+  setCurrentTrackIndex: (index: number) => void;
   setIsPlaying: (playing: boolean) => void;
   setIsMuted: (muted: boolean) => void;
   setVolume: (volume: number) => void;
@@ -25,18 +27,19 @@ interface MainPageMusicState {
   setAudioElement: (audio: HTMLAudioElement | null) => void;
 
   // 메서드들
-  play: () => void;
+  play: () => Promise<void>;
   pause: () => void;
   toggleMute: () => void;
-  playTrack: (track: AppleMusicTrack) => void;
+  playTrack: (track: AppleMusicTrack, index?: number) => Promise<void>;
   cleanup: () => void;
 }
 
 export const useMainPageMusicStore = create<MainPageMusicState>((set, get) => ({
   // 초기 상태
   currentTrack: null,
+  currentTrackIndex: 0,
   isPlaying: false,
-  isMuted: true, // 처음엔 음소거
+  isMuted: true, // 기본 음소거 상태
   volume: 0.7,
   currentTime: 0,
   duration: 0,
@@ -44,6 +47,7 @@ export const useMainPageMusicStore = create<MainPageMusicState>((set, get) => ({
 
   // 세터들
   setCurrentTrack: (track) => set({ currentTrack: track }),
+  setCurrentTrackIndex: (index) => set({ currentTrackIndex: index }),
   setIsPlaying: (playing) => set({ isPlaying: playing }),
   setIsMuted: (muted) => set({ isMuted: muted }),
   setVolume: (volume) => set({ volume }),
@@ -52,19 +56,31 @@ export const useMainPageMusicStore = create<MainPageMusicState>((set, get) => ({
   setAudioElement: (audio) => set({ audioElement: audio }),
 
   // 재생/일시정지
-  play: () => {
-    const { audioElement } = get();
-    if (audioElement) {
-      audioElement.play().catch(console.error);
-      set({ isPlaying: true });
+  play: async () => {
+    const { audioElement, isPlaying } = get();
+    if (audioElement && !isPlaying) {
+      try {
+        console.log("🎵 재생 시도 중...");
+        await audioElement.play();
+        set({ isPlaying: true });
+        console.log("✅ 재생 성공!");
+      } catch (error) {
+        console.log(
+          "❌ 재생 실패:",
+          error instanceof Error ? error.message : String(error)
+        );
+        set({ isPlaying: false });
+      }
     }
   },
 
   pause: () => {
-    const { audioElement } = get();
-    if (audioElement) {
+    const { audioElement, isPlaying } = get();
+    if (audioElement && isPlaying) {
+      console.log("⏸️ 일시정지 중...");
       audioElement.pause();
       set({ isPlaying: false });
+      console.log("✅ 일시정지 완료");
     }
   },
 
@@ -79,31 +95,55 @@ export const useMainPageMusicStore = create<MainPageMusicState>((set, get) => ({
   },
 
   // 새 트랙 재생
-  playTrack: (track) => {
-    const { audioElement, volume, isMuted } = get();
+  playTrack: async (track, index = 0) => {
+    const { audioElement, volume, isMuted, isPlaying } = get();
 
     if (audioElement) {
+      // 현재 재생 중이면 먼저 정지
+      if (isPlaying) {
+        console.log("🛑 현재 재생 중인 트랙 정지...");
+        audioElement.pause();
+      }
+
       // 미리보기 URL이 있는 경우에만 재생
       if (track.attributes.previews && track.attributes.previews.length > 0) {
         const previewUrl = track.attributes.previews[0].url;
+
+        console.log("📀 새 트랙 로딩:", track.attributes.name);
         audioElement.src = previewUrl;
         audioElement.volume = volume;
         audioElement.muted = isMuted;
 
         set({
           currentTrack: track,
+          currentTrackIndex: index,
           currentTime: 0,
           duration: 0,
+          isPlaying: false, // 일단 false로 설정
         });
 
-        // 자동 재생
-        audioElement.play().catch((error) => {
-          console.log("자동 재생 실패 (브라우저 정책):", error);
-          set({ isPlaying: false });
-        });
+        // 잠시 기다린 후 재생 시도 (브라우저가 준비될 시간)
+        setTimeout(async () => {
+          try {
+            console.log("▶️ 재생 시도:", track.attributes.name);
+            await audioElement.play();
+            set({ isPlaying: true });
+            console.log("✅ 재생 성공!");
+          } catch (error) {
+            console.log(
+              "❌ 재생 실패:",
+              error instanceof Error ? error.message : String(error)
+            );
+            set({ isPlaying: false });
+          }
+        }, 100);
       } else {
-        console.log("미리보기 URL이 없는 트랙:", track.attributes.name);
-        set({ currentTrack: track, isPlaying: false });
+        console.log("⚠️ 미리보기 URL이 없는 트랙:", track.attributes.name);
+        set({
+          currentTrack: track,
+          currentTrackIndex: index,
+          isPlaying: false,
+        });
       }
     }
   },
@@ -117,6 +157,7 @@ export const useMainPageMusicStore = create<MainPageMusicState>((set, get) => ({
     }
     set({
       currentTrack: null,
+      currentTrackIndex: 0,
       isPlaying: false,
       currentTime: 0,
       duration: 0,

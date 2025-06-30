@@ -36,6 +36,14 @@
   --warning: #ffae00;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
 /* 초기 테마 전환을 위한 최적화. 페이지 로드 시 깜빡임 방지 */
 html {
   transition: none;
@@ -170,4 +178,226 @@ button {
 .min-h-fit {
   min-height: fit-content !important;
   height: auto !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* 테스트용 간단한 애니메이션 */
+@keyframes simpleScale {
+  0% {
+    transform: scale(1) !important;
+  }
+  50% {
+    transform: scale(1.5) !important;
+  }
+  100% {
+    transform: scale(1) !important;
+  }
+}
+
+.test-scale {
+  animation: simpleScale 1s ease-in-out infinite !important;
+  border: 5px solid lime !important;
+}
+
+/* CSS 커스텀 속성을 사용한 강력한 애니메이션 */
+.beat-active {
+  transform: scale(var(--beat-scale, 1)) rotate(var(--beat-rotation, 0deg)) !important;
+  transform-origin: center center !important;
+  transition: none !important;
+}
+
+/* 강제 애니메이션 적용 - Tailwind 무시 */
+[data-beat-active="true"] {
+  animation: unifiedBeatAnimation 0.4s ease-in-out infinite !important;
+  transform-origin: center center !important;
+  will-change: transform, filter, box-shadow !important;
+}
+
+/* 통합된 비트 애니메이션 - transform과 filter를 함께 처리 */
+@keyframes unifiedBeatAnimation {
+  0% {
+    transform: scale(1) rotate(0deg) !important;
+    filter: brightness(1) contrast(1) saturate(1) hue-rotate(0deg) !important;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0) !important;
+  }
+  15% {
+    transform: scale(1.25) rotate(1deg) !important;
+    filter: brightness(1.1) contrast(1.15) saturate(1.2) hue-rotate(8deg) !important;
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.15) !important;
+  }
+  30% {
+    transform: scale(1) rotate(0deg) !important;
+    filter: brightness(1) contrast(1) saturate(1) hue-rotate(0deg) !important;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0) !important;
+  }
+  45% {
+    transform: scale(1.2) rotate(-1deg) !important;
+    filter: brightness(1.08) contrast(1.12) saturate(1.15) hue-rotate(-5deg) !important;
+    box-shadow: 0 0 35px rgba(255, 255, 255, 0.12) !important;
+  }
+  60% {
+    transform: scale(1) rotate(0deg) !important;
+    filter: brightness(1) contrast(1) saturate(1) hue-rotate(0deg) !important;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0) !important;
+  }
+  75% {
+    transform: scale(1.18) rotate(0.8deg) !important;
+    filter: brightness(1.12) contrast(1.18) saturate(1.25) hue-rotate(12deg) !important;
+    box-shadow: 0 0 45px rgba(255, 255, 255, 0.18) !important;
+  }
+  90% {
+    transform: scale(1) rotate(0deg) !important;
+    filter: brightness(1) contrast(1) saturate(1) hue-rotate(0deg) !important;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0) !important;
+  }
+  100% {
+    transform: scale(1.15) rotate(0.5deg) !important;
+    filter: brightness(1.05) contrast(1.1) saturate(1.1) hue-rotate(3deg) !important;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+@keyframes wooferFastAnimation {
+  0% {
+    transform: scale(1.1) !important;
+    opacity: 0.3 !important;
+  }
+  25% {
+    transform: scale(1.25) !important;
+    opacity: 0.4 !important;
+  }
+  50% {
+    transform: scale(1.1) !important;
+    opacity: 0.3 !important;
+  }
+  75% {
+    transform: scale(1.2) !important;
+    opacity: 0.35 !important;
+  }
+  100% {
+    transform: scale(1.1) !important;
+    opacity: 0.3 !important;
+  }
+}
+
+@keyframes wooferMediumAnimation {
+  0% {
+    transform: scale(1.2) !important;
+    opacity: 0.22 !important;
+  }
+  33% {
+    transform: scale(1.35) !important;
+    opacity: 0.3 !important;
+  }
+  66% {
+    transform: scale(1.25) !important;
+    opacity: 0.26 !important;
+  }
+  100% {
+    transform: scale(1.2) !important;
+    opacity: 0.22 !important;
+  }
+}
+
+@keyframes wooferSlowAnimation {
+  0% {
+    transform: scale(1.3) !important;
+    opacity: 0.15 !important;
+  }
+  50% {
+    transform: scale(1.5) !important;
+    opacity: 0.22 !important;
+  }
+  100% {
+    transform: scale(1.3) !important;
+    opacity: 0.15 !important;
+  }
+}
+
+/* 통합 애니메이션 클래스 */
+.unified-beat {
+  animation: unifiedBeatAnimation 0.4s ease-in-out infinite !important;
+  transform-origin: center center !important;
+  will-change: transform, filter, box-shadow !important;
+}
+
+/* 우퍼 효과는 별도 요소에 적용 */
+div.woofer-fast,
+.woofer-fast {
+  animation: wooferFastAnimation 0.25s ease-out infinite !important;
+  will-change: transform, opacity !important;
+}
+
+div.woofer-medium,
+.woofer-medium {
+  animation: wooferMediumAnimation 0.5s ease-out infinite !important;
+  will-change: transform, opacity !important;
+}
+
+div.woofer-slow,
+.woofer-slow {
+  animation: wooferSlowAnimation 1s ease-out infinite !important;
+  will-change: transform, opacity !important;
+}
+
+/* 가장 단순한 비트 애니메이션 - 더 강력하게 */
+.simple-beat {
+  animation: simpleBeat 0.8s ease-in-out infinite !important;
+  transform-origin: center center !important;
+  will-change: transform !important;
+}
+
+/* 더 강력한 선택자로 확실하게 적용 */
+div.simple-beat,
+[class*="simple-beat"] {
+  animation: simpleBeat 0.8s ease-in-out infinite !important;
+  transform-origin: center center !important;
+  will-change: transform !important;
+}
+
+@keyframes simpleBeat {
+  0% {
+    transform: scale(1) !important;
+  }
+  50% {
+    transform: scale(1.4) !important;
+  }
+  100% {
+    transform: scale(1) !important;
+  }
+}
+
+/* 더 눈에 띄는 대체 애니메이션 */
+.mega-beat {
+  animation: megaBeat 1s ease-in-out infinite !important;
+  transform-origin: center center !important;
+  will-change: transform !important;
+}
+
+@keyframes megaBeat {
+  0% {
+    transform: scale(1) rotate(0deg) !important;
+    filter: brightness(1) !important;
+  }
+  25% {
+    transform: scale(1.2) rotate(2deg) !important;
+    filter: brightness(1.1) !important;
+  }
+  50% {
+    transform: scale(1.5) rotate(0deg) !important;
+    filter: brightness(1.2) !important;
+  }
+  75% {
+    transform: scale(1.2) rotate(-2deg) !important;
+    filter: brightness(1.1) !important;
+  }
+  100% {
+    transform: scale(1) rotate(0deg) !important;
+    filter: brightness(1) !important;
+  }
 }
