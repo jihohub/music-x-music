@@ -36,6 +36,8 @@ export default function MainPageStory() {
     toggleMute,
     setAudioElement,
     setIsPlaying,
+    setTrackMetadata,
+    cleanup,
   } = useMainPageMusicStore();
 
   // 통합 쿼리로 데이터 로딩 (트랙만)
@@ -50,10 +52,62 @@ export default function MainPageStory() {
 
   const tracks = data?.tracks || [];
 
-  // 클라이언트 마운트 감지
+  // 클라이언트 마운트 감지 및 SSG Hydration 안전 처리
   useEffect(() => {
     setIsClientMounted(true);
-  }, []);
+
+    // 🔧 SSG Hydration 완료 후 오디오 상태 강제 초기화
+    if (typeof window !== "undefined") {
+      console.log("🔄 SSG Hydration 완료 - 오디오 상태 강제 초기화");
+
+      // 혹시 남아있을 수 있는 기존 오디오 정리
+      const existingAudios = document.querySelectorAll("audio");
+      existingAudios.forEach((audio, index) => {
+        console.log(`🧹 기존 오디오 ${index + 1} 정리 중...`);
+        if (!audio.paused) {
+          audio.pause();
+        }
+        audio.src = "";
+        audio.load();
+      });
+
+      // Store 상태도 초기화
+      cleanup();
+      console.log("✅ SSG Hydration 오디오 정리 완료");
+    }
+  }, [cleanup]);
+
+  // 🔧 컴포넌트 언마운트 시 모든 오디오 정리
+  useEffect(() => {
+    return () => {
+      console.log("🔌 MainPageStory 언마운트 - cleanup 호출");
+      cleanup();
+    };
+  }, [cleanup]);
+
+  // 🔧 브라우저 탭 이동/페이지 이탈 시 오디오 정리
+  useEffect(() => {
+    const handlePageUnload = () => {
+      console.log("🚪 페이지 이탈 감지 - cleanup 호출");
+      cleanup();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log("👁️ 탭 숨김 감지 - 오디오 일시정지");
+        pause();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    window.addEventListener("beforeunload", handlePageUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", handlePageUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [cleanup, pause]);
 
   // 로깅 최적화 - 상태 변경 시에만 출력
   const [lastLoggedState, setLastLoggedState] = useState<string>("");
@@ -101,41 +155,79 @@ export default function MainPageStory() {
 
   // 재생/일시정지 토글 함수 (사용자 인터랙션으로 간주)
   const togglePlayPause = async () => {
+    const audioElement = audioRef.current;
+    const actualIsPlaying = audioElement ? !audioElement.paused : false;
+
     console.log("🎵 togglePlayPause 호출됨", {
       userHasInteracted,
-      isPlaying,
+      storeIsPlaying: isPlaying,
+      actualIsPlaying: actualIsPlaying,
       currentIndex,
       currentTrackIndex,
       currentTrack: tracks[currentIndex],
       isProcessing,
+      hasAudioElement: !!audioElement,
+      audioSrc: audioElement?.src || "없음",
+      audioPaused: audioElement?.paused,
     });
 
     if (!userHasInteracted) {
       setUserHasInteracted(true);
+      console.log("✅ 사용자 상호작용 기록됨");
     }
 
-    if (isPlaying) {
-      // 일시정지는 즉시 처리 (잠금 없음)
-      console.log("⏸️ 일시정지 시도");
+    // 🔧 상태 동기화: store 상태를 실제 audio element 상태와 맞춤
+    if (audioElement && isPlaying !== actualIsPlaying) {
+      console.log("🔄 상태 동기화:", {
+        before: { storeIsPlaying: isPlaying, actualIsPlaying },
+        after: { storeIsPlaying: actualIsPlaying, actualIsPlaying },
+      });
+      setIsPlaying(actualIsPlaying);
+    }
+
+    // 실제 오디오 상태를 기준으로 판단
+    if (actualIsPlaying) {
+      // 실제로 재생 중이면 일시정지
+      console.log("⏸️ 실제 재생 중 - 일시정지 시도");
       pause();
       console.log("✅ 일시정지 완료");
     } else {
-      // 재생만 잠금 적용
+      // 실제로 일시정지 중이면 재생
       if (isProcessing) {
         console.log("⚠️ 재생 처리 중... 무시됨");
         return;
       }
 
-      setIsProcessing(true); // 재생 시작 시에만 잠금
+      setIsProcessing(true);
 
       try {
-        console.log("▶️ 재생 시도");
-        await play();
-        console.log("✅ 재생 완료");
+        console.log("▶️ 실제 일시정지 중 - 재생 시도");
+
+        // 현재 트랙이 설정되어 있는지 확인
+        if (!currentTrack && tracks.length > 0) {
+          console.log("📀 현재 트랙이 없음 - 첫 번째 트랙 메타데이터 설정");
+          setTrackMetadata(tracks[currentIndex], currentIndex);
+        }
+
+        // 🔧 강제 재생: store 상태와 관계없이 audio element 직접 제어
+        if (audioElement) {
+          console.log("🎵 직접 재생 시도...");
+          await audioElement.play();
+          setIsPlaying(true);
+
+          // Media Session 상태 업데이트
+          if ("mediaSession" in navigator) {
+            navigator.mediaSession.playbackState = "playing";
+          }
+
+          console.log("✅ 직접 재생 성공!");
+        } else {
+          console.log("⚠️ 오디오 엘리먼트가 없음");
+        }
       } catch (error) {
         console.log("❌ 재생 에러:", error);
+        setIsPlaying(false);
       } finally {
-        // 200ms 후에 잠금 해제 (더 빠르게)
         setTimeout(() => {
           setIsProcessing(false);
           console.log("🔓 재생 잠금 해제");
@@ -253,41 +345,114 @@ export default function MainPageStory() {
     }
   }, [isMobile, currentIndex, tracks.length]);
 
-  // 오디오 설정 및 이벤트 리스너
+  // 오디오 설정 및 이벤트 리스너 (SSG 안전 처리)
   useEffect(() => {
-    if (!tracks.length) return;
+    // 🔧 SSG Hydration 완료 후에만 오디오 초기화
+    if (!tracks.length || !isClientMounted) {
+      console.log("⏳ 오디오 초기화 대기 중:", {
+        tracksLength: tracks.length,
+        isClientMounted,
+      });
+      return;
+    }
 
     const audio = audioRef.current;
     if (audio) {
       setAudioElement(audio);
 
-      const handlePlay = () => setIsPlaying(true);
-      const handlePause = () => setIsPlaying(false);
+      // 강화된 이벤트 리스너들
+      const handlePlay = () => {
+        console.log("🎵 오디오 재생 이벤트 감지됨");
+        setIsPlaying(true);
+
+        // Media Session 상태 즉시 동기화
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.playbackState = "playing";
+          console.log("📱 Media Session -> playing 상태로 변경");
+        }
+      };
+
+      const handlePause = () => {
+        console.log("⏸️ 오디오 일시정지 이벤트 감지됨");
+        setIsPlaying(false);
+
+        // Media Session 상태 즉시 동기화
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.playbackState = "paused";
+          console.log("📱 Media Session -> paused 상태로 변경");
+        }
+      };
+
       const handleEnded = () => {
-        console.log("🔚 곡 종료됨 - 무한 반복 재생");
-        // 현재 곡을 처음부터 다시 재생 (무한 반복)
-        if (audio) {
+        console.log("🔚 곡 종료됨 - 무한 반복 재생 검토");
+
+        // 현재 상태 확인
+        const currentState = {
+          storeIsPlaying: isPlaying,
+          actuallyPaused: audio.paused,
+          userWantsPause: !isPlaying, // store 상태가 false면 사용자가 일시정지를 원함
+        };
+
+        console.log("🔍 곡 종료 시점 상태:", currentState);
+
+        setIsPlaying(false);
+
+        // Media Session 상태 업데이트
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.playbackState = "paused";
+        }
+
+        // 사용자가 일시정지를 원하지 않을 때만 자동 반복 재생
+        if (currentState.storeIsPlaying) {
+          console.log("🔄 사용자가 재생을 원하므로 무한 반복 재생 시작");
           audio.currentTime = 0;
           audio.play().catch((error) => {
             console.log("❌ 자동 반복 재생 실패:", error);
           });
+        } else {
+          console.log("⏸️ 사용자가 일시정지를 원하므로 자동 반복 재생 안 함");
         }
       };
 
+      const handleError = (e: Event) => {
+        console.log("❌ 오디오 에러 발생:", e);
+        setIsPlaying(false);
+
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.playbackState = "paused";
+        }
+      };
+
+      const handleLoadStart = () => {
+        console.log("📀 오디오 로딩 시작");
+      };
+
+      const handleCanPlayThrough = () => {
+        console.log("✅ 오디오 재생 준비 완료");
+      };
+
+      // 이벤트 리스너 등록
       audio.addEventListener("play", handlePlay);
       audio.addEventListener("pause", handlePause);
       audio.addEventListener("ended", handleEnded);
+      audio.addEventListener("error", handleError);
+      audio.addEventListener("loadstart", handleLoadStart);
+      audio.addEventListener("canplaythrough", handleCanPlayThrough);
 
       // volume 설정
       audio.volume = isMuted ? 0 : 1;
+      console.log("🔊 오디오 볼륨 설정:", audio.volume, "음소거:", isMuted);
 
       return () => {
         audio.removeEventListener("play", handlePlay);
         audio.removeEventListener("pause", handlePause);
         audio.removeEventListener("ended", handleEnded);
+        audio.removeEventListener("error", handleError);
+        audio.removeEventListener("loadstart", handleLoadStart);
+        audio.removeEventListener("canplaythrough", handleCanPlayThrough);
       };
     }
-  }, [setAudioElement, setIsPlaying, isMuted, tracks.length]);
+  }, [setAudioElement, setIsPlaying, isMuted, tracks.length, isClientMounted]);
 
   // 트랙 인덱스와 currentIndex 동기화
   useEffect(() => {
@@ -299,24 +464,47 @@ export default function MainPageStory() {
           currentTrackIndex,
           currentIndex,
           track: tracks[currentIndex],
+          isCurrentlyPlaying: isPlaying,
         });
-        await playTrack(tracks[currentIndex], currentIndex);
+
+        // 현재 재생 중일 때만 자동으로 새 트랙 재생
+        // 일시정지 상태라면 메타데이터만 설정하고 재생하지 않음
+        if (isPlaying) {
+          console.log("▶️ 재생 중이므로 새 트랙 재생");
+          await playTrack(tracks[currentIndex], currentIndex);
+        } else {
+          console.log("⏸️ 일시정지 상태이므로 메타데이터만 설정");
+          setTrackMetadata(tracks[currentIndex], currentIndex);
+        }
       }
     };
 
     syncTrack();
-  }, [currentIndex, currentTrackIndex, tracks, playTrack]);
+  }, [
+    currentIndex,
+    currentTrackIndex,
+    tracks,
+    playTrack,
+    isPlaying,
+    setTrackMetadata,
+  ]);
 
-  // 첫 번째 트랙 자동 로딩 (처음 접속 시)
+  // 첫 번째 트랙 자동 로딩 (처음 접속 시, SSG 안전 처리)
   useEffect(() => {
-    if (tracks.length > 0 && !currentTrack && currentIndex === 0) {
+    // 🔧 SSG Hydration 완료 후에만 첫 트랙 설정
+    if (
+      tracks.length > 0 &&
+      !currentTrack &&
+      currentIndex === 0 &&
+      isClientMounted
+    ) {
       console.log("📀 첫 번째 트랙 자동 설정:", tracks[0].attributes.name);
-      // 재생은 하지 않고 메타데이터만 로드
-      playTrack(tracks[0], 0).catch((error) => {
-        console.log("⚠️ 첫 번째 트랙 로드 실패:", error);
-      });
+      console.log("ℹ️ 메타데이터만 설정하고 재생하지 않음 (사용자 의도 존중)");
+
+      // 메타데이터만 설정 (재생하지 않음)
+      setTrackMetadata(tracks[0], 0);
     }
-  }, [tracks, currentTrack, currentIndex, playTrack]);
+  }, [tracks, currentTrack, currentIndex, setTrackMetadata, isClientMounted]);
 
   // 모바일용 스크롤 이벤트 (개선된 감도 조정)
   useEffect(() => {
@@ -372,11 +560,28 @@ export default function MainPageStory() {
   useEffect(() => {
     let animationInterval: NodeJS.Timeout;
 
-    if (isPlaying && tracks.length) {
+    const checkAndUpdateAnimation = () => {
+      const audioElement = audioRef.current;
+      const actualIsPlaying = audioElement ? !audioElement.paused : false;
+
+      // 🔧 실제 audio element 상태로 애니메이션 제어
+      return actualIsPlaying && tracks.length > 0;
+    };
+
+    const startAnimation = () => {
       console.log("🔊 우퍼 진동 애니메이션 시작!");
       let frameCount = 0;
 
       animationInterval = setInterval(() => {
+        // 🔧 매 프레임마다 실제 재생 상태 확인
+        if (!checkAndUpdateAnimation()) {
+          console.log("🔇 실제 일시정지 감지 - 애니메이션 즉시 중지");
+          setAnimationScale(1);
+          setAnimationRotation(0);
+          clearInterval(animationInterval);
+          return;
+        }
+
         // 실제 우퍼처럼 자연스러운 진동 패턴
         const time = frameCount * 0.05; // 시간 흐름
 
@@ -410,14 +615,11 @@ export default function MainPageStory() {
         setAnimationRotation(0);
 
         frameCount++;
-
-        // 킥 드럼 순간만 로그
-        if (vibrationIntensity > 0.03) {
-          console.log(
-            `🔊 킥! 진동 강도: ${(vibrationIntensity * 100).toFixed(1)}%`
-          );
-        }
       }, 50); // 50ms = 부드러운 20fps
+    };
+
+    if (checkAndUpdateAnimation()) {
+      startAnimation();
     } else {
       console.log("🔇 우퍼 진동 중지");
       setAnimationScale(1);
@@ -429,7 +631,7 @@ export default function MainPageStory() {
         clearInterval(animationInterval);
       }
     };
-  }, [isPlaying, tracks.length]);
+  }, [isPlaying, tracks.length]); // store 상태 변경 시에도 확인
 
   // 로딩 상태나 에러 상태, 또는 트랙이 없을 때 처리
   if (isLoading || isInitialLoading || (isFetching && !data)) {
